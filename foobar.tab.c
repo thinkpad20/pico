@@ -458,37 +458,37 @@ namespace foobar {
       {
           case 4:
 /* Line 664 of lalr1.cc  */
-#line 83 "foobar.y"
+#line 84 "foobar.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].term)); }
     break;
 
   case 5:
 /* Line 664 of lalr1.cc  */
-#line 84 "foobar.y"
+#line 85 "foobar.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].assign), (yysemantic_stack_[(2) - (2)].expr)); }
     break;
 
   case 6:
 /* Line 664 of lalr1.cc  */
-#line 85 "foobar.y"
+#line 86 "foobar.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].if_s), (yysemantic_stack_[(2) - (2)].expr)); }
     break;
 
   case 8:
 /* Line 664 of lalr1.cc  */
-#line 90 "foobar.y"
+#line 91 "foobar.y"
     { (yyval.term) = make_log_or((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 10:
 /* Line 664 of lalr1.cc  */
-#line 95 "foobar.y"
+#line 96 "foobar.y"
     { (yyval.term) = make_log_and((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 12:
 /* Line 664 of lalr1.cc  */
-#line 101 "foobar.y"
+#line 102 "foobar.y"
     {
          switch ((yysemantic_stack_[(3) - (2)].ival)) {
             case 0: (yyval.term) = make_eq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); break;
@@ -503,79 +503,79 @@ namespace foobar {
 
   case 13:
 /* Line 664 of lalr1.cc  */
-#line 113 "foobar.y"
+#line 114 "foobar.y"
     {(yyval.ival) = 0;}
     break;
 
   case 14:
 /* Line 664 of lalr1.cc  */
-#line 113 "foobar.y"
+#line 114 "foobar.y"
     {(yyval.ival) = 1;}
     break;
 
   case 15:
 /* Line 664 of lalr1.cc  */
-#line 113 "foobar.y"
+#line 114 "foobar.y"
     {(yyval.ival) = 2;}
     break;
 
   case 16:
 /* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
+#line 115 "foobar.y"
     {(yyval.ival) = 3;}
     break;
 
   case 17:
 /* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
+#line 115 "foobar.y"
     {(yyval.ival) = 4;}
     break;
 
   case 18:
 /* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
+#line 115 "foobar.y"
     {(yyval.ival) = 5;}
     break;
 
   case 20:
 /* Line 664 of lalr1.cc  */
-#line 119 "foobar.y"
+#line 120 "foobar.y"
     { (yyval.term) = make_add((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found an addition\n"); }
     break;
 
   case 21:
 /* Line 664 of lalr1.cc  */
-#line 120 "foobar.y"
+#line 121 "foobar.y"
     { (yyval.term) = make_sub((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a subtraction\n"); }
     break;
 
   case 23:
 /* Line 664 of lalr1.cc  */
-#line 125 "foobar.y"
+#line 126 "foobar.y"
     { (yyval.term) = make_mult((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a multiplication\n"); }
     break;
 
   case 24:
 /* Line 664 of lalr1.cc  */
-#line 126 "foobar.y"
+#line 127 "foobar.y"
     { (yyval.term) = make_div((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a division\n"); }
     break;
 
   case 26:
 /* Line 664 of lalr1.cc  */
-#line 131 "foobar.y"
+#line 132 "foobar.y"
     { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 27:
 /* Line 664 of lalr1.cc  */
-#line 132 "foobar.y"
+#line 133 "foobar.y"
     { (yyval.term) = make_log_not((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 29:
 /* Line 664 of lalr1.cc  */
-#line 138 "foobar.y"
+#line 139 "foobar.y"
     { 
          (yyval.term) = new Term(new Invoke((yysemantic_stack_[(4) - (1)].term), (yysemantic_stack_[(4) - (3)].expr))); 
       }
@@ -583,88 +583,130 @@ namespace foobar {
 
   case 31:
 /* Line 664 of lalr1.cc  */
-#line 145 "foobar.y"
+#line 146 "foobar.y"
     { (yysemantic_stack_[(3) - (1)].expr)->append((yysemantic_stack_[(3) - (3)].expr)); (yyval.expr) = (yysemantic_stack_[(3) - (1)].expr); }
     break;
 
   case 33:
 /* Line 664 of lalr1.cc  */
-#line 150 "foobar.y"
+#line 151 "foobar.y"
     {(yyval.expr) = new Expression(); }
     break;
 
   case 35:
 /* Line 664 of lalr1.cc  */
-#line 155 "foobar.y"
+#line 156 "foobar.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var)); }
     break;
 
   case 36:
 /* Line 664 of lalr1.cc  */
-#line 156 "foobar.y"
+#line 157 "foobar.y"
     { (yyval.term) = make_parens((yysemantic_stack_[(3) - (2)].expr)); }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
-#line 157 "foobar.y"
+#line 158 "foobar.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var)); }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
-#line 160 "foobar.y"
+#line 161 "foobar.y"
     { (yyval.var) = (yysemantic_stack_[(2) - (2)].var); }
     break;
 
-  case 46:
+  case 39:
+/* Line 664 of lalr1.cc  */
+#line 164 "foobar.y"
+    { (yyval.strval) = "Any"; }
+    break;
+
+  case 40:
 /* Line 664 of lalr1.cc  */
 #line 165 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
+    { (yyval.strval) = "Int"; }
+    break;
+
+  case 41:
+/* Line 664 of lalr1.cc  */
+#line 166 "foobar.y"
+    {(yyval.strval) = "Float"; }
+    break;
+
+  case 42:
+/* Line 664 of lalr1.cc  */
+#line 167 "foobar.y"
+    {(yyval.strval) = "String"; }
+    break;
+
+  case 43:
+/* Line 664 of lalr1.cc  */
+#line 168 "foobar.y"
+    { (yyval.strval) = "Array"; }
+    break;
+
+  case 44:
+/* Line 664 of lalr1.cc  */
+#line 169 "foobar.y"
+    { (yyval.strval) = "List"; }
+    break;
+
+  case 45:
+/* Line 664 of lalr1.cc  */
+#line 170 "foobar.y"
+    { (yyval.strval) = "Table"; }
     break;
 
   case 47:
 /* Line 664 of lalr1.cc  */
-#line 166 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
+#line 175 "foobar.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 48:
 /* Line 664 of lalr1.cc  */
-#line 167 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
+#line 176 "foobar.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
     break;
 
   case 49:
 /* Line 664 of lalr1.cc  */
-#line 168 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
+#line 177 "foobar.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 50:
 /* Line 664 of lalr1.cc  */
-#line 171 "foobar.y"
-    { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); printf("saw var %s\n", (yysemantic_stack_[(1) - (1)].strval)->c_str()); }
+#line 178 "foobar.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
     break;
 
   case 51:
 /* Line 664 of lalr1.cc  */
-#line 175 "foobar.y"
+#line 181 "foobar.y"
+    { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
+    break;
+
+  case 52:
+/* Line 664 of lalr1.cc  */
+#line 185 "foobar.y"
     { 
          (yyval.assign) = new Assign((yysemantic_stack_[(3) - (1)].var), (yysemantic_stack_[(3) - (3)].expr));
          (yyval.assign)->print();
       }
     break;
 
-  case 52:
+  case 53:
 /* Line 664 of lalr1.cc  */
-#line 181 "foobar.y"
+#line 191 "foobar.y"
     { (yyval.if_s) = new If((yysemantic_stack_[(5) - (2)].term), (yysemantic_stack_[(5) - (4)].expr)); }
     break;
 
 
 /* Line 664 of lalr1.cc  */
-#line 668 "foobar.tab.c"
+#line 710 "foobar.tab.c"
       default:
         break;
       }
@@ -964,18 +1006,18 @@ namespace foobar {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char BisonParser::yypact_ninf_ = -47;
+  const signed char BisonParser::yypact_ninf_ = -41;
   const signed char
   BisonParser::yypact_[] =
   {
-        80,   -47,   -47,   -47,   -47,   -47,   104,   -47,   104,   -47,
-     -47,   -47,   -47,   -47,   -47,   104,    80,    42,   -47,   -27,
-      -9,   -20,   -47,   -37,   -30,   -46,   -47,   -47,    -8,   -47,
-     -21,    80,    80,    -6,   -47,   -47,   -47,   -18,   -47,   -47,
-     104,   -47,   104,   -47,   -47,   -47,   -47,   -47,   -47,   104,
-     104,   104,   104,   104,    80,   -47,    80,   -47,   -47,    80,
-     -47,    -9,   -20,   -47,   -47,   -47,   -47,   -47,   -47,   -31,
-     -47,   -47,     8,   -47,    80,   -47,   -47
+        59,   -41,   -41,   -41,   -41,   -41,    97,   -41,   -41,    97,
+     -41,   -41,   -41,   -41,   -41,   -41,    97,    59,     1,   -41,
+     -21,   -26,    -1,   -41,   -39,    -8,   -40,   -41,   -41,   -14,
+     -41,   -30,    59,    59,    16,   -41,   -41,   -41,   -19,   -41,
+     -41,    97,   -41,    97,   -41,   -41,   -41,   -41,   -41,   -41,
+      97,    97,    97,    97,    97,    59,   -41,    59,   -41,   -41,
+      59,   -41,   -26,    -1,   -41,   -41,   -41,   -41,   -41,   -41,
+      -6,   -41,   -41,    12,   -41,    59,   -41,   -41
   };
 
   /* YYDEFACT[S] -- default reduction number in state S.  Performed when
@@ -984,30 +1026,30 @@ namespace foobar {
   const unsigned char
   BisonParser::yydefact_[] =
   {
-         0,    39,    40,    41,    42,    44,     0,    43,     0,    50,
-      45,    48,    47,    46,    49,     0,     0,     0,     2,     0,
-       7,     9,    11,    19,    22,    25,    28,    37,     0,    34,
-      35,     0,     0,     0,    35,    27,    26,     0,     1,     3,
-       0,     4,     0,    16,    18,    13,    17,    14,    15,     0,
-       0,     0,     0,     0,    33,    38,     0,     5,     6,     0,
-      36,     8,    10,    12,    20,    21,    23,    24,    32,     0,
-      30,    51,     0,    29,    33,    52,    31
+         0,    40,    41,    42,    43,    45,     0,    39,    44,     0,
+      51,    46,    49,    48,    47,    50,     0,     0,     0,     2,
+       0,     7,     9,    11,    19,    22,    25,    28,    37,     0,
+      34,    35,     0,     0,     0,    35,    27,    26,     0,     1,
+       3,     0,     4,     0,    16,    18,    13,    17,    14,    15,
+       0,     0,     0,     0,     0,    33,    38,     0,     5,     6,
+       0,    36,     8,    10,    12,    20,    21,    23,    24,    32,
+       0,    30,    52,     0,    29,    33,    53,    31
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yypgoto_[] =
   {
-       -47,   -47,     2,    34,     1,     3,   -47,   -38,   -17,    -5,
-     -47,   -47,   -26,   -47,   -47,   -47,   -47,     0,   -47,   -47
+       -41,   -41,     2,    41,    11,    15,   -41,    19,    23,    -5,
+     -41,   -41,   -10,   -41,   -41,   -41,   -41,     0,   -41,   -41
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yydefgoto_[] =
   {
-        -1,    17,    68,    19,    20,    21,    49,    22,    23,    24,
-      25,    69,    70,    26,    27,    28,    29,    34,    31,    32
+        -1,    18,    69,    20,    21,    22,    50,    23,    24,    25,
+      26,    70,    71,    27,    28,    29,    30,    35,    32,    33
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -1017,44 +1059,44 @@ namespace foobar {
   const unsigned char
   BisonParser::yytable_[] =
   {
-        30,    40,    18,    35,    43,    44,    45,    46,    59,    54,
-      36,    63,    64,    65,    50,    51,    30,    30,    37,    39,
-      42,    41,    40,    52,    53,    73,    74,     9,    55,    47,
-      48,    30,    30,    57,    58,    66,    67,    56,    60,    75,
-      33,    61,    38,     0,     0,    62,     1,     2,    76,     3,
-       4,     5,     0,     0,    30,     6,    30,     0,    71,    30,
-       0,    72,     0,     7,     0,     0,     0,     0,     0,     0,
-       0,     0,     8,     0,    30,     0,     0,     9,     0,    10,
-      11,    12,    13,    14,     1,     2,     0,     3,     4,     5,
-       0,     0,     0,     6,    15,     0,     0,    16,     0,     0,
-       0,     7,     0,     0,     0,     0,     0,     0,     1,     2,
-       8,     3,     4,     5,     0,     9,     0,    10,    11,    12,
-      13,    14,     0,     0,     0,     7,     0,     0,     0,     0,
-       0,     0,    15,     0,     8,    16,     0,     0,     0,     9,
-       0,    10,    11,    12,    13,    14,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    15,     0,     0,    16
+        31,    39,    19,    43,    36,     1,     2,    41,     3,     4,
+       5,    37,    51,    52,     6,    55,     7,    31,    31,    38,
+      40,    10,     8,    44,    45,    46,    47,    42,    57,    56,
+      60,     9,    31,    31,    58,    59,    10,    61,    11,    12,
+      13,    14,    15,    76,    41,    53,    54,    34,    48,    49,
+      74,    75,    62,    16,     0,    31,    17,    31,    63,    72,
+      31,     0,    73,     1,     2,    77,     3,     4,     5,    64,
+      65,    66,     6,     0,     7,    31,    67,    68,     0,     0,
+       8,     0,     0,     0,     0,     0,     0,     0,     0,     9,
+       0,     0,     0,     0,    10,     0,    11,    12,    13,    14,
+      15,     1,     2,     0,     3,     4,     5,     0,     0,     0,
+       0,    16,     7,     0,    17,     0,     0,     0,     8,     0,
+       0,     0,     0,     0,     0,     0,     0,     9,     0,     0,
+       0,     0,    10,     0,    11,    12,    13,    14,    15,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    16,
+       0,     0,    17
   };
 
   /* YYCHECK.  */
   const signed char
   BisonParser::yycheck_[] =
   {
-         0,    28,     0,     8,    24,    25,    26,    27,    14,    55,
-      15,    49,    50,    51,    51,    52,    16,    17,    16,    17,
-      29,    48,    28,    53,    54,    56,    57,    35,    28,    49,
-      50,    31,    32,    31,    32,    52,    53,    58,    56,    31,
-       6,    40,     0,    -1,    -1,    42,     4,     5,    74,     7,
-       8,     9,    -1,    -1,    54,    13,    56,    -1,    56,    59,
-      -1,    59,    -1,    21,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    30,    -1,    74,    -1,    -1,    35,    -1,    37,
-      38,    39,    40,    41,     4,     5,    -1,     7,     8,     9,
-      -1,    -1,    -1,    13,    52,    -1,    -1,    55,    -1,    -1,
-      -1,    21,    -1,    -1,    -1,    -1,    -1,    -1,     4,     5,
-      30,     7,     8,     9,    -1,    35,    -1,    37,    38,    39,
-      40,    41,    -1,    -1,    -1,    21,    -1,    -1,    -1,    -1,
-      -1,    -1,    52,    -1,    30,    55,    -1,    -1,    -1,    35,
-      -1,    37,    38,    39,    40,    41,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    52,    -1,    -1,    55
+         0,     0,     0,    29,     9,     4,     5,    28,     7,     8,
+       9,    16,    51,    52,    13,    55,    15,    17,    18,    17,
+      18,    35,    21,    24,    25,    26,    27,    48,    58,    29,
+      14,    30,    32,    33,    32,    33,    35,    56,    37,    38,
+      39,    40,    41,    31,    28,    53,    54,     6,    49,    50,
+      56,    57,    41,    52,    -1,    55,    55,    57,    43,    57,
+      60,    -1,    60,     4,     5,    75,     7,     8,     9,    50,
+      51,    52,    13,    -1,    15,    75,    53,    54,    -1,    -1,
+      21,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,
+      -1,    -1,    -1,    -1,    35,    -1,    37,    38,    39,    40,
+      41,     4,     5,    -1,     7,     8,     9,    -1,    -1,    -1,
+      -1,    52,    15,    -1,    55,    -1,    -1,    -1,    21,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,    -1,    -1,
+      -1,    -1,    35,    -1,    37,    38,    39,    40,    41,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    52,
+      -1,    -1,    55
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -1062,14 +1104,14 @@ namespace foobar {
   const unsigned char
   BisonParser::yystos_[] =
   {
-         0,     4,     5,     7,     8,     9,    13,    21,    30,    35,
-      37,    38,    39,    40,    41,    52,    55,    60,    61,    62,
-      63,    64,    66,    67,    68,    69,    72,    73,    74,    75,
-      76,    77,    78,    62,    76,    68,    68,    61,     0,    61,
-      28,    48,    29,    24,    25,    26,    27,    49,    50,    65,
-      51,    52,    53,    54,    55,    76,    58,    61,    61,    14,
-      56,    63,    64,    66,    66,    66,    67,    67,    61,    70,
-      71,    61,    61,    56,    57,    31,    71
+         0,     4,     5,     7,     8,     9,    13,    15,    21,    30,
+      35,    37,    38,    39,    40,    41,    52,    55,    60,    61,
+      62,    63,    64,    66,    67,    68,    69,    72,    73,    74,
+      75,    76,    77,    78,    62,    76,    68,    68,    61,     0,
+      61,    28,    48,    29,    24,    25,    26,    27,    49,    50,
+      65,    51,    52,    53,    54,    55,    76,    58,    61,    61,
+      14,    56,    63,    64,    66,    66,    66,    67,    67,    61,
+      70,    71,    61,    61,    56,    57,    31,    71
   };
 
 #if YYDEBUG
@@ -1095,8 +1137,8 @@ namespace foobar {
       63,    64,    64,    65,    65,    65,    65,    65,    65,    66,
       66,    66,    67,    67,    67,    68,    68,    68,    69,    69,
       70,    70,    71,    71,    72,    72,    72,    72,    73,    74,
-      74,    74,    74,    74,    74,    74,    75,    75,    75,    75,
-      76,    77,    78
+      74,    74,    74,    74,    74,    74,    74,    75,    75,    75,
+      75,    76,    77,    78
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -1108,7 +1150,7 @@ namespace foobar {
        3,     3,     1,     3,     3,     1,     2,     2,     1,     4,
        1,     3,     1,     0,     1,     1,     3,     1,     2,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     3,     5
+       1,     1,     3,     5
   };
 
 
@@ -1145,10 +1187,10 @@ namespace foobar {
       68,    -1,    30,    68,    -1,    72,    -1,    69,    55,    70,
       56,    -1,    71,    -1,    70,    57,    71,    -1,    61,    -1,
       -1,    75,    -1,    76,    -1,    55,    61,    56,    -1,    73,
-      -1,    74,    76,    -1,     4,    -1,     5,    -1,     7,    -1,
-       8,    -1,    21,    -1,     9,    -1,    37,    -1,    40,    -1,
-      39,    -1,    38,    -1,    41,    -1,    35,    -1,    76,    58,
-      61,    -1,    13,    62,    14,    61,    31,    -1
+      -1,    74,    76,    -1,    15,    -1,     4,    -1,     5,    -1,
+       7,    -1,     8,    -1,    21,    -1,     9,    -1,    37,    -1,
+      40,    -1,    39,    -1,    38,    -1,    41,    -1,    35,    -1,
+      76,    58,    61,    -1,    13,    62,    14,    61,    31,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -1161,19 +1203,19 @@ namespace foobar {
       49,    53,    57,    59,    63,    67,    69,    72,    75,    77,
       82,    84,    88,    90,    91,    93,    95,    99,   101,   104,
      106,   108,   110,   112,   114,   116,   118,   120,   122,   124,
-     126,   128,   132
+     126,   128,   130,   134
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    80,    80,    80,    83,    84,    85,    89,    90,    94,
-      95,    99,   100,   113,   113,   113,   114,   114,   114,   118,
-     119,   120,   124,   125,   126,   130,   131,   132,   136,   137,
-     144,   145,   149,   150,   154,   155,   156,   157,   160,   162,
-     162,   162,   162,   162,   162,   162,   165,   166,   167,   168,
-     171,   174,   181
+         0,    81,    81,    81,    84,    85,    86,    90,    91,    95,
+      96,   100,   101,   114,   114,   114,   115,   115,   115,   119,
+     120,   121,   125,   126,   127,   131,   132,   133,   137,   138,
+     145,   146,   150,   151,   155,   156,   157,   158,   161,   164,
+     165,   166,   167,   168,   169,   170,   171,   175,   176,   177,
+     178,   181,   184,   191
   };
 
   // Print the state stack on the debug stream.
@@ -1252,10 +1294,10 @@ namespace foobar {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 159;
+  const int BisonParser::yylast_ = 152;
   const int BisonParser::yynnts_ = 20;
   const int BisonParser::yyempty_ = -2;
-  const int BisonParser::yyfinal_ = 38;
+  const int BisonParser::yyfinal_ = 39;
   const int BisonParser::yyterror_ = 1;
   const int BisonParser::yyerrcode_ = 256;
   const int BisonParser::yyntokens_ = 59;
@@ -1267,9 +1309,9 @@ namespace foobar {
 #line 11 "foobar.y"
 } // foobar
 /* Line 1135 of lalr1.cc  */
-#line 1271 "foobar.tab.c"
+#line 1313 "foobar.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 183 "foobar.y"
+#line 193 "foobar.y"
 
 
 // We have to implement the error function

@@ -58,6 +58,7 @@ int yydebug = 1;
 %token <cval> CHAR_LITERAL
 %token <ival> INTEGER
 
+%type <strval> typename
 %type <expr> expr expr_list opt_expr
 %type <term> term mult_term unary_term literal invocation primary
 %type <term> add_term comp_term and_term
