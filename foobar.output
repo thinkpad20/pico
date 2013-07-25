@@ -1,0 +1,1970 @@
+Terminals unused in grammar
+
+   FN
+   CHAR
+   ALG
+   WHEN
+   END
+   ANY
+   RETURN
+   IS
+   DO
+   IO
+   IOFN
+   SL
+   SR
+   BOOL
+   TRUE
+   FALSE
+   SYMBOL
+   INTEGER
+   COMP
+   LOGICAL
+   ADDITIVE
+   MULTI
+   UNARY
+
+
+Grammar
+
+    0 $accept: exprs $end
+
+    1 exprs: expr
+    2      | exprs expr
+
+    3 expr: term '.'
+    4     | assign expr
+    5     | if expr
+
+    6 term: and_term
+    7     | term OR and_term
+
+    8 and_term: comp_term
+    9         | and_term AND comp_term
+
+   10 comp_term: add_term
+   11          | comp_term comp add_term
+
+   12 comp: EQ
+   13     | '<'
+   14     | '>'
+   15     | LEQ
+   16     | NEQ
+   17     | GEQ
+
+   18 add_term: mult_term
+   19         | mult_term '+' add_term
+   20         | mult_term '-' add_term
+
+   21 mult_term: unary_term
+   22          | unary_term '*' mult_term
+   23          | unary_term '/' mult_term
+
+   24 unary_term: invocation
+   25           | '-' unary_term
+   26           | NOT unary_term
+
+   27 invocation: primary
+   28           | invocation '(' expr_list ')'
+
+   29 expr_list: opt_expr
+   30          | expr_list ',' opt_expr
+
+   31 opt_expr: expr
+   32         | /* empty */
+
+   33 primary: literal
+   34        | var
+   35        | '(' expr ')'
+   36        | undef_var
+
+   37 undef_var: typename var
+
+   38 typename: INT
+   39         | FLOAT
+   40         | STRING
+   41         | ARRAY
+   42         | LIST
+   43         | TABLE
+   44         | TYPENAME
+
+   45 literal: INT_LITERAL
+   46        | FLOAT_LITERAL
+   47        | STRING_LITERAL
+   48        | CHAR_LITERAL
+
+   49 var: ID
+
+   50 assign: var '=' expr
+
+   51 if: IF term THEN expr ELSE
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 28 35
+')' (41) 28 35
+'*' (42) 22
+'+' (43) 19
+',' (44) 30
+'-' (45) 20 25
+'.' (46) 3
+'/' (47) 23
+'<' (60) 13
+'=' (61) 50
+'>' (62) 14
+error (256)
+FN (258)
+INT (259) 38
+FLOAT (260) 39
+CHAR (261)
+STRING (262) 40
+ARRAY (263) 41
+TABLE (264) 43
+ALG (265)
+WHEN (266)
+END (267)
+IF (268) 51
+THEN (269) 51
+ANY (270)
+RETURN (271)
+IS (272)
+DO (273)
+IO (274)
+IOFN (275)
+LIST (276) 42
+SL (277)
+SR (278)
+LEQ (279) 15
+GEQ (280) 17
+EQ (281) 12
+NEQ (282) 16
+OR (283) 7
+AND (284) 9
+NOT (285) 26
+ELSE (286) 51
+BOOL (287)
+TRUE (288)
+FALSE (289)
+ID (290) 49
+SYMBOL (291)
+TYPENAME (292) 44
+STRING_LITERAL (293) 47
+FLOAT_LITERAL (294) 46
+INT_LITERAL (295) 45
+CHAR_LITERAL (296) 48
+INTEGER (297)
+COMP (298)
+LOGICAL (299)
+ADDITIVE (300)
+MULTI (301)
+UNARY (302)
+
+
+Nonterminals, with rules where they appear
+
+$accept (59)
+    on left: 0
+exprs (60)
+    on left: 1 2, on right: 0 2
+expr (61)
+    on left: 3 4 5, on right: 1 2 4 5 31 35 50 51
+term (62)
+    on left: 6 7, on right: 3 7 51
+and_term (63)
+    on left: 8 9, on right: 6 7 9
+comp_term (64)
+    on left: 10 11, on right: 8 9 11
+comp (65)
+    on left: 12 13 14 15 16 17, on right: 11
+add_term (66)
+    on left: 18 19 20, on right: 10 11 19 20
+mult_term (67)
+    on left: 21 22 23, on right: 18 19 20 22 23
+unary_term (68)
+    on left: 24 25 26, on right: 21 22 23 25 26
+invocation (69)
+    on left: 27 28, on right: 24 28
+expr_list (70)
+    on left: 29 30, on right: 28 30
+opt_expr (71)
+    on left: 31 32, on right: 29 30
+primary (72)
+    on left: 33 34 35 36, on right: 27
+undef_var (73)
+    on left: 37, on right: 36
+typename (74)
+    on left: 38 39 40 41 42 43 44, on right: 37
+literal (75)
+    on left: 45 46 47 48, on right: 33
+var (76)
+    on left: 49, on right: 34 37 50
+assign (77)
+    on left: 50, on right: 4
+if (78)
+    on left: 51, on right: 5
+
+
+State 0
+
+    0 $accept: . exprs $end
+    1 exprs: . expr
+    2      | . exprs expr
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    exprs       go to state 17
+    expr        go to state 18
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 1
+
+   38 typename: INT .
+
+    $default  reduce using rule 38 (typename)
+
+
+State 2
+
+   39 typename: FLOAT .
+
+    $default  reduce using rule 39 (typename)
+
+
+State 3
+
+   40 typename: STRING .
+
+    $default  reduce using rule 40 (typename)
+
+
+State 4
+
+   41 typename: ARRAY .
+
+    $default  reduce using rule 41 (typename)
+
+
+State 5
+
+   43 typename: TABLE .
+
+    $default  reduce using rule 43 (typename)
+
+
+State 6
+
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   51 if: IF . term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    term        go to state 33
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 7
+
+   42 typename: LIST .
+
+    $default  reduce using rule 42 (typename)
+
+
+State 8
+
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   26           | NOT . unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    unary_term  go to state 35
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 9
+
+   49 var: ID .
+
+    $default  reduce using rule 49 (var)
+
+
+State 10
+
+   44 typename: TYPENAME .
+
+    $default  reduce using rule 44 (typename)
+
+
+State 11
+
+   47 literal: STRING_LITERAL .
+
+    $default  reduce using rule 47 (literal)
+
+
+State 12
+
+   46 literal: FLOAT_LITERAL .
+
+    $default  reduce using rule 46 (literal)
+
+
+State 13
+
+   45 literal: INT_LITERAL .
+
+    $default  reduce using rule 45 (literal)
+
+
+State 14
+
+   48 literal: CHAR_LITERAL .
+
+    $default  reduce using rule 48 (literal)
+
+
+State 15
+
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   25           | '-' . unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    unary_term  go to state 36
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 16
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   35        | '(' . expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 37
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 17
+
+    0 $accept: exprs . $end
+    2 exprs: exprs . expr
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    $end            shift, and go to state 38
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 39
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 18
+
+    1 exprs: expr .
+
+    $default  reduce using rule 1 (exprs)
+
+
+State 19
+
+    3 expr: term . '.'
+    7 term: term . OR and_term
+
+    OR   shift, and go to state 40
+    '.'  shift, and go to state 41
+
+
+State 20
+
+    6 term: and_term .  [THEN, OR, '.']
+    9 and_term: and_term . AND comp_term
+
+    AND  shift, and go to state 42
+
+    $default  reduce using rule 6 (term)
+
+
+State 21
+
+    8 and_term: comp_term .  [THEN, OR, AND, '.']
+   11 comp_term: comp_term . comp add_term
+   12 comp: . EQ
+   13     | . '<'
+   14     | . '>'
+   15     | . LEQ
+   16     | . NEQ
+   17     | . GEQ
+
+    LEQ  shift, and go to state 43
+    GEQ  shift, and go to state 44
+    EQ   shift, and go to state 45
+    NEQ  shift, and go to state 46
+    '<'  shift, and go to state 47
+    '>'  shift, and go to state 48
+
+    $default  reduce using rule 8 (and_term)
+
+    comp  go to state 49
+
+
+State 22
+
+   10 comp_term: add_term .
+
+    $default  reduce using rule 10 (comp_term)
+
+
+State 23
+
+   18 add_term: mult_term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '.', '<', '>']
+   19         | mult_term . '+' add_term
+   20         | mult_term . '-' add_term
+
+    '+'  shift, and go to state 50
+    '-'  shift, and go to state 51
+
+    $default  reduce using rule 18 (add_term)
+
+
+State 24
+
+   21 mult_term: unary_term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '.', '<', '>', '+', '-']
+   22          | unary_term . '*' mult_term
+   23          | unary_term . '/' mult_term
+
+    '*'  shift, and go to state 52
+    '/'  shift, and go to state 53
+
+    $default  reduce using rule 21 (mult_term)
+
+
+State 25
+
+   24 unary_term: invocation .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '.', '<', '>', '+', '-', '*', '/']
+   28 invocation: invocation . '(' expr_list ')'
+
+    '('  shift, and go to state 54
+
+    $default  reduce using rule 24 (unary_term)
+
+
+State 26
+
+   27 invocation: primary .
+
+    $default  reduce using rule 27 (invocation)
+
+
+State 27
+
+   36 primary: undef_var .
+
+    $default  reduce using rule 36 (primary)
+
+
+State 28
+
+   37 undef_var: typename . var
+   49 var: . ID
+
+    ID  shift, and go to state 9
+
+    var  go to state 55
+
+
+State 29
+
+   33 primary: literal .
+
+    $default  reduce using rule 33 (primary)
+
+
+State 30
+
+   34 primary: var .  [LEQ, GEQ, EQ, NEQ, OR, AND, '.', '<', '>', '+', '-', '*', '/', '(']
+   50 assign: var . '=' expr
+
+    '='  shift, and go to state 56
+
+    $default  reduce using rule 34 (primary)
+
+
+State 31
+
+    3 expr: . term '.'
+    4     | . assign expr
+    4     | assign . expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 57
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 32
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    5     | if . expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 58
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 33
+
+    7 term: term . OR and_term
+   51 if: IF term . THEN expr ELSE
+
+    THEN  shift, and go to state 59
+    OR    shift, and go to state 40
+
+
+State 34
+
+   34 primary: var .
+
+    $default  reduce using rule 34 (primary)
+
+
+State 35
+
+   26 unary_term: NOT unary_term .
+
+    $default  reduce using rule 26 (unary_term)
+
+
+State 36
+
+   25 unary_term: '-' unary_term .
+
+    $default  reduce using rule 25 (unary_term)
+
+
+State 37
+
+   35 primary: '(' expr . ')'
+
+    ')'  shift, and go to state 60
+
+
+State 38
+
+    0 $accept: exprs $end .
+
+    $default  accept
+
+
+State 39
+
+    2 exprs: exprs expr .
+
+    $default  reduce using rule 2 (exprs)
+
+
+State 40
+
+    7 term: term OR . and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    and_term    go to state 61
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 41
+
+    3 expr: term '.' .
+
+    $default  reduce using rule 3 (expr)
+
+
+State 42
+
+    9 and_term: and_term AND . comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    comp_term   go to state 62
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 43
+
+   15 comp: LEQ .
+
+    $default  reduce using rule 15 (comp)
+
+
+State 44
+
+   17 comp: GEQ .
+
+    $default  reduce using rule 17 (comp)
+
+
+State 45
+
+   12 comp: EQ .
+
+    $default  reduce using rule 12 (comp)
+
+
+State 46
+
+   16 comp: NEQ .
+
+    $default  reduce using rule 16 (comp)
+
+
+State 47
+
+   13 comp: '<' .
+
+    $default  reduce using rule 13 (comp)
+
+
+State 48
+
+   14 comp: '>' .
+
+    $default  reduce using rule 14 (comp)
+
+
+State 49
+
+   11 comp_term: comp_term comp . add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    add_term    go to state 63
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 50
+
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   19         | mult_term '+' . add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    add_term    go to state 64
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 51
+
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   20         | mult_term '-' . add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    add_term    go to state 65
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 52
+
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   22          | unary_term '*' . mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    mult_term   go to state 66
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 53
+
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   23          | unary_term '/' . mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    mult_term   go to state 67
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 34
+
+
+State 54
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   28           | invocation '(' . expr_list ')'
+   29 expr_list: . opt_expr
+   30          | . expr_list ',' opt_expr
+   31 opt_expr: . expr
+   32         | .  [')', ',']
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 32 (opt_expr)
+
+    expr        go to state 68
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    expr_list   go to state 69
+    opt_expr    go to state 70
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 55
+
+   37 undef_var: typename var .
+
+    $default  reduce using rule 37 (undef_var)
+
+
+State 56
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   50       | var '=' . expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 71
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 57
+
+    4 expr: assign expr .
+
+    $default  reduce using rule 4 (expr)
+
+
+State 58
+
+    5 expr: if expr .
+
+    $default  reduce using rule 5 (expr)
+
+
+State 59
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+   51   | IF term THEN . expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    expr        go to state 72
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 60
+
+   35 primary: '(' expr ')' .
+
+    $default  reduce using rule 35 (primary)
+
+
+State 61
+
+    7 term: term OR and_term .  [THEN, OR, '.']
+    9 and_term: and_term . AND comp_term
+
+    AND  shift, and go to state 42
+
+    $default  reduce using rule 7 (term)
+
+
+State 62
+
+    9 and_term: and_term AND comp_term .  [THEN, OR, AND, '.']
+   11 comp_term: comp_term . comp add_term
+   12 comp: . EQ
+   13     | . '<'
+   14     | . '>'
+   15     | . LEQ
+   16     | . NEQ
+   17     | . GEQ
+
+    LEQ  shift, and go to state 43
+    GEQ  shift, and go to state 44
+    EQ   shift, and go to state 45
+    NEQ  shift, and go to state 46
+    '<'  shift, and go to state 47
+    '>'  shift, and go to state 48
+
+    $default  reduce using rule 9 (and_term)
+
+    comp  go to state 49
+
+
+State 63
+
+   11 comp_term: comp_term comp add_term .
+
+    $default  reduce using rule 11 (comp_term)
+
+
+State 64
+
+   19 add_term: mult_term '+' add_term .
+
+    $default  reduce using rule 19 (add_term)
+
+
+State 65
+
+   20 add_term: mult_term '-' add_term .
+
+    $default  reduce using rule 20 (add_term)
+
+
+State 66
+
+   22 mult_term: unary_term '*' mult_term .
+
+    $default  reduce using rule 22 (mult_term)
+
+
+State 67
+
+   23 mult_term: unary_term '/' mult_term .
+
+    $default  reduce using rule 23 (mult_term)
+
+
+State 68
+
+   31 opt_expr: expr .
+
+    $default  reduce using rule 31 (opt_expr)
+
+
+State 69
+
+   28 invocation: invocation '(' expr_list . ')'
+   30 expr_list: expr_list . ',' opt_expr
+
+    ')'  shift, and go to state 73
+    ','  shift, and go to state 74
+
+
+State 70
+
+   29 expr_list: opt_expr .
+
+    $default  reduce using rule 29 (expr_list)
+
+
+State 71
+
+   50 assign: var '=' expr .
+
+    $default  reduce using rule 50 (assign)
+
+
+State 72
+
+   51 if: IF term THEN expr . ELSE
+
+    ELSE  shift, and go to state 75
+
+
+State 73
+
+   28 invocation: invocation '(' expr_list ')' .
+
+    $default  reduce using rule 28 (invocation)
+
+
+State 74
+
+    3 expr: . term '.'
+    4     | . assign expr
+    5     | . if expr
+    6 term: . and_term
+    7     | . term OR and_term
+    8 and_term: . comp_term
+    9         | . and_term AND comp_term
+   10 comp_term: . add_term
+   11          | . comp_term comp add_term
+   18 add_term: . mult_term
+   19         | . mult_term '+' add_term
+   20         | . mult_term '-' add_term
+   21 mult_term: . unary_term
+   22          | . unary_term '*' mult_term
+   23          | . unary_term '/' mult_term
+   24 unary_term: . invocation
+   25           | . '-' unary_term
+   26           | . NOT unary_term
+   27 invocation: . primary
+   28           | . invocation '(' expr_list ')'
+   30 expr_list: expr_list ',' . opt_expr
+   31 opt_expr: . expr
+   32         | .  [')', ',']
+   33 primary: . literal
+   34        | . var
+   35        | . '(' expr ')'
+   36        | . undef_var
+   37 undef_var: . typename var
+   38 typename: . INT
+   39         | . FLOAT
+   40         | . STRING
+   41         | . ARRAY
+   42         | . LIST
+   43         | . TABLE
+   44         | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49 var: . ID
+   50 assign: . var '=' expr
+   51 if: . IF term THEN expr ELSE
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    LIST            shift, and go to state 7
+    NOT             shift, and go to state 8
+    ID              shift, and go to state 9
+    TYPENAME        shift, and go to state 10
+    STRING_LITERAL  shift, and go to state 11
+    FLOAT_LITERAL   shift, and go to state 12
+    INT_LITERAL     shift, and go to state 13
+    CHAR_LITERAL    shift, and go to state 14
+    '-'             shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 32 (opt_expr)
+
+    expr        go to state 68
+    term        go to state 19
+    and_term    go to state 20
+    comp_term   go to state 21
+    add_term    go to state 22
+    mult_term   go to state 23
+    unary_term  go to state 24
+    invocation  go to state 25
+    opt_expr    go to state 76
+    primary     go to state 26
+    undef_var   go to state 27
+    typename    go to state 28
+    literal     go to state 29
+    var         go to state 30
+    assign      go to state 31
+    if          go to state 32
+
+
+State 75
+
+   51 if: IF term THEN expr ELSE .
+
+    $default  reduce using rule 51 (if)
+
+
+State 76
+
+   30 expr_list: expr_list ',' opt_expr .
+
+    $default  reduce using rule 30 (expr_list)
