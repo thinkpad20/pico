@@ -1,7 +1,7 @@
-#include "foobarScanner.h"
+#include "picoScanner.h"
 #include "expression.h"
 
-namespace foobar {
+namespace pico {
    class Parser {
       public:
          Parser() : parser(scanner) {}
@@ -13,15 +13,15 @@ namespace foobar {
             parser.set_debug_level(level);
          }
       private:
-         foobar::FlexScanner scanner;
-         foobar::BisonParser parser;
+         pico::FlexScanner scanner;
+         pico::BisonParser parser;
    };
 }
 
 // Entry Point
 int main(int argc, char * argv[]) {
-	foobar::Parser parser;
-   foobar::Initialize();
+	pico::Parser parser;
+   pico::Initialize();
    if (argc > 1 && !strcmp(argv[1], "debug"))
       parser.set_debug_level(1);
 	return parser.parse();

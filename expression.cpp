@@ -2,7 +2,7 @@
 
 using std::string;
 
-namespace foobar {
+namespace pico {
 
 static int indent = 0;
 
@@ -43,12 +43,13 @@ Expression::~Expression() {
 }
 Var::~Var() { delete name; }
 If::~If() { delete cond; delete if_true; }
-Assign::~Assign() { delete var; delete expr; }
+Assign::~Assign() { delete var; delete term; }
+Invoke::~Invoke() { delete func; if (term_list) delete term_list; }
 
 void Assign::print() {
    printf("%s = (", var->name->c_str());
    prindent();
-   expr->print();
+   term->print();
    prindent();
    printf(")"); fflush(stdout);
 }
@@ -105,9 +106,9 @@ void Term::print() {
          prindent();
          printf("with(");  fflush(stdout);
          bool first = true;
-         for (Expression *expr = invoke->expr_list; expr; expr = expr->next) {
+         for (Term *term = invoke->term_list; term; term = term->next) {
             if (first) first = false; else printf(", ");  fflush(stdout);
-            expr->print();
+            term->print();
          }
          printf(")");  fflush(stdout);
          indent--;
@@ -244,12 +245,24 @@ void Expression::append(Expression *expr) {
    }
 }
 
+void Term::append(Term *term) {
+   Term *term_list = this;
+   while (term_list) {
+      if (term_list->next) 
+         term_list = term_list->next;
+      else {
+         term_list->next = term;
+         return;
+      }
+   }
+}
+
 
 }
 
 /*#define EXPRESSION_TEST
 #ifdef EXPRESSION_TEST
-using namespace foobar;
+using namespace pico;
 
 int main(int argc, char const *argv[])
 {

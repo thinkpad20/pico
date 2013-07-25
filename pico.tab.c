@@ -33,7 +33,7 @@
 
 /* First part of user declarations.  */
 /* Line 283 of lalr1.cc  */
-#line 1 "foobar.y"
+#line 1 "pico.y"
 
 
 #include "expression.h"
@@ -42,25 +42,25 @@ int yydebug = 1;
 
 
 /* Line 283 of lalr1.cc  */
-#line 46 "foobar.tab.c"
+#line 46 "pico.tab.c"
 
 
-#include "foobar.tab.h"
+#include "pico.tab.h"
 
 /* User implementation prologue.  */
 
 /* Line 289 of lalr1.cc  */
-#line 54 "foobar.tab.c"
+#line 54 "pico.tab.c"
 /* Unqualified %code blocks.  */
 /* Line 290 of lalr1.cc  */
-#line 32 "foobar.y"
+#line 32 "pico.y"
 
 	// Prototype for the yylex function
-	static int yylex(foobar::BisonParser::semantic_type * yylval, foobar::FlexScanner &scanner);
+	static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner);
 
 
 /* Line 290 of lalr1.cc  */
-#line 64 "foobar.tab.c"
+#line 64 "pico.tab.c"
 
 
 # ifndef YY_NULL
@@ -153,10 +153,10 @@ do {					\
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 /* Line 357 of lalr1.cc  */
-#line 11 "foobar.y"
-namespace foobar {
+#line 11 "pico.y"
+namespace pico {
 /* Line 357 of lalr1.cc  */
-#line 160 "foobar.tab.c"
+#line 160 "pico.tab.c"
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -197,7 +197,7 @@ namespace foobar {
 
 
   /// Build a parser object.
-  BisonParser::BisonParser (foobar::FlexScanner &scanner_yyarg)
+  BisonParser::BisonParser (pico::FlexScanner &scanner_yyarg)
     :
 #if YYDEBUG
       yydebug_ (false),
@@ -458,37 +458,37 @@ namespace foobar {
       {
           case 4:
 /* Line 664 of lalr1.cc  */
-#line 84 "foobar.y"
+#line 82 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].term)); }
     break;
 
   case 5:
 /* Line 664 of lalr1.cc  */
-#line 85 "foobar.y"
-    { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].assign), (yysemantic_stack_[(2) - (2)].expr)); }
+#line 83 "pico.y"
+    { (yyval.expr) = new Expression(new Assign((yysemantic_stack_[(5) - (1)].var), (yysemantic_stack_[(5) - (3)].term)), (yysemantic_stack_[(5) - (5)].expr)); }
     break;
 
   case 6:
 /* Line 664 of lalr1.cc  */
-#line 86 "foobar.y"
-    { (yyval.expr) = new Expression((yysemantic_stack_[(2) - (1)].if_s), (yysemantic_stack_[(2) - (2)].expr)); }
-    break;
-
-  case 8:
-/* Line 664 of lalr1.cc  */
-#line 91 "foobar.y"
-    { (yyval.term) = make_log_or((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
+#line 84 "pico.y"
+    { (yyval.expr) = new Expression(new If((yysemantic_stack_[(7) - (2)].term), (yysemantic_stack_[(7) - (4)].term)), (yysemantic_stack_[(7) - (7)].expr)); }
     break;
 
   case 10:
 /* Line 664 of lalr1.cc  */
-#line 96 "foobar.y"
-    { (yyval.term) = make_log_and((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
+#line 93 "pico.y"
+    { (yyval.term) = make_log_or((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 12:
 /* Line 664 of lalr1.cc  */
-#line 102 "foobar.y"
+#line 98 "pico.y"
+    { (yyval.term) = make_log_and((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
+    break;
+
+  case 14:
+/* Line 664 of lalr1.cc  */
+#line 104 "pico.y"
     {
          switch ((yysemantic_stack_[(3) - (2)].ival)) {
             case 0: (yyval.term) = make_eq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); break;
@@ -501,212 +501,197 @@ namespace foobar {
       }
     break;
 
-  case 13:
-/* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
-    {(yyval.ival) = 0;}
-    break;
-
-  case 14:
-/* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
-    {(yyval.ival) = 1;}
-    break;
-
   case 15:
 /* Line 664 of lalr1.cc  */
-#line 114 "foobar.y"
-    {(yyval.ival) = 2;}
+#line 116 "pico.y"
+    {(yyval.ival) = 0;}
     break;
 
   case 16:
 /* Line 664 of lalr1.cc  */
-#line 115 "foobar.y"
-    {(yyval.ival) = 3;}
+#line 116 "pico.y"
+    {(yyval.ival) = 1;}
     break;
 
   case 17:
 /* Line 664 of lalr1.cc  */
-#line 115 "foobar.y"
-    {(yyval.ival) = 4;}
+#line 116 "pico.y"
+    {(yyval.ival) = 2;}
     break;
 
   case 18:
 /* Line 664 of lalr1.cc  */
-#line 115 "foobar.y"
-    {(yyval.ival) = 5;}
+#line 117 "pico.y"
+    {(yyval.ival) = 3;}
+    break;
+
+  case 19:
+/* Line 664 of lalr1.cc  */
+#line 117 "pico.y"
+    {(yyval.ival) = 4;}
     break;
 
   case 20:
 /* Line 664 of lalr1.cc  */
-#line 120 "foobar.y"
-    { (yyval.term) = make_add((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found an addition\n"); }
+#line 117 "pico.y"
+    {(yyval.ival) = 5;}
     break;
 
-  case 21:
+  case 22:
 /* Line 664 of lalr1.cc  */
-#line 121 "foobar.y"
-    { (yyval.term) = make_sub((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a subtraction\n"); }
+#line 122 "pico.y"
+    { (yyval.term) = make_add((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found an addition\n"); }
     break;
 
   case 23:
 /* Line 664 of lalr1.cc  */
-#line 126 "foobar.y"
-    { (yyval.term) = make_mult((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a multiplication\n"); }
+#line 123 "pico.y"
+    { (yyval.term) = make_sub((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a subtraction\n"); }
     break;
 
-  case 24:
+  case 25:
 /* Line 664 of lalr1.cc  */
-#line 127 "foobar.y"
-    { (yyval.term) = make_div((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a division\n"); }
+#line 128 "pico.y"
+    { (yyval.term) = make_mult((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a multiplication\n"); }
     break;
 
   case 26:
 /* Line 664 of lalr1.cc  */
-#line 132 "foobar.y"
-    { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term)); }
+#line 129 "pico.y"
+    { (yyval.term) = make_div((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); printf("Found a division\n"); }
     break;
 
-  case 27:
+  case 28:
 /* Line 664 of lalr1.cc  */
-#line 133 "foobar.y"
-    { (yyval.term) = make_log_not((yysemantic_stack_[(2) - (2)].term)); }
+#line 134 "pico.y"
+    { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 29:
 /* Line 664 of lalr1.cc  */
-#line 139 "foobar.y"
-    { 
-         (yyval.term) = new Term(new Invoke((yysemantic_stack_[(4) - (1)].term), (yysemantic_stack_[(4) - (3)].expr))); 
-      }
+#line 135 "pico.y"
+    { (yyval.term) = make_log_not((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 31:
 /* Line 664 of lalr1.cc  */
-#line 146 "foobar.y"
-    { (yysemantic_stack_[(3) - (1)].expr)->append((yysemantic_stack_[(3) - (3)].expr)); (yyval.expr) = (yysemantic_stack_[(3) - (1)].expr); }
+#line 141 "pico.y"
+    { 
+         (yyval.term) = new Term(new Invoke((yysemantic_stack_[(4) - (1)].term), (yysemantic_stack_[(4) - (3)].term))); 
+      }
     break;
 
   case 33:
 /* Line 664 of lalr1.cc  */
-#line 151 "foobar.y"
-    {(yyval.expr) = new Expression(); }
+#line 148 "pico.y"
+    { (yysemantic_stack_[(3) - (1)].term)->append((yysemantic_stack_[(3) - (3)].term)); (yyval.term) = (yysemantic_stack_[(3) - (1)].term); }
     break;
 
   case 35:
 /* Line 664 of lalr1.cc  */
-#line 156 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var)); }
-    break;
-
-  case 36:
-/* Line 664 of lalr1.cc  */
-#line 157 "foobar.y"
-    { (yyval.term) = make_parens((yysemantic_stack_[(3) - (2)].expr)); }
+#line 153 "pico.y"
+    {(yyval.term) = make_parens(new Expression()); }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
-#line 158 "foobar.y"
+#line 158 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var)); }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
-#line 161 "foobar.y"
-    { (yysemantic_stack_[(2) - (2)].var)->type = (yysemantic_stack_[(2) - (1)].strval); (yyval.var) = (yysemantic_stack_[(2) - (2)].var); }
+#line 159 "pico.y"
+    { (yyval.term) = make_parens((yysemantic_stack_[(3) - (2)].expr)); }
     break;
 
   case 39:
 /* Line 664 of lalr1.cc  */
-#line 164 "foobar.y"
-    { (yyval.strval) = new std::string("Any"); }
+#line 160 "pico.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var)); }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
-#line 165 "foobar.y"
-    { (yyval.strval) = new std::string("Int"); }
+#line 163 "pico.y"
+    { (yysemantic_stack_[(2) - (2)].var)->type = (yysemantic_stack_[(2) - (1)].strval); (yyval.var) = (yysemantic_stack_[(2) - (2)].var); }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
-#line 166 "foobar.y"
-    {(yyval.strval) = new std::string("Float"); }
+#line 166 "pico.y"
+    { (yyval.strval) = new std::string("Any"); }
     break;
 
   case 42:
 /* Line 664 of lalr1.cc  */
-#line 167 "foobar.y"
-    {(yyval.strval) = new std::string("String"); }
+#line 167 "pico.y"
+    { (yyval.strval) = new std::string("Int"); }
     break;
 
   case 43:
 /* Line 664 of lalr1.cc  */
-#line 168 "foobar.y"
-    { (yyval.strval) = new std::string("Array"); }
+#line 168 "pico.y"
+    {(yyval.strval) = new std::string("Float"); }
     break;
 
   case 44:
 /* Line 664 of lalr1.cc  */
-#line 169 "foobar.y"
-    { (yyval.strval) = new std::string("List"); }
+#line 169 "pico.y"
+    {(yyval.strval) = new std::string("String"); }
     break;
 
   case 45:
 /* Line 664 of lalr1.cc  */
-#line 170 "foobar.y"
-    { (yyval.strval) = new std::string("Table"); }
+#line 170 "pico.y"
+    { (yyval.strval) = new std::string("Array"); }
+    break;
+
+  case 46:
+/* Line 664 of lalr1.cc  */
+#line 171 "pico.y"
+    { (yyval.strval) = new std::string("List"); }
     break;
 
   case 47:
 /* Line 664 of lalr1.cc  */
-#line 175 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
-    break;
-
-  case 48:
-/* Line 664 of lalr1.cc  */
-#line 176 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
+#line 172 "pico.y"
+    { (yyval.strval) = new std::string("Table"); }
     break;
 
   case 49:
 /* Line 664 of lalr1.cc  */
-#line 177 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
+#line 177 "pico.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 50:
 /* Line 664 of lalr1.cc  */
-#line 178 "foobar.y"
-    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
+#line 178 "pico.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
     break;
 
   case 51:
 /* Line 664 of lalr1.cc  */
-#line 181 "foobar.y"
-    { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
+#line 179 "pico.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 52:
 /* Line 664 of lalr1.cc  */
-#line 185 "foobar.y"
-    { 
-         (yyval.assign) = new Assign((yysemantic_stack_[(3) - (1)].var), (yysemantic_stack_[(3) - (3)].expr));
-         (yyval.assign)->print();
-      }
+#line 180 "pico.y"
+    { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
     break;
 
   case 53:
 /* Line 664 of lalr1.cc  */
-#line 191 "foobar.y"
-    { (yyval.if_s) = new If((yysemantic_stack_[(5) - (2)].term), (yysemantic_stack_[(5) - (4)].expr)); }
+#line 183 "pico.y"
+    { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
 
 /* Line 664 of lalr1.cc  */
-#line 710 "foobar.tab.c"
+#line 695 "pico.tab.c"
       default:
         break;
       }
@@ -1006,18 +991,18 @@ namespace foobar {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char BisonParser::yypact_ninf_ = -41;
+  const signed char BisonParser::yypact_ninf_ = -45;
   const signed char
   BisonParser::yypact_[] =
   {
-        59,   -41,   -41,   -41,   -41,   -41,    97,   -41,   -41,    97,
-     -41,   -41,   -41,   -41,   -41,   -41,    97,    59,     1,   -41,
-     -21,   -26,    -1,   -41,   -39,    -8,   -40,   -41,   -41,   -14,
-     -41,   -30,    59,    59,    16,   -41,   -41,   -41,   -19,   -41,
-     -41,    97,   -41,    97,   -41,   -41,   -41,   -41,   -41,   -41,
-      97,    97,    97,    97,    97,    59,   -41,    59,   -41,   -41,
-      59,   -41,   -26,    -1,   -41,   -41,   -41,   -41,   -41,   -41,
-      -6,   -41,   -41,    12,   -41,    59,   -41,   -41
+        72,   -45,   -45,   -45,   -45,   -45,   111,   -45,   -45,   111,
+     -45,   -45,   -45,   -45,   -45,   -45,   111,    72,    28,   -45,
+     -23,   -20,   -14,   -45,   -10,    -4,   -42,   -45,   -45,   -17,
+     -45,   -25,    -8,   -45,   -45,   -45,   -19,   -45,   -45,   111,
+     -45,   111,   -45,   -45,   -45,   -45,   -45,   -45,   111,   111,
+     111,   111,   111,   111,   -45,   111,   111,   -45,   -20,   -14,
+     -45,   -45,   -45,   -45,   -45,     6,   -44,   -45,   -24,   -24,
+     111,   -45,   -45,   -45,    72,    11,   -45,   -45,    72,   -45
   };
 
   /* YYDEFACT[S] -- default reduction number in state S.  Performed when
@@ -1026,30 +1011,30 @@ namespace foobar {
   const unsigned char
   BisonParser::yydefact_[] =
   {
-         0,    40,    41,    42,    43,    45,     0,    39,    44,     0,
-      51,    46,    49,    48,    47,    50,     0,     0,     0,     2,
-       0,     7,     9,    11,    19,    22,    25,    28,    37,     0,
-      34,    35,     0,     0,     0,    35,    27,    26,     0,     1,
-       3,     0,     4,     0,    16,    18,    13,    17,    14,    15,
-       0,     0,     0,     0,     0,    33,    38,     0,     5,     6,
-       0,    36,     8,    10,    12,    20,    21,    23,    24,    32,
-       0,    30,    52,     0,    29,    33,    53,    31
+         0,    42,    43,    44,    45,    47,     0,    41,    46,     0,
+      53,    48,    51,    50,    49,    52,     0,     0,     0,     2,
+       0,     9,    11,    13,    21,    24,    27,    30,    39,     0,
+      36,    37,     0,    37,    29,    28,     0,     1,     3,     0,
+       4,     0,    18,    20,    15,    19,    16,    17,     0,     0,
+       0,     0,     0,    35,    40,     0,     0,    38,    10,    12,
+      14,    22,    23,    25,    26,    34,     0,    32,     0,     0,
+      35,    31,     7,     8,     0,     0,    33,     5,     0,     6
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yypgoto_[] =
   {
-       -41,   -41,     2,    41,    11,    15,   -41,    19,    23,    -5,
-     -41,   -41,   -10,   -41,   -41,   -41,   -41,     0,   -41,   -41
+       -45,   -45,   -15,   -22,    -5,     7,    13,   -45,   -26,   -21,
+       5,   -45,   -45,   -13,   -45,   -45,   -45,   -45,     0
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yydefgoto_[] =
   {
-        -1,    18,    69,    20,    21,    22,    50,    23,    24,    25,
-      26,    70,    71,    27,    28,    29,    30,    35,    32,    33
+        -1,    18,    19,    74,    20,    21,    22,    48,    23,    24,
+      25,    26,    66,    67,    27,    28,    29,    30,    33
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -1059,44 +1044,46 @@ namespace foobar {
   const unsigned char
   BisonParser::yytable_[] =
   {
-        31,    39,    19,    43,    36,     1,     2,    41,     3,     4,
-       5,    37,    51,    52,     6,    55,     7,    31,    31,    38,
-      40,    10,     8,    44,    45,    46,    47,    42,    57,    56,
-      60,     9,    31,    31,    58,    59,    10,    61,    11,    12,
-      13,    14,    15,    76,    41,    53,    54,    34,    48,    49,
-      74,    75,    62,    16,     0,    31,    17,    31,    63,    72,
-      31,     0,    73,     1,     2,    77,     3,     4,     5,    64,
-      65,    66,     6,     0,     7,    31,    67,    68,     0,     0,
-       8,     0,     0,     0,     0,     0,     0,     0,     0,     9,
-       0,     0,     0,     0,    10,     0,    11,    12,    13,    14,
-      15,     1,     2,     0,     3,     4,     5,     0,     0,     0,
-       0,    16,     7,     0,    17,     0,     0,     0,     8,     0,
-       0,     0,     0,     0,     0,     0,     0,     9,     0,     0,
-       0,     0,    10,     0,    11,    12,    13,    14,    15,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    16,
-       0,     0,    17
+        31,    32,    36,    38,    39,    39,    56,    70,    72,    41,
+      42,    43,    44,    45,    34,    71,    53,    31,    31,    10,
+      39,    35,    60,    61,    62,    55,    40,    73,    37,    54,
+      63,    64,     1,     2,    39,     3,     4,     5,    46,    47,
+      57,     6,    78,     7,    49,    50,    58,    75,    65,     8,
+      68,    69,    51,    52,    59,     0,     0,    76,     9,    77,
+       0,     0,     0,    79,    10,    65,    11,    12,    13,    14,
+      15,     0,     0,     0,    31,     0,     1,     2,    31,     3,
+       4,     5,     0,    16,     0,     6,    17,     7,     0,     0,
+       0,     0,     0,     8,     0,     0,     0,     0,     0,     0,
+       0,     0,     9,     0,     0,     0,     0,     0,    10,     0,
+      11,    12,    13,    14,    15,     1,     2,     0,     3,     4,
+       5,     0,     0,     0,     0,     0,     7,    16,     0,     0,
+      17,     0,     8,     0,     0,     0,     0,     0,     0,     0,
+       0,     9,     0,     0,     0,     0,     0,    10,     0,    11,
+      12,    13,    14,    15,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    16,     0,     0,    17
   };
 
   /* YYCHECK.  */
   const signed char
   BisonParser::yycheck_[] =
   {
-         0,     0,     0,    29,     9,     4,     5,    28,     7,     8,
-       9,    16,    51,    52,    13,    55,    15,    17,    18,    17,
-      18,    35,    21,    24,    25,    26,    27,    48,    58,    29,
-      14,    30,    32,    33,    32,    33,    35,    56,    37,    38,
-      39,    40,    41,    31,    28,    53,    54,     6,    49,    50,
-      56,    57,    41,    52,    -1,    55,    55,    57,    43,    57,
-      60,    -1,    60,     4,     5,    75,     7,     8,     9,    50,
-      51,    52,    13,    -1,    15,    75,    53,    54,    -1,    -1,
-      21,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,
-      -1,    -1,    -1,    -1,    35,    -1,    37,    38,    39,    40,
-      41,     4,     5,    -1,     7,     8,     9,    -1,    -1,    -1,
-      -1,    52,    15,    -1,    55,    -1,    -1,    -1,    21,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,    -1,    -1,
-      -1,    -1,    35,    -1,    37,    38,    39,    40,    41,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    52,
-      -1,    -1,    55
+         0,     6,    17,    18,    28,    28,    14,    51,    32,    29,
+      24,    25,    26,    27,     9,    59,    58,    17,    18,    36,
+      28,    16,    48,    49,    50,    50,    49,    51,     0,    29,
+      51,    52,     4,     5,    28,     7,     8,     9,    52,    53,
+      59,    13,    31,    15,    54,    55,    39,    69,    53,    21,
+      55,    56,    56,    57,    41,    -1,    -1,    70,    30,    74,
+      -1,    -1,    -1,    78,    36,    70,    38,    39,    40,    41,
+      42,    -1,    -1,    -1,    74,    -1,     4,     5,    78,     7,
+       8,     9,    -1,    55,    -1,    13,    58,    15,    -1,    -1,
+      -1,    -1,    -1,    21,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    30,    -1,    -1,    -1,    -1,    -1,    36,    -1,
+      38,    39,    40,    41,    42,     4,     5,    -1,     7,     8,
+       9,    -1,    -1,    -1,    -1,    -1,    15,    55,    -1,    -1,
+      58,    -1,    21,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    30,    -1,    -1,    -1,    -1,    -1,    36,    -1,    38,
+      39,    40,    41,    42,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    55,    -1,    -1,    58
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -1105,13 +1092,13 @@ namespace foobar {
   BisonParser::yystos_[] =
   {
          0,     4,     5,     7,     8,     9,    13,    15,    21,    30,
-      35,    37,    38,    39,    40,    41,    52,    55,    60,    61,
-      62,    63,    64,    66,    67,    68,    69,    72,    73,    74,
-      75,    76,    77,    78,    62,    76,    68,    68,    61,     0,
-      61,    28,    48,    29,    24,    25,    26,    27,    49,    50,
-      65,    51,    52,    53,    54,    55,    76,    58,    61,    61,
-      14,    56,    63,    64,    66,    66,    66,    67,    67,    61,
-      70,    71,    61,    61,    56,    57,    31,    71
+      36,    38,    39,    40,    41,    42,    55,    58,    61,    62,
+      64,    65,    66,    68,    69,    70,    71,    74,    75,    76,
+      77,    78,    64,    78,    70,    70,    62,     0,    62,    28,
+      49,    29,    24,    25,    26,    27,    52,    53,    67,    54,
+      55,    56,    57,    58,    78,    50,    14,    59,    65,    66,
+      68,    68,    68,    69,    69,    64,    72,    73,    64,    64,
+      51,    59,    32,    51,    63,    63,    73,    62,    31,    62
   };
 
 #if YYDEBUG
@@ -1124,8 +1111,8 @@ namespace foobar {
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302,    46,    60,
-      62,    43,    45,    42,    47,    40,    41,    44,    61
+     295,   296,   297,   298,   299,   300,   301,   302,   303,    46,
+      61,    44,    60,    62,    43,    45,    42,    47,    40,    41
   };
 #endif
 
@@ -1133,24 +1120,24 @@ namespace foobar {
   const unsigned char
   BisonParser::yyr1_[] =
   {
-         0,    59,    60,    60,    61,    61,    61,    62,    62,    63,
-      63,    64,    64,    65,    65,    65,    65,    65,    65,    66,
-      66,    66,    67,    67,    67,    68,    68,    68,    69,    69,
-      70,    70,    71,    71,    72,    72,    72,    72,    73,    74,
-      74,    74,    74,    74,    74,    74,    74,    75,    75,    75,
-      75,    76,    77,    78
+         0,    60,    61,    61,    62,    62,    62,    63,    63,    64,
+      64,    65,    65,    66,    66,    67,    67,    67,    67,    67,
+      67,    68,    68,    68,    69,    69,    69,    70,    70,    70,
+      71,    71,    72,    72,    73,    73,    74,    74,    74,    74,
+      75,    76,    76,    76,    76,    76,    76,    76,    76,    77,
+      77,    77,    77,    78
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
   const unsigned char
   BisonParser::yyr2_[] =
   {
-         0,     2,     1,     2,     2,     2,     2,     1,     3,     1,
-       3,     1,     3,     1,     1,     1,     1,     1,     1,     1,
-       3,     3,     1,     3,     3,     1,     2,     2,     1,     4,
-       1,     3,     1,     0,     1,     1,     3,     1,     2,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     3,     5
+         0,     2,     1,     2,     2,     5,     7,     1,     1,     1,
+       3,     1,     3,     1,     3,     1,     1,     1,     1,     1,
+       1,     1,     3,     3,     1,     3,     3,     1,     2,     2,
+       1,     4,     1,     3,     1,     0,     1,     1,     3,     1,
+       2,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1
   };
 
 
@@ -1162,14 +1149,14 @@ namespace foobar {
     "$end", "error", "$undefined", "FN", "INT", "FLOAT", "CHAR", "STRING",
   "ARRAY", "TABLE", "ALG", "WHEN", "END", "IF", "THEN", "ANY", "RETURN",
   "IS", "DO", "IO", "IOFN", "LIST", "SL", "SR", "LEQ", "GEQ", "EQ", "NEQ",
-  "OR", "AND", "NOT", "ELSE", "BOOL", "TRUE", "FALSE", "ID", "SYMBOL",
-  "TYPENAME", "STRING_LITERAL", "FLOAT_LITERAL", "INT_LITERAL",
+  "OR", "AND", "NOT", "ELSE", "NEWLINE", "BOOL", "TRUE", "FALSE", "ID",
+  "SYMBOL", "TYPENAME", "STRING_LITERAL", "FLOAT_LITERAL", "INT_LITERAL",
   "CHAR_LITERAL", "INTEGER", "COMP", "LOGICAL", "ADDITIVE", "MULTI",
-  "UNARY", "'.'", "'<'", "'>'", "'+'", "'-'", "'*'", "'/'", "'('", "')'",
-  "','", "'='", "$accept", "exprs", "expr", "term", "and_term",
+  "UNARY", "'.'", "'='", "','", "'<'", "'>'", "'+'", "'-'", "'*'", "'/'",
+  "'('", "')'", "$accept", "exprs", "expr", "term_end", "term", "and_term",
   "comp_term", "comp", "add_term", "mult_term", "unary_term", "invocation",
-  "expr_list", "opt_expr", "primary", "undef_var", "typename", "literal",
-  "var", "assign", "if", YY_NULL
+  "term_list", "opt_term", "primary", "undef_var", "typename", "literal",
+  "var", YY_NULL
   };
 
 #if YYDEBUG
@@ -1177,20 +1164,21 @@ namespace foobar {
   const BisonParser::rhs_number_type
   BisonParser::yyrhs_[] =
   {
-        60,     0,    -1,    61,    -1,    60,    61,    -1,    62,    48,
-      -1,    77,    61,    -1,    78,    61,    -1,    63,    -1,    62,
-      28,    63,    -1,    64,    -1,    63,    29,    64,    -1,    66,
-      -1,    64,    65,    66,    -1,    26,    -1,    49,    -1,    50,
-      -1,    24,    -1,    27,    -1,    25,    -1,    67,    -1,    67,
-      51,    66,    -1,    67,    52,    66,    -1,    68,    -1,    68,
-      53,    67,    -1,    68,    54,    67,    -1,    69,    -1,    52,
-      68,    -1,    30,    68,    -1,    72,    -1,    69,    55,    70,
-      56,    -1,    71,    -1,    70,    57,    71,    -1,    61,    -1,
-      -1,    75,    -1,    76,    -1,    55,    61,    56,    -1,    73,
-      -1,    74,    76,    -1,    15,    -1,     4,    -1,     5,    -1,
-       7,    -1,     8,    -1,    21,    -1,     9,    -1,    37,    -1,
-      40,    -1,    39,    -1,    38,    -1,    41,    -1,    35,    -1,
-      76,    58,    61,    -1,    13,    62,    14,    61,    31,    -1
+        61,     0,    -1,    62,    -1,    61,    62,    -1,    64,    49,
+      -1,    78,    50,    64,    63,    62,    -1,    13,    64,    14,
+      64,    63,    31,    62,    -1,    32,    -1,    51,    -1,    65,
+      -1,    64,    28,    65,    -1,    66,    -1,    65,    29,    66,
+      -1,    68,    -1,    66,    67,    68,    -1,    26,    -1,    52,
+      -1,    53,    -1,    24,    -1,    27,    -1,    25,    -1,    69,
+      -1,    69,    54,    68,    -1,    69,    55,    68,    -1,    70,
+      -1,    70,    56,    69,    -1,    70,    57,    69,    -1,    71,
+      -1,    55,    70,    -1,    30,    70,    -1,    74,    -1,    71,
+      58,    72,    59,    -1,    73,    -1,    72,    51,    73,    -1,
+      64,    -1,    -1,    77,    -1,    78,    -1,    58,    62,    59,
+      -1,    75,    -1,    76,    78,    -1,    15,    -1,     4,    -1,
+       5,    -1,     7,    -1,     8,    -1,    21,    -1,     9,    -1,
+      38,    -1,    41,    -1,    40,    -1,    39,    -1,    42,    -1,
+      36,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -1198,24 +1186,24 @@ namespace foobar {
   const unsigned char
   BisonParser::yyprhs_[] =
   {
-         0,     0,     3,     5,     8,    11,    14,    17,    19,    23,
-      25,    29,    31,    35,    37,    39,    41,    43,    45,    47,
-      49,    53,    57,    59,    63,    67,    69,    72,    75,    77,
-      82,    84,    88,    90,    91,    93,    95,    99,   101,   104,
-     106,   108,   110,   112,   114,   116,   118,   120,   122,   124,
-     126,   128,   130,   134
+         0,     0,     3,     5,     8,    11,    17,    25,    27,    29,
+      31,    35,    37,    41,    43,    47,    49,    51,    53,    55,
+      57,    59,    61,    65,    69,    71,    75,    79,    81,    84,
+      87,    89,    94,    96,   100,   102,   103,   105,   107,   111,
+     113,   116,   118,   120,   122,   124,   126,   128,   130,   132,
+     134,   136,   138,   140
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    81,    81,    81,    84,    85,    86,    90,    91,    95,
-      96,   100,   101,   114,   114,   114,   115,   115,   115,   119,
-     120,   121,   125,   126,   127,   131,   132,   133,   137,   138,
-     145,   146,   150,   151,   155,   156,   157,   158,   161,   164,
-     165,   166,   167,   168,   169,   170,   171,   175,   176,   177,
-     178,   181,   184,   191
+         0,    79,    79,    79,    82,    83,    84,    88,    88,    92,
+      93,    97,    98,   102,   103,   116,   116,   116,   117,   117,
+     117,   121,   122,   123,   127,   128,   129,   133,   134,   135,
+     139,   140,   147,   148,   152,   153,   157,   158,   159,   160,
+     163,   166,   167,   168,   169,   170,   171,   172,   173,   177,
+     178,   179,   180,   183
   };
 
   // Print the state stack on the debug stream.
@@ -1259,9 +1247,9 @@ namespace foobar {
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      55,    56,    53,    51,    57,    52,    48,    54,     2,     2,
+      58,    59,    56,    54,    51,    55,    49,    57,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      49,    58,    50,     2,     2,     2,     2,     2,     2,     2,
+      52,    50,    53,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1285,7 +1273,7 @@ namespace foobar {
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47
+      45,    46,    47,    48
     };
     if ((unsigned int) t <= yyuser_token_number_max_)
       return translate_table[t];
@@ -1294,34 +1282,34 @@ namespace foobar {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 152;
-  const int BisonParser::yynnts_ = 20;
+  const int BisonParser::yylast_ = 169;
+  const int BisonParser::yynnts_ = 19;
   const int BisonParser::yyempty_ = -2;
-  const int BisonParser::yyfinal_ = 39;
+  const int BisonParser::yyfinal_ = 37;
   const int BisonParser::yyterror_ = 1;
   const int BisonParser::yyerrcode_ = 256;
-  const int BisonParser::yyntokens_ = 59;
+  const int BisonParser::yyntokens_ = 60;
 
-  const unsigned int BisonParser::yyuser_token_number_max_ = 302;
+  const unsigned int BisonParser::yyuser_token_number_max_ = 303;
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 /* Line 1135 of lalr1.cc  */
-#line 11 "foobar.y"
-} // foobar
+#line 11 "pico.y"
+} // pico
 /* Line 1135 of lalr1.cc  */
-#line 1313 "foobar.tab.c"
+#line 1301 "pico.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 193 "foobar.y"
+#line 185 "pico.y"
 
 
 // We have to implement the error function
-void foobar::BisonParser::error(const foobar::BisonParser::location_type &loc, const std::string &msg) {
+void pico::BisonParser::error(const pico::BisonParser::location_type &loc, const std::string &msg) {
 	std::cerr << "Error: " << msg << std::endl;
 }
 
 // Now that we have the Parser declared, we can declare the Scanner and implement
 // the yylex function
-#include "foobarScanner.h"
-static int yylex(foobar::BisonParser::semantic_type * yylval, foobar::FlexScanner &scanner) {
+#include "picoScanner.h"
+static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner) {
 	return scanner.yylex(yylval);
 }

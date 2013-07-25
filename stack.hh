@@ -32,7 +32,7 @@
 
 /**
  ** \file stack.hh
- ** Define the foobar::stack class.
+ ** Define the pico::stack class.
  */
 
 #ifndef YY_YY_STACK_HH_INCLUDED
@@ -41,8 +41,8 @@
 # include <deque>
 
 /* Line 34 of stack.hh  */
-#line 11 "foobar.y"
-namespace foobar {
+#line 11 "pico.y"
+namespace pico {
 /* Line 34 of stack.hh  */
 #line 48 "stack.hh"
   template <class T, class S = std::deque<T> >
@@ -135,8 +135,8 @@ namespace foobar {
     unsigned int range_;
   };
 /* Line 124 of stack.hh  */
-#line 11 "foobar.y"
-} // foobar
+#line 11 "pico.y"
+} // pico
 /* Line 124 of stack.hh  */
 #line 142 "stack.hh"
 

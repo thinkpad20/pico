@@ -1,23 +1,23 @@
-all: foobar
+all: pico
 
-run: foobar
-	./foobar
+run: pico
+	./pico
 
-foobar: lex.yy.cc foobar.tab.c expression.cpp expression.h
-	g++ lex.yy.cc parse.cpp foobar.tab.c expression.cpp -o foobar
+pico: lex.yy.cc pico.tab.c expression.cpp expression.h
+	g++ lex.yy.cc parse.cpp pico.tab.c expression.cpp -o pico
 	
-lex.yy.cc: foobar.l
-	flex foobar.l
+lex.yy.cc: pico.l
+	flex pico.l
 
-foobar.tab.c: foobar.y
-	bison --report=all foobar.y
+pico.tab.c: pico.y
+	bison --report=all pico.y
 
-debug: foobar.y
-	bison -v --report=all --debug foobar.y
-	flex foobar.l
-	g++ lex.yy.cc parse.cpp foobar.tab.c expression.cpp -o foobar-debug
+debug: pico.y
+	bison -v --report=all --debug pico.y
+	flex pico.l
+	g++ lex.yy.cc parse.cpp pico.tab.c expression.cpp -o pico-debug
 
 clean:
-	rm -rf foobar.tab.c foobar.tab.h location.hh position.hh stack.hh
+	rm -rf pico.tab.c pico.tab.h location.hh position.hh stack.hh
 	rm -rf lex.yy.cc
-	rm -rf foobar
+	rm -rf pico

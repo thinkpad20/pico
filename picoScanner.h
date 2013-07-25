@@ -7,17 +7,17 @@
 
 // Override the interface for yylex since we namespaced it
 #undef YY_DECL
-#define YY_DECL int foobar::FlexScanner::yylex()
+#define YY_DECL int pico::FlexScanner::yylex()
 
 // Include Bison for types / tokens
-#include "foobar.tab.h"
+#include "pico.tab.h"
 
 
-namespace foobar {
+namespace pico {
 	class FlexScanner : public yyFlexLexer {
 		public:
 			// save the pointer to yylval so we can change it, and invoke scanner
-			int yylex(foobar::BisonParser::semantic_type * lval) { yylval = lval; return yylex(); }
+			int yylex(pico::BisonParser::semantic_type * lval) { yylval = lval; return yylex(); }
 		
 		private:
 			// Scanning function created by Flex; make this private to force usage
@@ -25,7 +25,7 @@ namespace foobar {
 			int yylex();
 			
 			// point to yylval (provided by Bison in overloaded yylex)
-			foobar::BisonParser::semantic_type * yylval;
+			pico::BisonParser::semantic_type * yylval;
 	};
 }
 

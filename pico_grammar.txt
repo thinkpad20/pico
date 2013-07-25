@@ -1,0 +1,32 @@
+pico Grammar
+
+pico -> expr
+        | pico expr
+
+expr -> term '.'
+      | var '=' term ',' expr
+      | IF term THEN term ',' ELSE expr
+
+binary_term -> unary_term
+             | binary_term binary_op unary_term
+
+unary_term -> invocation
+            | unary_op unary_term
+
+invocation -> primary
+            | invocation '(' term (',' term)* ')'
+
+primary -> literal
+         | '(' expr ')'
+
+literal -> var
+         | undef_var
+         | INT_CONSTANT
+         | FLOAT_CONSTANT
+         | STRING_CONSTANT
+         | CHAR_CONSTANT
+
+binary_op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|' | '~'
+             | GEQ | LEQ | EQ | NEQ | AND | OR | NOT
+
+unary_op -> '-' | '!' | '~'

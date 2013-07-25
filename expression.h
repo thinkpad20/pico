@@ -3,16 +3,16 @@
 #include "common.h"
 #include <map>
 
-namespace foobar {
+namespace pico {
 
 struct Term;
 struct Expression;
 
 struct Invoke {
-   Term *func;
-   Expression *expr_list;
-   Invoke(Term *func): func(func), expr_list(NULL) {}
-   Invoke(Term *func, Expression *expr_list): func(func), expr_list(expr_list) {}
+   Term *func, *term_list;
+   Invoke(Term *func): func(func), term_list(NULL) {}
+   Invoke(Term *func, Term *term_list): func(func), term_list(term_list) {}
+   ~Invoke();
 };
 
 struct Var {
@@ -24,17 +24,16 @@ struct Var {
 
 struct Assign {
    Var *var; 
-   Expression *expr;
-   Assign(Var *var, Expression *expr): 
-      var(var), expr(expr) { }
+   Term *term;
+   Assign(Var *var, Term *term): 
+      var(var), term(term) { }
    ~Assign();
    void print();
 };
 
 struct If {
-   Term *cond;
-   Expression *if_true; 
-   If(Term *cond, Expression *if_true):
+   Term *cond, *if_true; 
+   If(Term *cond, Term *if_true):
       cond(cond), if_true(if_true) {}
    ~If();
    void print();
@@ -86,6 +85,7 @@ struct Term {
       struct {Expression *expr1, *expr2;} binary;
       Expression *unary;
    };
+   Term *next;
    Term(); // to facilitate boost::variant
    Term(double f): t(FLOAT), fval(f) {}
    Term(int i): t(INT), ival(i) {}
@@ -101,6 +101,7 @@ struct Term {
    }
    Term(Expression *expr, enum Type type): t(type), unary(expr) {}
    void print();
+   void append(Term *term);
 };
 
 Term *make_add(Term *term1, Term *term2);

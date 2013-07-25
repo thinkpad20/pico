@@ -32,7 +32,7 @@
 
 /**
  ** \file location.hh
- ** Define the foobar::location class.
+ ** Define the pico::location class.
  */
 
 #ifndef YY_YY_LOCATION_HH_INCLUDED
@@ -41,8 +41,8 @@
 # include "position.hh"
 
 /* Line 166 of location.cc  */
-#line 11 "foobar.y"
-namespace foobar {
+#line 11 "pico.y"
+namespace pico {
 /* Line 166 of location.cc  */
 #line 48 "location.hh"
 
@@ -175,8 +175,8 @@ namespace foobar {
   }
 
 /* Line 296 of location.cc  */
-#line 11 "foobar.y"
-} // foobar
+#line 11 "pico.y"
+} // pico
 /* Line 296 of location.cc  */
 #line 182 "location.hh"
 

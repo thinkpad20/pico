@@ -1,6 +1,6 @@
 %{
 #include "expression.h"
-#include "foobarScanner.h"
+#include "picoScanner.h"
 static int block_comment_num = 0;
 static char to_char(char *str);
 int yylineno = 0;
@@ -14,26 +14,26 @@ int yylineno = 0;
 
 %%
 
-Any                     { return foobar::BisonParser::token::ANY; }
-Int                     { return foobar::BisonParser::token::INT; }
-Float                   { return foobar::BisonParser::token::FLOAT; }
-Char                    { return foobar::BisonParser::token::CHAR; }
-List                    { return foobar::BisonParser::token::LIST; }
-Array                   { return foobar::BisonParser::token::ARRAY; }
-Table                   { return foobar::BisonParser::token::TABLE; }
-alg                     { return foobar::BisonParser::token::ALG; }
-fn                      { return foobar::BisonParser::token::FN; }
-iofn                    { return foobar::BisonParser::token::IOFN; }
-end                     { return foobar::BisonParser::token::END; }
-if                      { return foobar::BisonParser::token::IF; }
-then                    { return foobar::BisonParser::token::THEN; }
-else                    { return foobar::BisonParser::token::ELSE; }
-is                      { return foobar::BisonParser::token::IS; }
-or                      { return foobar::BisonParser::token::OR; }
-and                     { return foobar::BisonParser::token::AND; }
-not                     { return foobar::BisonParser::token::NOT; }
-when                    { return foobar::BisonParser::token::WHEN; }
-"=="                     { return foobar::BisonParser::token::EQ; }
+Any                     { return pico::BisonParser::token::ANY; }
+Int                     { return pico::BisonParser::token::INT; }
+Float                   { return pico::BisonParser::token::FLOAT; }
+Char                    { return pico::BisonParser::token::CHAR; }
+List                    { return pico::BisonParser::token::LIST; }
+Array                   { return pico::BisonParser::token::ARRAY; }
+Table                   { return pico::BisonParser::token::TABLE; }
+alg                     { return pico::BisonParser::token::ALG; }
+fn                      { return pico::BisonParser::token::FN; }
+iofn                    { return pico::BisonParser::token::IOFN; }
+end                     { return pico::BisonParser::token::END; }
+if                      { return pico::BisonParser::token::IF; }
+then                    { return pico::BisonParser::token::THEN; }
+else                    { return pico::BisonParser::token::ELSE; }
+is                      { return pico::BisonParser::token::IS; }
+or                      { return pico::BisonParser::token::OR; }
+and                     { return pico::BisonParser::token::AND; }
+not                     { return pico::BisonParser::token::NOT; }
+when                    { return pico::BisonParser::token::WHEN; }
+"=="                     { return pico::BisonParser::token::EQ; }
 =                       { return '='; }
 ,                       { return ','; }
 "&"                       { return '&'; }
@@ -47,11 +47,11 @@ when                    { return foobar::BisonParser::token::WHEN; }
 "/"                     { return '/'; }
 ">"                     { return '>'; }
 "<"                     { return '<'; }
-"<<"                    { return foobar::BisonParser::token::SL; }
-">>"                    { return foobar::BisonParser::token::SR; }
-"!="                    { return foobar::BisonParser::token::NEQ; }
-return                  { return foobar::BisonParser::token::RETURN; }
-"->"                    { return foobar::BisonParser::token::RETURN; }
+"<<"                    { return pico::BisonParser::token::SL; }
+">>"                    { return pico::BisonParser::token::SR; }
+"!="                    { return pico::BisonParser::token::NEQ; }
+return                  { return pico::BisonParser::token::RETURN; }
+"->"                    { return pico::BisonParser::token::RETURN; }
 "<--"                   { BEGIN(LINE_COMMENT); }
 <LINE_COMMENT>\n        { BEGIN(INITIAL); yylineno++; }
 <LINE_COMMENT>.         { /* ignore */ }
@@ -61,21 +61,21 @@ return                  { return foobar::BisonParser::token::RETURN; }
 <BLOCK_COMMENT>\n       { yylineno++; }
 <BLOCK_COMMENT><<EOF>>  { puts("Warning: EOF encountered inside a block comment"); return EOF; }
 <BLOCK_COMMENT>.        { /* ignore */ }
-[A-Z][a-zA-Z0-9_]*   { yylval->strval = new std::string(yytext); 
-                          return foobar::BisonParser::token::TYPENAME; }
-[a-z_][a-zA-Z0-9_]*   { yylval->strval = new std::string(yytext); 
-                          return foobar::BisonParser::token::ID; }
+[A-Z][a-zA-Z0-9_]*      { yylval->strval = new std::string(yytext); 
+                          return pico::BisonParser::token::TYPENAME; }
+[a-z_][a-zA-Z0-9_]*     { yylval->strval = new std::string(yytext); 
+                          return pico::BisonParser::token::ID; }
 [-+]?[0-9]+             { yylval->ival = atoi(yytext); 
-                          return foobar::BisonParser::token::INT_LITERAL; }
+                          return pico::BisonParser::token::INT_LITERAL; }
 ([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)  { yylval->fval = atof(yytext); 
-                                               return foobar::BisonParser::token::FLOAT_LITERAL; }
+                                               return pico::BisonParser::token::FLOAT_LITERAL; }
 \"(\\.|[^\\"])*\"  { yylval->strval = new std::string(strndup(yytext+1, strlen(yytext) - 2)); 
-                     return foobar::BisonParser::token::STRING_LITERAL; }
+                     return pico::BisonParser::token::STRING_LITERAL; }
 \'(\\.|[^\\'])*\'     { yylval->cval = to_char(yytext+1); 
-                        return foobar::BisonParser::token::CHAR_LITERAL; }
-[\*\+\-/<=>\^~.]+       { return foobar::BisonParser::token::SYMBOL; }
+                        return pico::BisonParser::token::CHAR_LITERAL; }
+[\*\+\-/<=>\^~.]+       { return pico::BisonParser::token::SYMBOL; }
 [ \t\r]+                  { /* ignore */ }
-\n                      { yylineno++; }
+\n                      { yylineno++; /* return pico::BisonParser::token::NEWLINE; */ }
 .                       { return yytext[0]; }
 
 %%

@@ -31,22 +31,22 @@
    version 2.2 of Bison.  */
 
 /**
- ** \file foobar.tab.h
- ** Define the foobar::parser class.
+ ** \file pico.tab.h
+ ** Define the pico::parser class.
  */
 
 /* C++ LALR(1) parser skeleton written by Akim Demaille.  */
 
-#ifndef YY_YY_FOOBAR_TAB_H_INCLUDED
-# define YY_YY_FOOBAR_TAB_H_INCLUDED
+#ifndef YY_YY_PICO_TAB_H_INCLUDED
+# define YY_YY_PICO_TAB_H_INCLUDED
 
 /* "%code requires" blocks.  */
 /* Line 270 of lalr1.cc  */
-#line 19 "foobar.y"
+#line 19 "pico.y"
 
 	// Forward-declare the Scanner class; the Parser needs to be assigned a 
 	// Scanner, but the Scanner can't be declared without the Parser
-	namespace foobar {
+	namespace pico {
 		class FlexScanner;
 		struct Expression;
 		struct Term;
@@ -57,7 +57,7 @@
 
 
 /* Line 270 of lalr1.cc  */
-#line 61 "foobar.tab.h"
+#line 61 "pico.tab.h"
 
 
 #include <string>
@@ -71,10 +71,10 @@
 #endif
 
 /* Line 270 of lalr1.cc  */
-#line 11 "foobar.y"
-namespace foobar {
+#line 11 "pico.y"
+namespace pico {
 /* Line 270 of lalr1.cc  */
-#line 78 "foobar.tab.h"
+#line 78 "pico.tab.h"
 
   /// A Bison parser.
   class BisonParser
@@ -85,21 +85,21 @@ namespace foobar {
     union semantic_type
     {
 /* Line 270 of lalr1.cc  */
-#line 37 "foobar.y"
+#line 37 "pico.y"
 
    double fval;
    int ival;
    char cval;
    std::string *strval;
-   foobar::Expression *expr;
-   foobar::Term *term;
-   foobar::Assign *assign;
-   foobar::If *if_s;
-   foobar::Var *var;
+   pico::Expression *expr;
+   pico::Term *term;
+   pico::Assign *assign;
+   pico::If *if_s;
+   pico::Var *var;
 
 
 /* Line 270 of lalr1.cc  */
-#line 103 "foobar.tab.h"
+#line 103 "pico.tab.h"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -140,22 +140,23 @@ namespace foobar {
      AND = 284,
      NOT = 285,
      ELSE = 286,
-     BOOL = 287,
-     TRUE = 288,
-     FALSE = 289,
-     ID = 290,
-     SYMBOL = 291,
-     TYPENAME = 292,
-     STRING_LITERAL = 293,
-     FLOAT_LITERAL = 294,
-     INT_LITERAL = 295,
-     CHAR_LITERAL = 296,
-     INTEGER = 297,
-     COMP = 298,
-     LOGICAL = 299,
-     ADDITIVE = 300,
-     MULTI = 301,
-     UNARY = 302
+     NEWLINE = 287,
+     BOOL = 288,
+     TRUE = 289,
+     FALSE = 290,
+     ID = 291,
+     SYMBOL = 292,
+     TYPENAME = 293,
+     STRING_LITERAL = 294,
+     FLOAT_LITERAL = 295,
+     INT_LITERAL = 296,
+     CHAR_LITERAL = 297,
+     INTEGER = 298,
+     COMP = 299,
+     LOGICAL = 300,
+     ADDITIVE = 301,
+     MULTI = 302,
+     UNARY = 303
    };
 
     };
@@ -163,7 +164,7 @@ namespace foobar {
     typedef token::yytokentype token_type;
 
     /// Build a parser object.
-    BisonParser (foobar::FlexScanner &scanner_yyarg);
+    BisonParser (pico::FlexScanner &scanner_yyarg);
     virtual ~BisonParser ();
 
     /// Parse.
@@ -332,14 +333,14 @@ namespace foobar {
     static const token_number_type yyundef_token_;
 
     /* User arguments.  */
-    foobar::FlexScanner &scanner;
+    pico::FlexScanner &scanner;
   };
 /* Line 270 of lalr1.cc  */
-#line 11 "foobar.y"
-} // foobar
+#line 11 "pico.y"
+} // pico
 /* Line 270 of lalr1.cc  */
-#line 342 "foobar.tab.h"
+#line 343 "pico.tab.h"
 
 
 
-#endif /* !YY_YY_FOOBAR_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PICO_TAB_H_INCLUDED  */

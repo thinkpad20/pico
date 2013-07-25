@@ -8,18 +8,18 @@ int yydebug = 1;
 %require "2.4.1"
 %skeleton "lalr1.cc"
 %defines
-%define namespace "foobar"
+%define namespace "pico"
 %define parser_class_name "BisonParser"
 %error-verbose
-%parse-param { foobar::FlexScanner &scanner }
-%lex-param   { foobar::FlexScanner &scanner }
+%parse-param { pico::FlexScanner &scanner }
+%lex-param   { pico::FlexScanner &scanner }
 
 %debug
 
 %code requires {
 	// Forward-declare the Scanner class; the Parser needs to be assigned a 
 	// Scanner, but the Scanner can't be declared without the Parser
-	namespace foobar {
+	namespace pico {
 		class FlexScanner;
 		struct Expression;
 		struct Term;
@@ -31,7 +31,7 @@ int yydebug = 1;
 
 %code {
 	// Prototype for the yylex function
-	static int yylex(foobar::BisonParser::semantic_type * yylval, foobar::FlexScanner &scanner);
+	static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner);
 }
 
 %union {
@@ -39,16 +39,16 @@ int yydebug = 1;
    int ival;
    char cval;
    std::string *strval;
-   foobar::Expression *expr;
-   foobar::Term *term;
-   foobar::Assign *assign;
-   foobar::If *if_s;
-   foobar::Var *var;
+   pico::Expression *expr;
+   pico::Term *term;
+   pico::Assign *assign;
+   pico::If *if_s;
+   pico::Var *var;
 }
 
 %token FN INT FLOAT CHAR STRING ARRAY TABLE ALG WHEN
 %token END IF THEN ANY RETURN IS DO IO IOFN LIST SL SR
-%token LEQ GEQ EQ NEQ OR AND NOT ELSE
+%token LEQ GEQ EQ NEQ OR AND NOT ELSE NEWLINE
 %token BOOL TRUE FALSE
 %token <strval> ID SYMBOL
 %token <strval> TYPENAME
@@ -59,12 +59,10 @@ int yydebug = 1;
 %token <ival> INTEGER
 
 %type <strval> typename
-%type <expr> expr expr_list opt_expr
+%type <expr> expr
 %type <term> term mult_term unary_term literal invocation primary
-%type <term> add_term comp_term and_term
+%type <term> add_term comp_term and_term term_list opt_term
 %type <ival> comp
-%type <assign> assign 
-%type <if_s> if
 %type <var> undef_var var
 
 %left COMP
@@ -82,8 +80,12 @@ exprs: expr | exprs expr ;
 
 expr
    : term '.' { $$ = new Expression($1); }
-   | assign expr { $$ = new Expression($1, $2); }
-   | if expr { $$ = new Expression($1, $2); }
+   | var '=' term term_end expr { $$ = new Expression(new Assign($1, $3), $5); }
+   | IF term THEN term term_end ELSE expr { $$ = new Expression(new If($2, $4), $7); }
+   ;
+
+term_end
+   : NEWLINE | ','
    ;
 
 term
@@ -135,20 +137,20 @@ unary_term
 
 invocation
    : primary
-   | invocation '(' expr_list ')' 
+   | invocation '(' term_list ')' 
       { 
          $$ = new Term(new Invoke($1, $3)); 
       }
    ;
 
-expr_list
-   : opt_expr
-   | expr_list ',' opt_expr { $1->append($3); $$ = $1; }
+term_list
+   : opt_term
+   | term_list ',' opt_term { $1->append($3); $$ = $1; }
    ;
 
-opt_expr
-   : expr
-   | {$$ = new Expression(); }
+opt_term
+   : term
+   | {$$ = make_parens(new Expression()); }
    ;
 
 primary
@@ -180,26 +182,16 @@ literal
 
 var: ID { $$ = new Var($1); } ;
 
-assign
-   : var '=' expr
-      { 
-         $$ = new Assign($1, $3);
-         $$->print();
-      }
-   ;
-
-if: IF term THEN expr ELSE { $$ = new If($2, $4); } ;
-
 %%
 
 // We have to implement the error function
-void foobar::BisonParser::error(const foobar::BisonParser::location_type &loc, const std::string &msg) {
+void pico::BisonParser::error(const pico::BisonParser::location_type &loc, const std::string &msg) {
 	std::cerr << "Error: " << msg << std::endl;
 }
 
 // Now that we have the Parser declared, we can declare the Scanner and implement
 // the yylex function
-#include "foobarScanner.h"
-static int yylex(foobar::BisonParser::semantic_type * yylval, foobar::FlexScanner &scanner) {
+#include "picoScanner.h"
+static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner) {
 	return scanner.yylex(yylval);
 }
