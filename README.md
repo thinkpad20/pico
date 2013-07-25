@@ -99,11 +99,38 @@ foo' = foo(1) <-- what happens here?
 What is `foo'`? Well, `foo` returns `bar`, which is itself a function with `i` unresolved, so `foo' = bar(1) = baz(1)`. We can think alternatively `foo` having no unresolved symbols, so it passes `i` down the chain. Let's make it a little more complex:
 
 ```
-foo = (bar = (buzz = baz(i), herp = derp(j), buzz + herp), bar)
+foo = (
+   bar = (
+      buzz = baz(i), herp = derp(j), 
+      buzz + herp), 
+   bar)
 foo' = foo(1) <-- how about this?
 ```
 
 The easy way to look at it is to find the first unresolved variable and replace it with `1`, and see what we have. `foo` has no unresolved variables, and neither does `bar`, but `buzz` does: `i`. Resolving `i` resolves `buzz`, leaving `bar` as `baz(1) + derp(j)`. Since `foo` resolves simply to `bar`, `foo' = bar = baz(1) + derp(j)`.
+
+Notice another implication of this: just as we can provide arguments to create new functions, we can add arguments or other functions and create new functions.
+
+```
+foo = a + b <-- foo is a function of two variables
+bar = a - b <-- bar is a function of two variables
+baz = foo * bar <-- baz is a function of four variables
+baz(3,4) <-- equivalent to foo(3,4) * bar
+baz(3,4,5,6) <-- equivalent to foo(3,4) * bar(5,6) = (3 + 4) * (5 - 6) = -1
+``` 
+
+Notice a few things here: one, because functions have separate namespaces, combining two functions can result in namespace collisions. So if we want to use dictionary syntax to call the function, we have to indicate which function's variables we're supplying. This is similar to SQL.
+
+```
+foo = a * b
+bar = a / b
+qux = foo^bar
+lux = qux(foo.a = 4, bar.b = 5)
+bux = lux(,10) <-- second unbound variable is now bar.a, foo.b still unbound
+dux = bux(3)   <-- no unbound variables, now we can resolve:
+               <-- bux(3) = lux(1,10) = qux(4,3,10,5) = foo(4,3) / bar(10,5)
+               <-- = (4 * 3) ^ (10 / 5) = 12^2 = 144
+```
 
 I'm currently debating whether to make Pico a dynamic language. They have their benefits. There are many advantages to typing, however, and one in this case is simply that it better indicates which variables are unbound:
 
