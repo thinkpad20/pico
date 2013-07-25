@@ -1,6 +1,7 @@
 Pico Grammar
 
 Operator Precedence Ordering:
+%left AND OR
 %left '<' '>' LEQ GEQ NEQ EQ
 %right U_LOG_NOT
 %left '+' '-'
