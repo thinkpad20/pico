@@ -1,9 +1,17 @@
-pico Grammar
+Pico Grammar
+
+Operator Precedence Ordering:
+%left '<' '>' LEQ GEQ NEQ EQ
+%right U_LOG_NOT
+%left '+' '-'
+%left '*' '/' '%' '&' '|'
+%right U_MINUS U_BIT_NOT
 
 pico -> expr
         | pico expr
 
 expr -> term '.'
+      | undef_var_dec ',' expr
       | var '=' term ',' expr
       | IF term THEN term ',' ELSE expr
 
@@ -26,7 +34,9 @@ literal -> var
          | STRING_CONSTANT
          | CHAR_CONSTANT
 
-binary_op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|' | '~'
-             | GEQ | LEQ | EQ | NEQ | AND | OR | NOT
+undef_var_dec -> TYPENAME var (',' var)*
 
-unary_op -> '-' | '!' | '~'
+binary_op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
+             | GEQ | LEQ | EQ | NEQ | AND | OR
+
+unary_op -> '-' | '!' | '~' | NOT
