@@ -132,6 +132,15 @@ dux = bux(3)   <-- no unbound variables, now we can resolve:
                <-- = (4 * 3) ^ (10 / 5) = 12^2 = 144
 ```
 
+Going further off of SQL inspiration, we could create aliases for some of these functions:
+
+```
+foo = a * b
+bar = a / b
+qux = (foo f)^(bar b)
+lux = qux(f.a = 12, f.b = 3, b.a = 4, b.b = 8) <-- = (12 * 3)^(1/2) = 6
+```
+
 I'm currently debating whether to make Pico a dynamic language. They have their benefits. There are many advantages to typing, however, and one in this case is simply that it better indicates which variables are unbound:
 
 ```
@@ -143,4 +152,58 @@ fact4 = fact(n = Int n, acc = 1) <-- once again Int specifier means n is a new, 
 n = 10
 fact5 = fact(n,1) <-- now n is bound, so fact4 is the constant expression 3628800
 fact6 = fact3(n) <-- constant expression 3628800
+```
+
+This would also allow the writer to indicate off the bat which unbound variables there were:
+
+```
+bsearchr = (Int start, finish, target, Vector(Int) v, <-- 4 unbound variables
+            mid = (start + finish)/2, <-- not unbound
+            if target == v[mid] then True, else
+            if start == finish then False, else
+            if target > v[mid] then bsearchr(mid, finish, target, v), else
+            if target < v[mid] then bsearchr(start, mid, target, v)
+          )
+bsearch = bsearchr(0, len(Vector(Int) v), Int target, v) <-- here we've inlined the variable declarations
+
+<-- Now we can use it for some stuff.
+contains5 = bsearch(,5)
+v = {1,2,3,4,5,6,7,8,9,10}
+vcontains = bsearch(v)
+vcontains(6) <-- true
+vcontains(11) <-- false
+
+<{ note that the below is a meaningless function; it's just there 
+   to illustrate combining two functions. }>
+usableVector = (contains5 || vcontains)
+usableVector({1,2,3,4}, 5) <-- true
+usableVector({1,2,3}, 12) <-- false
+
+<{ one interesting thing is that we could make the OR operator short-circuit, so 
+   that the following resolves to True even though it has unbound variables: }>
+usableVector({1,2,3,4,5}) <-- contains 5, so resolves to true.
+usableVector({1,2,3,4}) <-- is a function equivalent to vcontains
+f = (if Int i != i then Int j, else 1) <-- given any argument, f will always resolve to 1
+f(123) <-- 1
+```
+
+As a functional language, Pico will have algebraic types. Consider a List which is either `Empty` or `Cons(elem, List)`, and a `when` statement which acts as a pattern matcher. Note that this vector usage might not be how we actually do it.
+
+```
+len = (when List l is Empty: Int acc, when l is Cons(_, next): len(next, acc+1))
+fillVector = (List(Int) l, Vector v, Int posn
+               when l is Empty: v,
+               when l is Cons(elem, next): listToVector(next, add(v, posn, elem), posn - 1)
+             )
+listToVector = (ln = len(List(Int) l, 0),
+                v = Vector(Int)(ln),
+                fillVector(l, v, ln - 1))
+
+<{
+   Note: one curious question is what would happen if we defined it as such:
+   listToVector = (ln = len(, 0),
+                   v = Vector(Int)(ln),
+                   fillVector(l, v, ln - 1))
+   The call to len supplies one argument, so ln is a function which takes a List as an argument. Then passing in a list to listToVector, the list would be passed to the first unbound variable, which is l in the len function. Then the l on the third line of listToVector would be undefined, which would either mean listToVector requires two (identical or same-length) lists as arguments, or if we require a type declaration in front of every unbound variable, then we have an error.
+}>                
 ```
