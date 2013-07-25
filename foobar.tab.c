@@ -620,43 +620,43 @@ namespace foobar {
   case 39:
 /* Line 664 of lalr1.cc  */
 #line 164 "foobar.y"
-    { (yyval.strval) = "Any"; }
+    { (yyval.strval) = new std::string("Any"); }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
 #line 165 "foobar.y"
-    { (yyval.strval) = "Int"; }
+    { (yyval.strval) = new std::string("Int"); }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
 #line 166 "foobar.y"
-    {(yyval.strval) = "Float"; }
+    {(yyval.strval) = new std::string("Float"); }
     break;
 
   case 42:
 /* Line 664 of lalr1.cc  */
 #line 167 "foobar.y"
-    {(yyval.strval) = "String"; }
+    {(yyval.strval) = new std::string("String"); }
     break;
 
   case 43:
 /* Line 664 of lalr1.cc  */
 #line 168 "foobar.y"
-    { (yyval.strval) = "Array"; }
+    { (yyval.strval) = new std::string("Array"); }
     break;
 
   case 44:
 /* Line 664 of lalr1.cc  */
 #line 169 "foobar.y"
-    { (yyval.strval) = "List"; }
+    { (yyval.strval) = new std::string("List"); }
     break;
 
   case 45:
 /* Line 664 of lalr1.cc  */
 #line 170 "foobar.y"
-    { (yyval.strval) = "Table"; }
+    { (yyval.strval) = new std::string("Table"); }
     break;
 
   case 47:

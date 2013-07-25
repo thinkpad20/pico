@@ -161,13 +161,13 @@ primary
 undef_var: typename var { $$ = $2; } ;
 
 typename
-   : ANY { $$ = "Any"; } 
-   | INT { $$ = "Int"; }
-   | FLOAT {$$ = "Float"; }
-   | STRING {$$ = "String"; }
-   | ARRAY { $$ = "Array"; }
-   | LIST { $$ = "List"; }
-   | TABLE { $$ = "Table"; }
+   : ANY { $$ = new std::string("Any"); } 
+   | INT { $$ = new std::string("Int"); }
+   | FLOAT {$$ = new std::string("Float"); }
+   | STRING {$$ = new std::string("String"); }
+   | ARRAY { $$ = new std::string("Array"); }
+   | LIST { $$ = new std::string("List"); }
+   | TABLE { $$ = new std::string("Table"); }
    | TYPENAME 
    ;
 
