@@ -614,7 +614,7 @@ namespace foobar {
   case 38:
 /* Line 664 of lalr1.cc  */
 #line 161 "foobar.y"
-    { (yyval.var) = (yysemantic_stack_[(2) - (2)].var); }
+    { (yysemantic_stack_[(2) - (2)].var)->type = (yysemantic_stack_[(2) - (1)].strval); (yyval.var) = (yysemantic_stack_[(2) - (2)].var); }
     break;
 
   case 39:

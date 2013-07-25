@@ -158,7 +158,7 @@ primary
    | undef_var { $$ = new Term($1); }
    ;
 
-undef_var: typename var { $$ = $2; } ;
+undef_var: typename var { $2->type = $1; $$ = $2; } ;
 
 typename
    : ANY { $$ = new std::string("Any"); } 

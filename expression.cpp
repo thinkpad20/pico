@@ -136,6 +136,7 @@ void Term::print() {
       case VAR:
       {
          printf("var %s", var->name->c_str()); fflush(stdout);
+         if (var->type) printf(" (%s)", var->type->c_str());
          return;
       }
       case ADD: case SUB: case MULT: case DIV:
