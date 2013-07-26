@@ -22,7 +22,9 @@ int yydebug = 1;
 	namespace pico {
 		class FlexScanner;
 		struct Expression;
+      struct ExpressionList;
 		struct Term;
+      struct TermList;
 		struct Assign;
 		struct If;
       struct Var;
@@ -44,11 +46,13 @@ int yydebug = 1;
    pico::Assign *assign;
    pico::If *if_s;
    pico::Var *var;
+   pico::ExpressionList *expr_list;
+   pico::TermList *term_list;
 }
 
 %token FN INT FLOAT CHAR STRING ARRAY TABLE ALG WHEN
 %token END IF THEN ANY RETURN IS DO IO IOFN LIST SL SR
-%token LEQ GEQ EQ NEQ OR AND NOT ELSE NEWLINE
+%token LEQ GEQ EQ NEQ OR AND NOT ELSE
 %token BOOL TRUE FALSE
 %token <strval> ID SYMBOL
 %token <strval> TYPENAME
@@ -58,111 +62,78 @@ int yydebug = 1;
 %token <cval> CHAR_LITERAL
 %token <ival> INTEGER
 
-%type <strval> typename
+%type <strval> type_name var_name
 %type <expr> expr
-%type <term> term mult_term unary_term literal invocation primary
-%type <term> add_term comp_term and_term term_list opt_term
-%type <ival> comp
-%type <var> undef_var var
+%type <expr_list> pico exprs
+%type <term> term opt_term literal invocation primary
+%type <term_list> term_list
+%type <var> var
 
-%left COMP
-%left LOGICAL
-%left ADDITIVE
-%left MULTI
-%left SYMBOL
-%left UNARY
+%left '<' '>' LEQ GEQ EQ NEQ
+%left AND OR
+%left '+' '-'
+%left '*' '/' '%'
+%right NOT UNARY
 
-%start exprs
+%start pico
 
 %%
 
-exprs: expr | exprs expr ;
+pico: exprs { $$ = $1; $$->print(); } ;
+
+exprs: expr '.' { $$ = new ExpressionList(); $$->push_back($1); }
+    | pico expr '.' { $1->push_back($2); $$ = $1; }
 
 expr
-   : term '.' { $$ = new Expression($1); }
-   | var '=' term term_end expr { $$ = new Expression(new Assign($1, $3), $5); }
-   | IF term THEN term term_end ELSE expr { $$ = new Expression(new If($2, $4), $7); }
-   ;
-
-term_end
-   : NEWLINE | ','
+   : term { $$ = new Expression($1); }
+   | var_name '=' term ',' expr { $$ = new Expression(new Assign(new Var($1), $3), $5); }
+   | IF term THEN term ',' ELSE expr { $$ = new Expression(new If($2, $4), $7); }
    ;
 
 term
-   : and_term
-   | term OR and_term { $$ = make_log_or($1, $3); }
-   ;
-
-and_term
-   : comp_term
-   | and_term AND comp_term { $$ = make_log_and($1, $3); }
-   ;
-
-comp_term
-   : add_term
-   | comp_term comp add_term
-      {
-         switch ($2) {
-            case 0: $$ = make_eq($1, $3); break;
-            case 1: $$ = make_lt($1, $3); break;
-            case 2: $$ = make_gt($1, $3); break;
-            case 3: $$ = make_leq($1, $3); break;
-            case 4: $$ = make_neq($1, $3); break;
-            case 5: $$ = make_geq($1, $3); break;
-         }
-      }
-   ;
-
-comp: EQ {$$ = 0;} | '<' {$$ = 1;} | '>' {$$ = 2;}
-   | LEQ {$$ = 3;} | NEQ {$$ = 4;} | GEQ {$$ = 5;}
-   ;
-
-add_term
-   : mult_term
-   | mult_term '+' add_term { $$ = make_add($1, $3); printf("Found an addition\n"); }
-   | mult_term '-' add_term { $$ = make_sub($1, $3); printf("Found a subtraction\n"); }
-   ;
-
-mult_term
-   : unary_term
-   | unary_term '*' mult_term { $$ = make_mult($1, $3); printf("Found a multiplication\n"); }
-   | unary_term '/' mult_term { $$ = make_div($1, $3); printf("Found a division\n"); }
-   ;
-
-unary_term
    : invocation
-   | '-' unary_term { $$ = make_neg($2); }
-   | NOT unary_term { $$ = make_log_not($2); }
+   | term '<' invocation  { $$ = make_lt($1, $3); }
+   | term '>' invocation  { $$ = make_gt($1, $3); }
+   | term LEQ invocation  { $$ = make_leq($1, $3); }
+   | term GEQ invocation  { $$ = make_leq($1, $3); }
+   | term EQ invocation   { $$ = make_eq($1, $3); }
+   | term NEQ invocation  { $$ = make_neq($1, $3); }
+   | term AND invocation  { $$ = make_log_and($1, $3); }
+   | term OR invocation   { $$ = make_log_or($1, $3); }
+   | term '+' invocation  { $$ = make_add($1, $3); }
+   | term '-' invocation  { $$ = make_sub($1, $3); }
+   | term '*' invocation  { $$ = make_mult($1, $3); }
+   | term '/' invocation  { $$ = make_div($1, $3); }
+   | term '%' invocation  { $$ = make_mod($1, $3); }
+   | NOT term             { $$ = make_log_not($2); }
+   | '-' term %prec UNARY { $$ = make_neg($2); }
    ;
 
 invocation
    : primary
-   | invocation '(' term_list ')' 
-      { 
-         $$ = new Term(new Invoke($1, $3)); 
-      }
+   | invocation '(' term_list ')' { $$ = new Term(new Invoke($1, $3)); }
    ;
 
 term_list
-   : opt_term
-   | term_list ',' opt_term { $1->append($3); $$ = $1; }
+   : opt_term { $$ = new TermList(); $$->push_back($1); }
+   | term_list ',' opt_term { $1->push_back($3); $$ = $1; }
    ;
 
 opt_term
    : term
-   | {$$ = make_parens(new Expression()); }
+   | { $$ = NULL; }//{$$ = make_parens(new Expression()); }
    ;
 
 primary
    : literal
-   | var { $$ = new Term($1); }
-   | '(' expr ')' { $$ = make_parens($2); }
-   | undef_var { $$ = new Term($1); }
+   | var { $$ = new Term($1);}//{  }
+   | '(' expr ')' { $$ = new Term($2); }//{ $$ = make_parens($2); }
    ;
 
-undef_var: typename var { $2->type = $1; $$ = $2; } ;
+var: var_name     { $$ = new Var($1); }
+   | type_name var_name { $$ = new Var($2, $1); } ;//{ $2->type = $1; $$ = $2; } ;
 
-typename
+type_name
    : ANY { $$ = new std::string("Any"); } 
    | INT { $$ = new std::string("Int"); }
    | FLOAT {$$ = new std::string("Float"); }
@@ -174,13 +145,15 @@ typename
    ;
 
 literal
-   : INT_LITERAL { $$ = new Term($1); }
-   | FLOAT_LITERAL { $$ = new Term($1); }
-   | STRING_LITERAL { $$ = new Term($1); }
-   | CHAR_LITERAL { $$ = new Term($1); }
+   : INT_LITERAL     { $$ = new Term($1); }
+   | FLOAT_LITERAL   { $$ = new Term($1); }
+   | STRING_LITERAL  { $$ = new Term($1); }
+   | CHAR_LITERAL    { $$ = new Term($1); }
+   | TRUE            { $$ = new Term(true); }
+   | FALSE           { $$ = new Term(false); }
    ;
 
-var: ID { $$ = new Var($1); } ;
+var_name: ID;
 
 %%
 

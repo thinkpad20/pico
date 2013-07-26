@@ -49,7 +49,9 @@
 	namespace pico {
 		class FlexScanner;
 		struct Expression;
+      struct ExpressionList;
 		struct Term;
+      struct TermList;
 		struct Assign;
 		struct If;
       struct Var;
@@ -57,7 +59,7 @@
 
 
 /* Line 270 of lalr1.cc  */
-#line 61 "pico.tab.h"
+#line 63 "pico.tab.h"
 
 
 #include <string>
@@ -74,7 +76,7 @@
 #line 11 "pico.y"
 namespace pico {
 /* Line 270 of lalr1.cc  */
-#line 78 "pico.tab.h"
+#line 80 "pico.tab.h"
 
   /// A Bison parser.
   class BisonParser
@@ -85,7 +87,7 @@ namespace pico {
     union semantic_type
     {
 /* Line 270 of lalr1.cc  */
-#line 37 "pico.y"
+#line 39 "pico.y"
 
    double fval;
    int ival;
@@ -96,10 +98,12 @@ namespace pico {
    pico::Assign *assign;
    pico::If *if_s;
    pico::Var *var;
+   pico::ExpressionList *expr_list;
+   pico::TermList *term_list;
 
 
 /* Line 270 of lalr1.cc  */
-#line 103 "pico.tab.h"
+#line 107 "pico.tab.h"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -140,23 +144,18 @@ namespace pico {
      AND = 284,
      NOT = 285,
      ELSE = 286,
-     NEWLINE = 287,
-     BOOL = 288,
-     TRUE = 289,
-     FALSE = 290,
-     ID = 291,
-     SYMBOL = 292,
-     TYPENAME = 293,
-     STRING_LITERAL = 294,
-     FLOAT_LITERAL = 295,
-     INT_LITERAL = 296,
-     CHAR_LITERAL = 297,
-     INTEGER = 298,
-     COMP = 299,
-     LOGICAL = 300,
-     ADDITIVE = 301,
-     MULTI = 302,
-     UNARY = 303
+     BOOL = 287,
+     TRUE = 288,
+     FALSE = 289,
+     ID = 290,
+     SYMBOL = 291,
+     TYPENAME = 292,
+     STRING_LITERAL = 293,
+     FLOAT_LITERAL = 294,
+     INT_LITERAL = 295,
+     CHAR_LITERAL = 296,
+     INTEGER = 297,
+     UNARY = 298
    };
 
     };
@@ -246,7 +245,7 @@ namespace pico {
     typedef unsigned char token_number_type;
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
-    static const signed char yypact_[];
+    static const short int yypact_[];
     static const signed char yypact_ninf_;
 
     /// For a state, default reduction number.
@@ -254,7 +253,7 @@ namespace pico {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const signed char yypgoto_[];
+    static const short int yypgoto_[];
     static const signed char yydefgoto_[];
 
     /// What to do in a state.
@@ -339,7 +338,7 @@ namespace pico {
 #line 11 "pico.y"
 } // pico
 /* Line 270 of lalr1.cc  */
-#line 343 "pico.tab.h"
+#line 342 "pico.tab.h"
 
 
 

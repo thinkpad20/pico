@@ -1,45 +1,33 @@
 Pico Grammar
 
-Operator Precedence Ordering:
-%left AND OR
-%left '<' '>' LEQ GEQ NEQ EQ
-%right U_LOG_NOT
-%left '+' '-'
-%left '*' '/' '%' '&' '|'
-%right U_MINUS U_BIT_NOT
+pico -> expression '.'
+      | pico expression '.'
 
-pico -> expr
-        | pico expr
+expression -> term
+            | var '=' term ',' expression
+            | IF term THEN term ',' ELSE expression
 
-expr -> term '.'
-      | undef_var_dec ',' expr
-      | var '=' term ',' expr
-      | IF term THEN term ',' ELSE expr
+term -> literal
+      | '(' expression ')'
+      | invocation
+      | term op term
+      | unary_op term
+      | term ( '(' term (',' term)* ')' )*
 
-binary_term -> unary_term
-             | binary_term binary_op unary_term
+literal -> (typename)? var 
+         | int_literal 
+         | float_literal
+         | string_literal
+         | char_literal
 
-unary_term -> invocation
-            | unary_op unary_term
+op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
+      | ">=" | "<=" | "==" | "!=" | "&&" | "||"
 
-invocation -> primary
-            | invocation '(' term (',' term)* ')'
+unary_op -> '-' | '!' | '~'
 
-primary -> literal
-         | '(' expr ')'
-
-literal -> var
-         | undef_var
-         | INT_CONSTANT
-         | FLOAT_CONSTANT
-         | STRING_CONSTANT
-         | CHAR_CONSTANT
-
-undef_var_dec -> TYPENAME var (',' var)*
-
-binary_op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
-             | GEQ | LEQ | EQ | NEQ | AND | OR
-
-unary_op -> '-' %prec U_MINUS
-          | '!' %prec U_NOT
-          | '~' %prec U_BIT_NOT
+var ->            [a-z_][a-zA-Z_]*
+typename ->       [A-Z][a-zA-Z_]*
+int_literal ->    [0-9]+
+float_literal ->  ([0-9]*\.[0-9]+)
+string_literal->  \"(\\.|[^\\"])*\"
+char_literal ->   \'(\\.|[^\\'])*\'

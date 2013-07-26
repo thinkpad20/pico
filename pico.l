@@ -3,6 +3,7 @@
 #include "picoScanner.h"
 static int block_comment_num = 0;
 static char to_char(char *str);
+static std::string *get_string(const char *);
 int yylineno = 0;
 %}
 
@@ -21,64 +22,51 @@ Char                    { return pico::BisonParser::token::CHAR; }
 List                    { return pico::BisonParser::token::LIST; }
 Array                   { return pico::BisonParser::token::ARRAY; }
 Table                   { return pico::BisonParser::token::TABLE; }
-alg                     { return pico::BisonParser::token::ALG; }
-fn                      { return pico::BisonParser::token::FN; }
-iofn                    { return pico::BisonParser::token::IOFN; }
-end                     { return pico::BisonParser::token::END; }
 if                      { return pico::BisonParser::token::IF; }
 then                    { return pico::BisonParser::token::THEN; }
 else                    { return pico::BisonParser::token::ELSE; }
 is                      { return pico::BisonParser::token::IS; }
-or                      { return pico::BisonParser::token::OR; }
-and                     { return pico::BisonParser::token::AND; }
 not                     { return pico::BisonParser::token::NOT; }
 when                    { return pico::BisonParser::token::WHEN; }
-"=="                     { return pico::BisonParser::token::EQ; }
-=                       { return '='; }
-,                       { return ','; }
-"&"                       { return '&'; }
-"|"                       { return '|'; }
-"^"                       { return '^'; }
-"~"                       { return '~'; }
-"."                     { return '.'; }
-"+"                     { return '+'; }
-"-"                     { return '-'; }
-"*"                     { return '*'; }
-"/"                     { return '/'; }
-">"                     { return '>'; }
-"<"                     { return '<'; }
-"<<"                    { return pico::BisonParser::token::SL; }
-">>"                    { return pico::BisonParser::token::SR; }
+True                    { return pico::BisonParser::token::WHEN; }
+False                   { return pico::BisonParser::token::WHEN; }
+"=="                    { return pico::BisonParser::token::EQ; }
+"<="                    { return pico::BisonParser::token::LEQ; }
+">="                    { return pico::BisonParser::token::GEQ; }
 "!="                    { return pico::BisonParser::token::NEQ; }
-return                  { return pico::BisonParser::token::RETURN; }
-"->"                    { return pico::BisonParser::token::RETURN; }
+"||"                    { return pico::BisonParser::token::OR; }
+"&&"                    { return pico::BisonParser::token::AND; }
+[+\-*/=><,.]            { return yytext[0]; }
+
 "<--"                   { BEGIN(LINE_COMMENT); }
-<LINE_COMMENT>\n        { BEGIN(INITIAL); yylineno++; }
 <LINE_COMMENT>.         { /* ignore */ }
+<LINE_COMMENT>\n        { BEGIN(INITIAL); yylineno++; }
 "<{"                    { BEGIN(BLOCK_COMMENT); block_comment_num = 1; }
 <BLOCK_COMMENT>"<{"     { block_comment_num++; }
-<BLOCK_COMMENT>"}>"     { if ((--block_comment_num) == 0) BEGIN(INITIAL); }
 <BLOCK_COMMENT>\n       { yylineno++; }
 <BLOCK_COMMENT><<EOF>>  { puts("Warning: EOF encountered inside a block comment"); return EOF; }
 <BLOCK_COMMENT>.        { /* ignore */ }
-[A-Z][a-zA-Z0-9_]*      { yylval->strval = new std::string(yytext); 
-                          return pico::BisonParser::token::TYPENAME; }
-[a-z_][a-zA-Z0-9_]*     { yylval->strval = new std::string(yytext); 
-                          return pico::BisonParser::token::ID; }
-[-+]?[0-9]+             { yylval->ival = atoi(yytext); 
-                          return pico::BisonParser::token::INT_LITERAL; }
-([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)  { yylval->fval = atof(yytext); 
-                                               return pico::BisonParser::token::FLOAT_LITERAL; }
-\"(\\.|[^\\"])*\"  { yylval->strval = new std::string(strndup(yytext+1, strlen(yytext) - 2)); 
-                     return pico::BisonParser::token::STRING_LITERAL; }
-\'(\\.|[^\\'])*\'     { yylval->cval = to_char(yytext+1); 
-                        return pico::BisonParser::token::CHAR_LITERAL; }
-[\*\+\-/<=>\^~.]+       { return pico::BisonParser::token::SYMBOL; }
-[ \t\r]+                  { /* ignore */ }
-\n                      { yylineno++; /* return pico::BisonParser::token::NEWLINE; */ }
-.                       { return yytext[0]; }
+<BLOCK_COMMENT>"}>"     { if ((--block_comment_num) == 0) BEGIN(INITIAL); }
+
+[A-Z][a-zA-Z0-9_]*      { yylval->strval = new std::string(yytext); return pico::BisonParser::token::TYPENAME; }
+[a-z_][a-zA-Z0-9_]*     { yylval->strval = new std::string(yytext); return pico::BisonParser::token::ID; }
+[0-9]+                  { yylval->ival = atoi(yytext); return pico::BisonParser::token::INT_LITERAL; }
+([0-9]*\.[0-9]+)        { yylval->fval = atof(yytext); return pico::BisonParser::token::FLOAT_LITERAL; }
+\"(\\.|[^\\"])*\"       { yylval->strval = get_string(yytext); return pico::BisonParser::token::STRING_LITERAL; }
+\'(\\.|[^\\'])*\'       { yylval->cval = to_char(yytext+1); return pico::BisonParser::token::CHAR_LITERAL; }
+
+[ \t\r]+                { /* ignore */ }
+\n                      { yylineno++;  }
+.                       { printf("unrecognized character '%c' found\n", *yytext); return yytext[0]; }
 
 %%
+
+static std::string *get_string(const char *yytext) {
+   char *c_str = strndup(yytext+1, strlen(yytext) - 2);
+   std::string *res = new std::string(c_str);
+   free(c_str);
+   return res;
+}
 
 static char to_char(char *str) {
    if (strlen(str) <= 1) {
