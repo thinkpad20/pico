@@ -1,23 +1,5 @@
-<{--io 
-main = (
-   Int a, Int b,
-   c = if a > b then 4, else 
-         if a > b then 4, else 5..
-<--   print(c)
-)}>
-<{
+collatz = (if Int i == 1 then Int acc, else 
+           if i % 2 == 0 then collatz(i/2, acc + 1), else
+           collatz(i + 3, acc + 1)), collatz.
 
-assign -> var '=' expr
-
-expr -> term '.'
-   -> assign expr_end expr
-   -> IF term THEN term ',' ELSE expr 
-
-}>
-
-collatz = 3, collatz. 5. hello = "hello", if 3 < 4 then 5, else 6.
-
-<{(if (Int i == 1) then (Int acc), else 
-           if (i % 2 == 0) then (collatz(i/2, acc + 1)), else
-           collatz(i + 3, acc + 1)
-          ).}>
+fact = (if Int i < 2 then Int acc, else fact(i-1, acc*i))(,1), fact.

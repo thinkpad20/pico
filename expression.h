@@ -9,70 +9,18 @@ namespace pico {
 struct Term;
 struct Expression;
 
-struct ExpressionList : public std::deque<Expression *> {
-   void print();
-};
+struct ExpressionList : public std::deque<Expression *> { void print(); };
 
-struct TermList : public std::deque<Term *> {
-   void print();
-};
-
-struct Invoke {
-   Term *func;
-   TermList *term_list;
-   Invoke(Term *func): func(func), term_list(NULL) {}
-   Invoke(Term *func, TermList *term_list): func(func), term_list(term_list) {}
-   ~Invoke();
-};
+struct TermList : public std::deque<Term *> { void print(); };
 
 struct Var {
    std::string *name, *type;
    Var(std::string *name): name(name), type(NULL) {}
    Var(std::string *name, std::string *type): name(name), type(type) {}
    ~Var();
-};
-
-struct Assign {
-   Var *var; 
-   Term *term;
-   Assign(Var *var, Term *term): 
-      var(var), term(term) {}
-   ~Assign();
-   void print();
-};
-
-struct If {
-   Term *cond, *if_true; 
-   If(Term *cond, Term *if_true):
-      cond(cond), if_true(if_true) {}
-   ~If();
-   void print();
-};
-
-struct Expression {
-   enum Type {
-      TERM, 
-      ASSIGN, 
-      IF,
-   } t;
-   union {
-      Term *term;
-      struct {Assign *assign; Expression *next; } assign;
-      struct {If *if_s; Expression *next;} if_s;
-   };
-   Expression *next;
-   Expression(Term *term): t(TERM), term(term) {/*printf("made term expression\n");*/}
-   Expression(If *if_s, Expression *next): t(IF) {
-      this->if_s.if_s = if_s; 
-      this->if_s.next = next;
+   static Var *lookup(std::string *str) {
+      return new Var(str); // later add actual lookup, might not return new
    }
-   Expression(Assign *a, Expression *next): t(ASSIGN) {
-      this->assign.assign = a;
-      this->assign.next = next;
-   }
-   ~Expression();
-   void print();
-   void append(Expression *expr);
 };
 
 struct Term {
@@ -89,7 +37,7 @@ struct Term {
       bool bval;
       double fval;
       std::string *strval; 
-      Invoke *invoke;
+      struct {Term *func; TermList *term_list;} invoke;
       Var *var;
       struct {Term *term1, *term2;} binary;
       Term *unary;
@@ -104,16 +52,33 @@ struct Term {
    Term(std::string *str): t(STRING), strval(str) {}
    Term(const char *str): t(STRING), strval(new std::string(str)) {}
    Term(Var *var): t(VAR), var(var) {}
-   Term(Invoke *inv): t(INVOKE), invoke(inv) {}
-   Term(Term *term1, Term *term2, enum Type type) {
-      binary.term1 = term1;
-      binary.term2 = term2;
-      t = type;
-   }
+   Term(Term *term1, Term *term2, enum Type type) 
+      { t = type; binary.term1 = term1; binary.term2 = term2; }
    Term(Expression *expr): t(PARENS), expr(expr) {}
    Term(Term *term, enum Type type): t(type), unary(term) {}
+   Term(Term *func, TermList *term_list)
+      { t = INVOKE; invoke.func = func; invoke.term_list = term_list; }
+   ~Term();
    void print();
    void append(Term *term);
+};
+
+struct Expression {
+   enum Type { TERM, ASSIGN, IF } t;
+   union {
+      Term *term;
+      struct {Var *var; Term *term; Expression *next;} assign;
+      struct {Term *cond, *if_true; Expression *if_false;} if_;
+   };
+   Expression *next;
+   Expression(Term *term): t(TERM), term(term) { }
+   Expression(Term *cond, Term *if_true, Expression *if_false)
+      { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
+   Expression(Var *var, Term *term, Expression *next)
+      { t = ASSIGN; assign.var = var; assign.term = term; assign.next = next; }
+   ~Expression();
+   void print();
+   void append(Expression *expr);
 };
 
 Term *make_add(Term *term1, Term *term2);

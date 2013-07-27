@@ -33,54 +33,59 @@ void Initialize() {
    symdic[Term::BIT_OR] = "|";
    symdic[Term::BIT_XOR] = "^";
    symdic[Term::BIT_NOT] = "~";
+   symdic[Term::MOD] = "%";
 }
 
 Expression::~Expression() { 
    switch (t) {
       case TERM: delete term; break;
-      case ASSIGN: delete assign.assign; delete assign.next; break;
-      case IF: delete if_s.if_s; delete if_s.next; break;
+      case ASSIGN: delete assign.term; delete assign.var; delete assign.next; break;
+      case IF: delete if_.cond; delete if_.if_true; delete if_.if_false; break;
       default: break;
    }
    if (next) delete next; 
 }
-Var::~Var() { delete name; }
-If::~If() { delete cond; delete if_true; }
-Assign::~Assign() { delete var; delete term; }
-Invoke::~Invoke() { delete func; if (term_list) delete term_list; }
+Var::~Var() { delete name; if (type) delete type; }
 
-void Assign::print() {
-   printf("%s = (", var->name->c_str());
-   upInd();
-   term->print();
-   dnInd();
-   printf(")"); fflush(stdout);
-}
-
-void If::print() {
-   printf("IF "); fflush(stdout);
-   cond->print(); puts("");
-   printf("THEN "); fflush(stdout);
-   upInd();
-   if_true->print();
-   dnInd();
+Term::~Term() {
+   switch (t) {
+      case INVOKE:
+      {
+         delete invoke.func; if (invoke.term_list) delete invoke.term_list; 
+         return;
+      }
+      default:
+         printf("Can't delete most types of terms...\n");
+         return;
+   }
 }
 
 void Expression::print() {
+   // printf("PRINTING EXPR %p, type %d\n", this, t);
    switch(t) {
       case IF: 
       {
-         if_s.if_s->print();
+         printf("IF "); fflush(stdout);
+         upInd();
+         if_.cond->print(); puts("");
+         dnInd();
+         printf("THEN "); fflush(stdout);
+         upInd();
+         if_.if_true->print();
+         dnInd();
          printf("ELSE ");
          upInd();
-         if_s.next->print();
+         if_.if_false->print();
          dnInd();
          return;
       }
       case ASSIGN:
       {
-         assign.assign->print();
-         assign.next->print();
+         printf("%s = (", assign.var->name->c_str());
+         upInd();
+         assign.term->print();
+         dnInd();
+         printf(")"); fflush(stdout);
          return;
       }
       case TERM:
@@ -95,8 +100,7 @@ void Expression::print() {
 }
 
 void Term::print() {
-   if (t != VAR && t != INT && t != STRING && t != FLOAT && t != INVOKE && t != CHAR)
-      {  }
+   // printf("PRINTING TERM %p, type %d\n", this, t);
    switch (t) {
       case EMPTY: 
       {
@@ -105,15 +109,14 @@ void Term::print() {
       }
       case INVOKE:
       {
-         printf("call ("); fflush(stdout);
+         printf("CALL"); fflush(stdout);
          upInd();
-         invoke->func->print();
+         invoke.func->print();
          dnInd();
-         printf(", with(");  fflush(stdout);
+         printf("WITH");  fflush(stdout);
          upInd();
-         invoke->term_list->print();
+         invoke.term_list->print();
          dnInd();
-         printf(")");  fflush(stdout);
          return;
       }
       case FLOAT:
@@ -133,7 +136,7 @@ void Term::print() {
       }
       case BOOL:
       {
-         printf("%s", bval == true ? "TRUE" : "FALSE"); fflush(stdout);
+         printf("%s", bval ? "TRUE" : "FALSE"); fflush(stdout);
          return;
       }
       case STRING:
@@ -143,12 +146,11 @@ void Term::print() {
       }
       case VAR:
       {
-         printf("var %s", var->name->c_str()); fflush(stdout);
-         if (var->type) printf(" (%s)", var->type->c_str());
+         printf("%s %s", var->type ? var->type->c_str() : "var", var->name->c_str()); fflush(stdout);
          return;
       }
       case ADD: case SUB: case MULT: case DIV:
-      case LT: case GT: case GEQ: case LEQ:
+      case LT: case GT: case GEQ: case LEQ: case MOD:
       case EQ: case NEQ: case LOG_AND: case LOG_OR:
       case BIT_AND: case BIT_OR: case BIT_XOR:
       {
@@ -168,11 +170,11 @@ void Term::print() {
       }
       case PARENS:
       {
-         unary->print();
+         expr->print();
          return;
       }
       default:
-         printf("UNKNOWN TERM"); fflush(stdout);
+         printf("UNKNOWN TERM %d\n", t); fflush(stdout);
          break;
    }
 }
@@ -276,18 +278,19 @@ void ExpressionList::print() {
       if (first) first = false; else printf(", ");  fflush(stdout);
       (*it)->print();
    }
-   printf("]");
+   printf("]\n");
 }
 
 void TermList::print() {
    std::deque<Term *>::iterator it;
    bool first = true;
-   printf("terms[");
+   printf("TERMLIST");
+   upInd();
    for (it = begin(); it != end(); it++) {
       if (first) first = false; else printf(", ");  fflush(stdout);
       (*it)->print();
    }
-   printf("]");
+   dnInd();
 }
 
 }

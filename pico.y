@@ -25,8 +25,6 @@ int yydebug = 1;
       struct ExpressionList;
 		struct Term;
       struct TermList;
-		struct Assign;
-		struct If;
       struct Var;
 	}
 }
@@ -43,8 +41,6 @@ int yydebug = 1;
    std::string *strval;
    pico::Expression *expr;
    pico::Term *term;
-   pico::Assign *assign;
-   pico::If *if_s;
    pico::Var *var;
    pico::ExpressionList *expr_list;
    pico::TermList *term_list;
@@ -85,13 +81,13 @@ exprs: expr '.' { $$ = new ExpressionList(); $$->push_back($1); }
     | pico expr '.' { $1->push_back($2); $$ = $1; }
 
 expr
-   : term { $$ = new Expression($1); }
-   | var_name '=' term ',' expr { $$ = new Expression(new Assign(new Var($1), $3), $5); }
-   | IF term THEN term ',' ELSE expr { $$ = new Expression(new If($2, $4), $7); }
+   : term                              { $$ = new Expression($1); }
+   | var_name '=' term ',' expr        { $$ = new Expression(new Var($1), $3, $5); }
+   | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
    ;
 
 term
-   : invocation
+   : invocation 
    | term '<' invocation  { $$ = make_lt($1, $3); }
    | term '>' invocation  { $$ = make_gt($1, $3); }
    | term LEQ invocation  { $$ = make_leq($1, $3); }
@@ -111,36 +107,36 @@ term
 
 invocation
    : primary
-   | invocation '(' term_list ')' { $$ = new Term(new Invoke($1, $3)); }
+   | invocation '(' term_list ')' { $$ = new Term($1, $3); }
    ;
 
 term_list
-   : opt_term { $$ = new TermList(); $$->push_back($1); }
-   | term_list ',' opt_term { $1->push_back($3); $$ = $1; }
+   : opt_term                 { $$ = new TermList(); $$->push_back($1); }
+   | term_list ',' opt_term   { $1->push_back($3); $$ = $1; }
    ;
 
 opt_term
    : term
-   | { $$ = NULL; }//{$$ = make_parens(new Expression()); }
+   | { $$ = new Term(); }
    ;
 
 primary
    : literal
-   | var { $$ = new Term($1);}//{  }
-   | '(' expr ')' { $$ = new Term($2); }//{ $$ = make_parens($2); }
+   | var          { $$ = new Term($1);}
+   | '(' expr ')' { $$ = new Term($2); }
    ;
 
-var: var_name     { $$ = new Var($1); }
-   | type_name var_name { $$ = new Var($2, $1); } ;//{ $2->type = $1; $$ = $2; } ;
+var: var_name           { $$ = Var::lookup($1); }
+   | type_name var_name { $$ = new Var($2, $1); } ;
 
 type_name
-   : ANY { $$ = new std::string("Any"); } 
-   | INT { $$ = new std::string("Int"); }
-   | FLOAT {$$ = new std::string("Float"); }
-   | STRING {$$ = new std::string("String"); }
-   | ARRAY { $$ = new std::string("Array"); }
-   | LIST { $$ = new std::string("List"); }
-   | TABLE { $$ = new std::string("Table"); }
+   : ANY       { $$ = new std::string("Any"); } 
+   | INT       { $$ = new std::string("Int"); }
+   | FLOAT     { $$ = new std::string("Float"); }
+   | STRING    { $$ = new std::string("String"); }
+   | ARRAY     { $$ = new std::string("Array"); }
+   | LIST      { $$ = new std::string("List"); }
+   | TABLE     { $$ = new std::string("Table"); }
    | TYPENAME 
    ;
 

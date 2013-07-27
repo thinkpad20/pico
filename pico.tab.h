@@ -52,14 +52,12 @@
       struct ExpressionList;
 		struct Term;
       struct TermList;
-		struct Assign;
-		struct If;
       struct Var;
 	}
 
 
 /* Line 270 of lalr1.cc  */
-#line 63 "pico.tab.h"
+#line 61 "pico.tab.h"
 
 
 #include <string>
@@ -76,7 +74,7 @@
 #line 11 "pico.y"
 namespace pico {
 /* Line 270 of lalr1.cc  */
-#line 80 "pico.tab.h"
+#line 78 "pico.tab.h"
 
   /// A Bison parser.
   class BisonParser
@@ -87,7 +85,7 @@ namespace pico {
     union semantic_type
     {
 /* Line 270 of lalr1.cc  */
-#line 39 "pico.y"
+#line 37 "pico.y"
 
    double fval;
    int ival;
@@ -95,15 +93,13 @@ namespace pico {
    std::string *strval;
    pico::Expression *expr;
    pico::Term *term;
-   pico::Assign *assign;
-   pico::If *if_s;
    pico::Var *var;
    pico::ExpressionList *expr_list;
    pico::TermList *term_list;
 
 
 /* Line 270 of lalr1.cc  */
-#line 107 "pico.tab.h"
+#line 103 "pico.tab.h"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -338,7 +334,7 @@ namespace pico {
 #line 11 "pico.y"
 } // pico
 /* Line 270 of lalr1.cc  */
-#line 342 "pico.tab.h"
+#line 338 "pico.tab.h"
 
 
 
