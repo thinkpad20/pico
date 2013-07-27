@@ -85,7 +85,12 @@ void Expression::print() {
          upInd();
          assign.term->print();
          dnInd();
-         printf(")"); fflush(stdout);
+         printf("),"); fflush(stdout);
+         --indent;
+         upInd();
+         assign.next->print();
+         ++indent;
+         dnInd();
          return;
       }
       case TERM:
@@ -121,17 +126,17 @@ void Term::print() {
       }
       case FLOAT:
       {
-         printf("flt %f", fval); fflush(stdout);
+         printf("%f", fval); fflush(stdout);
          return;
       }
       case INT:
       {
-         printf("int %d", ival); fflush(stdout);
+         printf("%d", ival); fflush(stdout);
          return;
       }
       case CHAR:
       {
-         printf("char %c", cval); fflush(stdout);
+         printf("%c", cval); fflush(stdout);
          return;
       }
       case BOOL:
@@ -146,7 +151,8 @@ void Term::print() {
       }
       case VAR:
       {
-         printf("%s %s", var->type ? var->type->c_str() : "var", var->name->c_str()); fflush(stdout);
+         if (var->type) printf("%s ", var->type->c_str());
+         printf("%s", var->name->c_str()); fflush(stdout);
          return;
       }
       case ADD: case SUB: case MULT: case DIV:
@@ -273,12 +279,13 @@ void Term::append(Term *term) {
 void ExpressionList::print() {
    std::deque<Expression *>::iterator it;
    bool first = true;
-   printf("exprs[");
+   printf("EXPLIST");
+   upInd();
    for (it = begin(); it != end(); it++) {
       if (first) first = false; else printf(", ");  fflush(stdout);
       (*it)->print();
    }
-   printf("]\n");
+   dnInd();
 }
 
 void TermList::print() {
