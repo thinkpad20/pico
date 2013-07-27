@@ -46,6 +46,7 @@ Expression::~Expression() {
    }
    if (next) delete next; 
 }
+
 Var::~Var() { delete name; if (type) delete type; }
 
 Term::~Term() {

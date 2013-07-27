@@ -16,9 +16,6 @@ struct Var {
    Var(std::string *name): name(name), type(NULL) {}
    Var(std::string *name, std::string *type): name(name), type(type) {}
    ~Var();
-   static Var *lookup(std::string *str) {
-      return new Var(str); // later add actual lookup, might not return new
-   }
 };
 
 struct Term {
@@ -72,8 +69,8 @@ struct Expression {
    Expression(Term *term): t(TERM), term(term) { }
    Expression(Term *cond, Term *if_true, Expression *if_false)
       { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
-   Expression(Var *var, Term *term, Expression *next)
-      { t = ASSIGN; assign.var = var; assign.term = term; assign.next = next; store(var, term); }
+   Expression(std::string *vname, Term *term, Expression *next)
+      { t = ASSIGN; assign.var = new Var(vname); assign.term = term; assign.next = next; }
    ~Expression();
    void print();
    void append(Expression *expr);

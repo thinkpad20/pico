@@ -83,7 +83,7 @@ exprs: expr '.' { $$ = new ExpressionList(); $$->push_back($1); }
 
 expr
    : term                              { $$ = new Expression($1); }
-   | var_name '=' term ',' expr        { $$ = new Expression(new Var($1), $3, $5); }
+   | var_name '=' term ',' expr        { $$ = new Expression($1, $3, $5); }
    | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
    ;
 
@@ -127,7 +127,7 @@ primary
    | '(' expr ')' { $$ = new Term($2); }
    ;
 
-var: var_name           { $$ = Var::lookup($1); }
+var: var_name           { $$ = new Var($1); }
    | type_name var_name { $$ = new Var($2, $1); } ;
 
 type_name

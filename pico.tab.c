@@ -484,7 +484,7 @@ namespace pico {
   case 6:
 /* Line 664 of lalr1.cc  */
 #line 86 "pico.y"
-    { (yyval.expr) = new Expression(new Var((yysemantic_stack_[(5) - (1)].strval)), (yysemantic_stack_[(5) - (3)].term), (yysemantic_stack_[(5) - (5)].expr)); }
+    { (yyval.expr) = new Expression((yysemantic_stack_[(5) - (1)].strval), (yysemantic_stack_[(5) - (3)].term), (yysemantic_stack_[(5) - (5)].expr)); }
     break;
 
   case 7:
@@ -622,7 +622,7 @@ namespace pico {
   case 33:
 /* Line 664 of lalr1.cc  */
 #line 130 "pico.y"
-    { (yyval.var) = Var::lookup((yysemantic_stack_[(1) - (1)].strval)); }
+    { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 34:

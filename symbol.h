@@ -5,10 +5,10 @@
 
 namespace pico {
 
-void push();
-void pop();
-Term *lookup(Var *var);
-void store(Var *var, Term *term);
+void sym_push();
+void sym_pop();
+Var *sym_lookup(std::string *var_name);
+void sym_store(Var *var);
 
 }
 
