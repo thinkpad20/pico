@@ -51,7 +51,7 @@
 # endif
 
 /* Line 36 of location.cc  */
-#line 11 "pico.y"
+#line 12 "pico.y"
 namespace pico {
 /* Line 36 of location.cc  */
 #line 58 "position.hh"
@@ -167,7 +167,7 @@ namespace pico {
   }
 
 /* Line 148 of location.cc  */
-#line 11 "pico.y"
+#line 12 "pico.y"
 } // pico
 /* Line 148 of location.cc  */
 #line 174 "position.hh"

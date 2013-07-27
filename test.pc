@@ -1,10 +1,8 @@
-main = 
-(
+main = (
 collatz = (if Int i == 1 then Int acc, else 
            if i % 2 == 0 then collatz(i/2, acc + 1), else
            collatz((i + 3)/2, acc + 1)),
 fact = (if Int i < 2 then Int acc, 
         else fact(i-1, acc*i))(,1), 
-print(fact(10))
-), 
-main.
+print(fact(10) + "hey")
+), main.

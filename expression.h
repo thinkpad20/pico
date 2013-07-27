@@ -1,16 +1,14 @@
-#pragma once
+#ifndef __EXPRESSION_H_
+#define __EXPRESSION_H_
 
 #include "common.h"
+#include "symbol.h"
 #include <map>
 #include <deque>
 
 namespace pico {
 
-struct Term;
-struct Expression;
-
 struct ExpressionList : public std::deque<Expression *> { void print(); };
-
 struct TermList : public std::deque<Term *> { void print(); };
 
 struct Var {
@@ -75,7 +73,7 @@ struct Expression {
    Expression(Term *cond, Term *if_true, Expression *if_false)
       { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
    Expression(Var *var, Term *term, Expression *next)
-      { t = ASSIGN; assign.var = var; assign.term = term; assign.next = next; }
+      { t = ASSIGN; assign.var = var; assign.term = term; assign.next = next; store(var, term); }
    ~Expression();
    void print();
    void append(Expression *expr);
@@ -102,8 +100,8 @@ Term *make_bit_xor(Term *term1, Term *term2);
 Term *make_neg(Term *term);
 Term *make_parens(Expression *expr);
 
-static std::map<Term::Type, std::string> symdic;
-
 void Initialize();
 
 }
+
+#endif

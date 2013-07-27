@@ -3,8 +3,8 @@ all: pico
 run: pico
 	./pico
 
-pico: lex.yy.cc pico.tab.c expression.cpp expression.h
-	g++ lex.yy.cc parse.cpp pico.tab.c expression.cpp -o pico
+pico: lex.yy.cc pico.tab.c expression.cpp expression.h symbol.h symbol.cpp
+	g++ lex.yy.cc parse.cpp pico.tab.c expression.cpp symbol.cpp -o pico
 	
 lex.yy.cc: pico.l
 	flex pico.l

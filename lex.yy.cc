@@ -879,7 +879,7 @@ case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
 #line 59 "pico.l"
-{ yylineno++;  }
+{ yylineno++; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP

@@ -56,7 +56,7 @@ False                   { return pico::BisonParser::token::WHEN; }
 \'(\\.|[^\\'])*\'       { yylval->cval = to_char(yytext+1); return pico::BisonParser::token::CHAR_LITERAL; }
 
 [ \t\r]+                { /* ignore */ }
-\n                      { yylineno++;  }
+\n                      { yylineno++; }
 .                       { printf("unrecognized character '%c' found\n", *yytext); return yytext[0]; }
 
 %%

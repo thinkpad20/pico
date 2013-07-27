@@ -3,6 +3,7 @@
 #include "expression.h"
 #define YYDEBUG 1
 int yydebug = 1;
+extern int yylineno;
 
 %}
 %require "2.4.1"
@@ -155,7 +156,7 @@ var_name: ID;
 
 // We have to implement the error function
 void pico::BisonParser::error(const pico::BisonParser::location_type &loc, const std::string &msg) {
-	std::cerr << "Error: " << msg << std::endl;
+	std::cerr << "Error: " << msg << ", line " << yylineno << std::endl;
 }
 
 // Now that we have the Parser declared, we can declare the Scanner and implement

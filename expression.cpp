@@ -5,6 +5,7 @@ using std::string;
 namespace pico {
 
 static int indent = 0;
+static std::map<Term::Type, std::string> symdic;
 
 void prindent() {
    puts("");
@@ -114,14 +115,14 @@ void Term::print() {
       }
       case INVOKE:
       {
-         printf("CALL"); fflush(stdout);
-         upInd();
+         if (invoke.func->t != Term::VAR)
+            printf("("); fflush(stdout);
          invoke.func->print();
-         dnInd();
-         printf("WITH");  fflush(stdout);
-         upInd();
+         if (invoke.func->t != Term::VAR)
+            printf(") on "); fflush(stdout);
+         printf("(");  fflush(stdout);
          invoke.term_list->print();
-         dnInd();
+         printf(")"); fflush(stdout);
          return;
       }
       case FLOAT:
@@ -155,10 +156,8 @@ void Term::print() {
          printf("%s", var->name->c_str()); fflush(stdout);
          return;
       }
-      case ADD: case SUB: case MULT: case DIV:
-      case LT: case GT: case GEQ: case LEQ: case MOD:
-      case EQ: case NEQ: case LOG_AND: case LOG_OR:
-      case BIT_AND: case BIT_OR: case BIT_XOR:
+      case ADD: case SUB: case MULT: case DIV: case LT: case GT: case GEQ: case LEQ: case MOD:
+      case EQ: case NEQ: case LOG_AND: case LOG_OR: case BIT_AND: case BIT_OR: case BIT_XOR:
       {
          printf("(");
          binary.term1->print(); fflush(stdout);
@@ -291,13 +290,10 @@ void ExpressionList::print() {
 void TermList::print() {
    std::deque<Term *>::iterator it;
    bool first = true;
-   printf("TERMLIST");
-   upInd();
    for (it = begin(); it != end(); it++) {
       if (first) first = false; else printf(", ");  fflush(stdout);
       (*it)->print();
    }
-   dnInd();
 }
 
 }
