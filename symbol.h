@@ -7,8 +7,8 @@ namespace pico {
 
 void sym_push();
 void sym_pop();
-Var *sym_lookup(std::string *var_name);
-void sym_store(Var *var);
+Term *sym_lookup(Var *var);
+void sym_store(Var *var, Term *term);
 
 }
 

@@ -36,7 +36,7 @@
 #line 1 "pico.y"
 
 
-#include "expression.h"
+#include "ast.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
@@ -634,43 +634,43 @@ namespace pico {
   case 35:
 /* Line 664 of lalr1.cc  */
 #line 134 "pico.y"
-    { (yyval.strval) = new std::string("Any"); }
+    { (yyval.strval) = "Any"; }
     break;
 
   case 36:
 /* Line 664 of lalr1.cc  */
 #line 135 "pico.y"
-    { (yyval.strval) = new std::string("Int"); }
+    { (yyval.strval) = "Int"; }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
 #line 136 "pico.y"
-    { (yyval.strval) = new std::string("Float"); }
+    { (yyval.strval) = "Float"; }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
 #line 137 "pico.y"
-    { (yyval.strval) = new std::string("String"); }
+    { (yyval.strval) = "String"; }
     break;
 
   case 39:
 /* Line 664 of lalr1.cc  */
 #line 138 "pico.y"
-    { (yyval.strval) = new std::string("Array"); }
+    { (yyval.strval) = "Array"; }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
 #line 139 "pico.y"
-    { (yyval.strval) = new std::string("List"); }
+    { (yyval.strval) = "List"; }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
 #line 140 "pico.y"
-    { (yyval.strval) = new std::string("Table"); }
+    { (yyval.strval) = "Table"; }
     break;
 
   case 43:

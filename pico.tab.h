@@ -90,7 +90,7 @@ namespace pico {
    double fval;
    int ival;
    char cval;
-   std::string *strval;
+   const char *strval;
    pico::Expression *expr;
    pico::Term *term;
    pico::Var *var;

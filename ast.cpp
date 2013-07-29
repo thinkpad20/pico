@@ -1,4 +1,4 @@
-#include "expression.h"
+#include "ast.h"
 
 using std::string;
 
@@ -44,7 +44,6 @@ Expression::~Expression() {
       case IF: delete if_.cond; delete if_.if_true; delete if_.if_false; break;
       default: break;
    }
-   if (next) delete next; 
 }
 
 Var::~Var() { delete name; if (type) delete type; }
@@ -106,10 +105,12 @@ void Expression::print() {
    }
 }
 
+Term::Term(Expression *expr): t(PARENS), expr(expr), u(expr->u) {} // can't be defined in header
+
 void Term::print() {
    // printf("PRINTING TERM %p, type %d\n", this, t);
    switch (t) {
-      case EMPTY: 
+      case UNRESOLVED: 
       {
          printf("(Empty term)"); fflush(stdout);
          return;
@@ -248,32 +249,6 @@ Term *make_bit_not(Term *term) {
 
 Term *make_neg(Term *term) {
    return new Term(term, Term::NEG);
-}
-
-void Expression::append(Expression *expr) {
-   puts("Appending expression");
-   expr->print();
-   Expression *expr_list = this;
-   while (expr_list) {
-      if (expr_list->next) 
-         expr_list = expr_list->next;
-      else {
-         expr_list->next = expr;
-         return;
-      }
-   }
-}
-
-void Term::append(Term *term) {
-   Term *term_list = this;
-   while (term_list) {
-      if (term_list->next) 
-         term_list = term_list->next;
-      else {
-         term_list->next = term;
-         return;
-      }
-   }
 }
 
 void ExpressionList::print() {

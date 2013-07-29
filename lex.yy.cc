@@ -486,15 +486,14 @@ static yyconst flex_int16_t yy_chk[175] =
 #define YY_RESTORE_YY_MORE_OFFSET
 #line 1 "pico.l"
 #line 2 "pico.l"
-#include "expression.h"
+#include "ast.h"
 #include "picoScanner.h"
 static int block_comment_num = 0;
 static char to_char(char *str);
-static std::string *get_string(const char *);
 int yylineno = 0;
 
 
-#line 498 "lex.yy.cc"
+#line 497 "lex.yy.cc"
 
 #define INITIAL 0
 #define LINE_COMMENT 1
@@ -596,10 +595,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 16 "pico.l"
+#line 15 "pico.l"
 
 
-#line 603 "lex.yy.cc"
+#line 602 "lex.yy.cc"
 
 	if ( !(yy_init) )
 		{
@@ -684,214 +683,214 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 18 "pico.l"
+#line 17 "pico.l"
 { return pico::BisonParser::token::ANY; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "pico.l"
+#line 18 "pico.l"
 { return pico::BisonParser::token::INT; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 20 "pico.l"
+#line 19 "pico.l"
 { return pico::BisonParser::token::FLOAT; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 21 "pico.l"
+#line 20 "pico.l"
 { return pico::BisonParser::token::CHAR; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "pico.l"
+#line 21 "pico.l"
 { return pico::BisonParser::token::LIST; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "pico.l"
+#line 22 "pico.l"
 { return pico::BisonParser::token::ARRAY; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 24 "pico.l"
+#line 23 "pico.l"
 { return pico::BisonParser::token::TABLE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 25 "pico.l"
+#line 24 "pico.l"
 { return pico::BisonParser::token::IF; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 26 "pico.l"
+#line 25 "pico.l"
 { return pico::BisonParser::token::THEN; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 27 "pico.l"
+#line 26 "pico.l"
 { return pico::BisonParser::token::ELSE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 28 "pico.l"
+#line 27 "pico.l"
 { return pico::BisonParser::token::IS; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "pico.l"
+#line 28 "pico.l"
 { return pico::BisonParser::token::NOT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "pico.l"
+#line 29 "pico.l"
 { return pico::BisonParser::token::WHEN; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 31 "pico.l"
+#line 30 "pico.l"
 { return pico::BisonParser::token::WHEN; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "pico.l"
+#line 31 "pico.l"
 { return pico::BisonParser::token::WHEN; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 33 "pico.l"
+#line 32 "pico.l"
 { return pico::BisonParser::token::EQ; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 34 "pico.l"
+#line 33 "pico.l"
 { return pico::BisonParser::token::LEQ; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 35 "pico.l"
+#line 34 "pico.l"
 { return pico::BisonParser::token::GEQ; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 36 "pico.l"
+#line 35 "pico.l"
 { return pico::BisonParser::token::NEQ; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 37 "pico.l"
+#line 36 "pico.l"
 { return pico::BisonParser::token::OR; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 38 "pico.l"
+#line 37 "pico.l"
 { return pico::BisonParser::token::AND; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 39 "pico.l"
+#line 38 "pico.l"
 { return yytext[0]; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 41 "pico.l"
+#line 40 "pico.l"
 { BEGIN(LINE_COMMENT); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 42 "pico.l"
+#line 41 "pico.l"
 { /* ignore */ }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 43 "pico.l"
+#line 42 "pico.l"
 { BEGIN(INITIAL); yylineno++; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 44 "pico.l"
+#line 43 "pico.l"
 { BEGIN(BLOCK_COMMENT); block_comment_num = 1; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 45 "pico.l"
+#line 44 "pico.l"
 { block_comment_num++; }
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 46 "pico.l"
+#line 45 "pico.l"
 { yylineno++; }
 	YY_BREAK
 case YY_STATE_EOF(BLOCK_COMMENT):
-#line 47 "pico.l"
+#line 46 "pico.l"
 { puts("Warning: EOF encountered inside a block comment"); return EOF; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 48 "pico.l"
+#line 47 "pico.l"
 { /* ignore */ }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 49 "pico.l"
+#line 48 "pico.l"
 { if ((--block_comment_num) == 0) BEGIN(INITIAL); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 51 "pico.l"
-{ yylval->strval = new std::string(yytext); return pico::BisonParser::token::TYPENAME; }
+#line 50 "pico.l"
+{ yylval->strval = yytext; return pico::BisonParser::token::TYPENAME; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 52 "pico.l"
-{ yylval->strval = new std::string(yytext); return pico::BisonParser::token::ID; }
+#line 51 "pico.l"
+{ yylval->strval = yytext; return pico::BisonParser::token::ID; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 53 "pico.l"
+#line 52 "pico.l"
 { yylval->ival = atoi(yytext); return pico::BisonParser::token::INT_LITERAL; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 54 "pico.l"
+#line 53 "pico.l"
 { yylval->fval = atof(yytext); return pico::BisonParser::token::FLOAT_LITERAL; }
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 55 "pico.l"
-{ yylval->strval = get_string(yytext); return pico::BisonParser::token::STRING_LITERAL; }
+#line 54 "pico.l"
+{ yylval->strval = yytext; return pico::BisonParser::token::STRING_LITERAL; }
 	YY_BREAK
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 56 "pico.l"
+#line 55 "pico.l"
 { yylval->cval = to_char(yytext+1); return pico::BisonParser::token::CHAR_LITERAL; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 58 "pico.l"
+#line 57 "pico.l"
 { /* ignore */ }
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 59 "pico.l"
+#line 58 "pico.l"
 { yylineno++; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 60 "pico.l"
+#line 59 "pico.l"
 { printf("unrecognized character '%c' found\n", *yytext); return yytext[0]; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 62 "pico.l"
+#line 61 "pico.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 895 "lex.yy.cc"
+#line 894 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(LINE_COMMENT):
 	yyterminate();
@@ -1792,16 +1791,9 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 62 "pico.l"
+#line 61 "pico.l"
 
 
-
-static std::string *get_string(const char *yytext) {
-   char *c_str = strndup(yytext+1, strlen(yytext) - 2);
-   std::string *res = new std::string(c_str);
-   free(c_str);
-   return res;
-}
 
 static char to_char(char *str) {
    if (strlen(str) <= 1) {

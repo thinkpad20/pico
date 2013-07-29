@@ -1,6 +1,6 @@
 %{
 
-#include "expression.h"
+#include "ast.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
@@ -39,7 +39,7 @@ extern int yylineno;
    double fval;
    int ival;
    char cval;
-   std::string *strval;
+   const char *strval;
    pico::Expression *expr;
    pico::Term *term;
    pico::Var *var;
@@ -131,13 +131,13 @@ var: var_name           { $$ = new Var($1); }
    | type_name var_name { $$ = new Var($2, $1); } ;
 
 type_name
-   : ANY       { $$ = new std::string("Any"); } 
-   | INT       { $$ = new std::string("Int"); }
-   | FLOAT     { $$ = new std::string("Float"); }
-   | STRING    { $$ = new std::string("String"); }
-   | ARRAY     { $$ = new std::string("Array"); }
-   | LIST      { $$ = new std::string("List"); }
-   | TABLE     { $$ = new std::string("Table"); }
+   : ANY       { $$ = "Any"; } 
+   | INT       { $$ = "Int"; }
+   | FLOAT     { $$ = "Float"; }
+   | STRING    { $$ = "String"; }
+   | ARRAY     { $$ = "Array"; }
+   | LIST      { $$ = "List"; }
+   | TABLE     { $$ = "Table"; }
    | TYPENAME 
    ;
 
