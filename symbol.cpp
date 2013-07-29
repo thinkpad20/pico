@@ -33,14 +33,14 @@ Term *sym_lookup(string *str) {
    printf("looking up %s\n", str->c_str());
    if (!symbol_table) symbol_table = new Symstack();
    Term *res = lookup(str, symbol_table);
-   printf("'%s' resolves to: ", str->c_str()); res->print();
-   printf(", with %u unresolved syms\n", Term::unresolved(res)); fflush(stdout);
+   printf("'%s' resolves to: ", str->c_str()); res->print(); puts("yup");
+   // printf(", with %u unresolved syms\n", Term::unresolved(res)); fflush(stdout);
    return res;
 }
 
 void sym_store(string *str, Term *term) {
    if (!symbol_table) symbol_table = new Symstack();
-   printf("Storing %s, creating new thunk: ", str->c_str()); term->print(); puts("");
+   // printf("Storing %s, creating new thunk: ", str->c_str()); term->print(); puts("");
    if (symbol_table->m.find(*str) != symbol_table->m.end()) {
       throw string("Error: symbol %s already exists in table, can't assign.\n", str->c_str());
    }
@@ -73,6 +73,10 @@ void sym_print(void) {
       }
       s = s->next;
    }
+}
+
+bool sym_contains(string *name) {
+   return symbol_table && symbol_table->m.find(*name) != symbol_table->m.end();
 }
 
 }

@@ -471,7 +471,7 @@ namespace pico {
                   (yysemantic_stack_[(2) - (1)].expr)->print(); 
                   printf("Evaluating: ");
                   Expression::eval((yysemantic_stack_[(2) - (1)].expr));                                    
-                  printf("Second printing: ");
+                  printf("\nDone evaluating. Second printing: ");
                   (yysemantic_stack_[(2) - (1)].expr)->print();
                   (yyval.expr_list)->push_back((yysemantic_stack_[(2) - (1)].expr)); }
     break;

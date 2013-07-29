@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "symbol.h"
 
 using std::string;
 
@@ -118,7 +119,10 @@ void Expression::print() {
       {
          printf("%s = (", assign.var->name->c_str());
          upInd();
-         assign.term->print();
+         if (sym_contains(assign.var->name))
+            sym_lookup(assign.var->name)->print();
+         else
+            assign.term->print();
          dnInd();
          printf("),"); fflush(stdout);
          --indent;

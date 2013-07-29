@@ -83,7 +83,7 @@ exprs: expr '.' { $$ = new ExpressionList();
                   $1->print(); 
                   printf("Evaluating: ");
                   Expression::eval($1);                                    
-                  printf("Second printing: ");
+                  printf("\nDone evaluating. Second printing: ");
                   $1->print();
                   $$->push_back($1); }
     | pico expr '.' { $1->push_back($2); $$ = $1; }

@@ -29,17 +29,16 @@ Term *Expression::eval(Expression *expr) {
 }
 
 int e_num = 0;
-
-static int callno = 0;
+int callno = 0;
 
 Term *Term::eval(Term *term) {
    if (!term) {
       printf("term was null\n");
       return new Term();
    }
-   int thiscall = callno++;
-   printf("%d calling eval on term: ", thiscall);
-   term->print_info(); printf(" "); term->print(); puts("");
+   // int thiscall = callno++;
+   // printf("%d calling eval on term: ", thiscall);
+   // term->print_info(); printf(" "); term->print(); puts("");
    switch (term->t) {
       case ADD: { return add(term->binary.term1, term->binary.term2); }
       case SUB: { return sub(term->binary.term1, term->binary.term2); }
@@ -117,7 +116,7 @@ unsigned Expression::unresolved(Expression *e) {
 }
 
 bool Expression::is_eq(Expression *other) {
-   printf("Checking if "); print(); printf(" == "); other->print(); puts("");
+   // printf("Checking if "); print(); printf(" == "); other->print(); puts("");
    if (t != other->t) return false;
    switch (t) {
       case TERM: { return term == other->term; }
@@ -131,7 +130,7 @@ bool Expression::is_eq(Expression *other) {
 }
 
 bool Term::is_eq(Term *other) {
-   printf("Checking if "); print(); printf(" == "); other->print(); puts("");
+   // printf("Checking if "); print(); printf(" == "); other->print(); puts("");
    if (t != other->t) return false;
    switch (t) {
       // binary
@@ -227,7 +226,8 @@ Term *Term::mult(Term *t1, Term *t2) {
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { Term *res = new Term(t1->ival * t2->ival); 
-            printf("\nthe result is %p: ", res); res->print(); puts(""); return res;}
+            // printf("\nthe result is %p: ", res); res->print(); puts(""); 
+            return res;}
          case FLOAT: { return new Term(t1->ival * t2->ival); }
          default: break;
       }
