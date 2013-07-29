@@ -113,7 +113,7 @@ term
    | term '/' invocation  { $$ = make_div($1, $3); }
    | term '%' invocation  { $$ = make_mod($1, $3); }
    | NOT term             { $$ = make_log_not($2); }
-   | '-' term %prec UNARY { $$ = make_neg($2); }
+   | '-' term %prec UNARY { $$ = make_neg($2);  }
    ;
 
 invocation

@@ -590,7 +590,7 @@ namespace pico {
   case 23:
 /* Line 664 of lalr1.cc  */
 #line 116 "pico.y"
-    { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term)); }
+    { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term));  }
     break;
 
   case 25:
