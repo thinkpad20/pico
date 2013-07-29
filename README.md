@@ -1,4 +1,4 @@
-# Pico - a small language expressing a small idea
+## Pico - a strange, tiny functional language
 
 The main idea behind Pico is that the only difference between a function and a constant expression is that a function leaves some arguments unspecified. What do I mean by that? Well consider the expression:
 
@@ -206,4 +206,40 @@ listToVector = (ln = len(List(Int) l, 0),
                    fillVector(l, v, ln - 1))
    The call to len supplies one argument, so ln is a function which takes a List as an argument. Then passing in a list to listToVector, the list would be passed to the first unbound variable, which is l in the len function. Then the l on the third line of listToVector would be undefined, which would either mean listToVector requires two (identical or same-length) lists as arguments, or if we require a type declaration in front of every unbound variable, then we have an error.
 }>                
+```
+
+Pico is designed to be a very small language with minimal syntax. Currently the entire grammar is here (this will be expanded slightly to include algebraic types, pattern matching and possibly interfaces)
+
+```
+pico -> expression '.'
+      | pico expression '.'
+
+expression -> term
+            | var '=' term ',' expression
+            | IF term THEN term ',' ELSE expression
+
+term -> literal
+      | '(' expression ')'
+      | invocation
+      | term op term
+      | unary_op term
+      | term ( '(' term (',' term)* ')' )*
+
+literal -> (typename)? var 
+         | int_literal 
+         | float_literal
+         | string_literal
+         | char_literal
+
+op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
+      | ">=" | "<=" | "==" | "!=" | "&&" | "||"
+
+unary_op -> '-' | '!' | '~'
+
+var ->            [a-z_][a-zA-Z_]*
+typename ->       [A-Z][a-zA-Z_]*
+int_literal ->    [0-9]+
+float_literal ->  ([0-9]*\.[0-9]+)
+string_literal->  \"(\\.|[^\\"])*\"
+char_literal ->   \'(\\.|[^\\'])*\'
 ```
