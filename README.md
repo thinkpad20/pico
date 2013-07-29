@@ -243,7 +243,7 @@ pico -> expression '.'
 
 expression -> term
             | var '=' term ',' expression
-            | IF term THEN term ',' ELSE expression
+            | "if" term "then" term ',' "else" expression
 
 term -> literal
       | '(' expression ')'
@@ -264,7 +264,7 @@ op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
 unary_op -> '-' | '!' | '~'
 
 var ->            [a-z_][a-zA-Z_]*
-typename ->       [A-Z][a-zA-Z_]*
+typename ->       [A-Z][a-zA-Z_]* | "Int" | "Float" | "String" | "Char" | "List"
 int_literal ->    [0-9]+
 float_literal ->  ([0-9]*\.[0-9]+)
 string_literal->  \"(\\.|[^\\"])*\"
