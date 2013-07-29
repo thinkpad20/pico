@@ -47,11 +47,11 @@ False                   { return pico::BisonParser::token::WHEN; }
 <BLOCK_COMMENT>.        { /* ignore */ }
 <BLOCK_COMMENT>"}>"     { if ((--block_comment_num) == 0) BEGIN(INITIAL); }
 
-[A-Z][a-zA-Z0-9_]*      { yylval->strval = yytext; return pico::BisonParser::token::TYPENAME; }
-[a-z_][a-zA-Z0-9_]*     { yylval->strval = yytext; return pico::BisonParser::token::ID; }
+[A-Z][a-zA-Z0-9_]*      { yylval->strval = strdup(yytext); return pico::BisonParser::token::TYPENAME; }
+[a-z_][a-zA-Z0-9_]*     { yylval->strval = strdup(yytext); return pico::BisonParser::token::ID; }
 [0-9]+                  { yylval->ival = atoi(yytext); return pico::BisonParser::token::INT_LITERAL; }
 ([0-9]*\.[0-9]+)        { yylval->fval = atof(yytext); return pico::BisonParser::token::FLOAT_LITERAL; }
-\"(\\.|[^\\"])*\"       { yylval->strval = yytext; return pico::BisonParser::token::STRING_LITERAL; }
+\"(\\.|[^\\"])*\"       { yylval->strval = strdup(yytext); return pico::BisonParser::token::STRING_LITERAL; }
 \'(\\.|[^\\'])*\'       { yylval->cval = to_char(yytext+1); return pico::BisonParser::token::CHAR_LITERAL; }
 
 [ \t\r]+                { /* ignore */ }

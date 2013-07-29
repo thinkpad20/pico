@@ -8,16 +8,19 @@ Term *Expression::eval(Expression *expr) {
    switch(expr->t) {
       case Expression::TERM:
       { 
-         return Term::eval_update(expr->term);
+         Term *res = Term::eval(expr->term);
+         delete expr->term;
+         expr->term = res;
+         return res;
       }
       case Expression::ASSIGN:
-      {  sym_store(expr->assign.var, expr->assign.term);
+      {  sym_store(expr->assign.var->name, expr->assign.term);
          return eval(expr->assign.next); }
       case Expression::IF:
       {
-         Term::eval_update(expr->if_.cond);
-         if (Term::unresolved(expr->if_.cond) > 0) return new Term(expr); // stop evaluating
-         if (expr->if_.cond->to_bool()) 
+         if (Term::unresolved(expr->if_.cond) > 0) 
+            return new Term(expr); // stop evaluating
+         if (Term::eval(expr->if_.cond)->to_bool()) 
             return Term::eval(expr->if_.if_true); // only evaluate one of the conditions
          else
             return eval(expr->if_.if_false);
@@ -25,24 +28,24 @@ Term *Expression::eval(Expression *expr) {
    }
 }
 
-Term *Term::eval_update(Term *&term) {
-   // evaluate the term
-   // if the result of evaluation is different than the original
-      // delete the original
-      // replace the original with the evaluated term
-   Term *res = eval(term);
-   if (res != term) {
-      delete term;
-      term = res;
-   }
-   return term;
-}
+int e_num = 0;
+
+static int callno = 0;
 
 Term *Term::eval(Term *term) {
+   if (!term) {
+      printf("term was null\n");
+      return new Term();
+   }
+   int thiscall = callno++;
+   printf("%d calling eval on term: ", thiscall);
+   term->print_info(); printf(" "); term->print(); puts("");
    switch (term->t) {
       case ADD: { return add(term->binary.term1, term->binary.term2); }
       case SUB: { return sub(term->binary.term1, term->binary.term2); }
-      case MULT: { return mult(term->binary.term1, term->binary.term2); }
+      case MULT: { Term *res = mult(term->binary.term1, term->binary.term2); 
+                   //printf("finishing call %d, res %p: ", thiscall, res); res->print(); puts(""); 
+                   return res;}
       case DIV: { return div(term->binary.term1, term->binary.term2); }
       case MOD: { return mod(term->binary.term1, term->binary.term2); }
       case EXP: { return exp(term->binary.term1, term->binary.term2); }
@@ -61,12 +64,16 @@ Term *Term::eval(Term *term) {
       case BIT_NOT: { return bnot(term->binary.term1, term->binary.term2); }
       case BIT_XOR: { return bxor(term->binary.term1, term->binary.term2); }
       //literals
-      case BOOL: { return mod(term->binary.term1, term->binary.term2); }
       case PARENS: { return Expression::eval(term->expr); }
-      case INT: case FLOAT: case CHAR: case STRING: { return term; }
-      case VAR: { return eval(sym_lookup(term->var)); }
-      case UNRESOLVED: { printf("Can't handle UNRESOLVED yet :(\n"); exit(1); }
-      case INVOKE: { printf("Can't handle invoke yet :(\n"); exit(1); }
+      case BOOL: case INT: case FLOAT: case CHAR: case STRING: { return term; }
+      case VAR: { 
+                  Term *resolve = sym_lookup(term->var->name);
+                  Term *result = eval(resolve);
+                  // printf("name '%s' resolved to: ", term->var->name->c_str()); puts("");
+                  // to_eval->print();
+                  return result; }
+      case UNRESOLVED:  { return term; }
+      case INVOKE:      { throw std::string("Can't handle invoke yet :(\n"); }
       // case INVOKE: { printf("Can't handle UNRESOLVED yet :(\n"); exit(1); }
    }
 }
@@ -78,7 +85,7 @@ unsigned Term::unresolved(Term *t) {
       case INT: case FLOAT:
       { return 0; }
       case VAR: 
-      { t->u = unresolved(sym_lookup(t->var)); return t->u;}
+      { t->u = unresolved(sym_lookup(t->var->name)); return t->u;}
       case UNRESOLVED: 
       { return 1; }
       case INVOKE:
@@ -109,9 +116,64 @@ unsigned Expression::unresolved(Expression *e) {
    }
 }
 
+bool Expression::is_eq(Expression *other) {
+   printf("Checking if "); print(); printf(" == "); other->print(); puts("");
+   if (t != other->t) return false;
+   switch (t) {
+      case TERM: { return term == other->term; }
+      case ASSIGN: { return assign.var == other->assign.var 
+                            && assign.term == other->assign.term 
+                            && assign.next == other->assign.next; }
+      case IF: { return if_.cond == other->if_.cond
+                        && if_.if_true == other->if_.if_true
+                        && if_.if_false == other->if_.if_false; }
+   }
+}
+
+bool Term::is_eq(Term *other) {
+   printf("Checking if "); print(); printf(" == "); other->print(); puts("");
+   if (t != other->t) return false;
+   switch (t) {
+      // binary
+      case ADD: 
+      case SUB: 
+      case MULT:                
+      case DIV: 
+      case MOD: 
+      case EXP: 
+      case LOG_AND:
+      case LOG_OR: 
+      case EQ: 
+      case NEQ:
+      case LT: 
+      case GT: 
+      case LEQ:
+      case GEQ:
+      case BIT_AND:
+      case BIT_OR: 
+      case BIT_NOT:
+      case BIT_XOR:
+      { return binary.term1 == other->binary.term1 && binary.term2 == other->binary.term2; }
+      // unary
+      case NEG:
+      case LOG_NOT:
+      { return unary == other->unary; }
+      //literals
+      case PARENS: { return expr == other->expr; }
+      case INT: { return ival == other->ival; }
+      case FLOAT: { return fval == other->fval; }
+      case CHAR: { return cval == other->cval; }
+      case STRING: { return strval == other->strval; }
+      case BOOL: { return bval == other->bval; }
+      case VAR: { return var == other->var; }
+      case UNRESOLVED:  { return false; }
+      case INVOKE:      
+      { return invoke.func == other->invoke.func && invoke.term_list == other->invoke.term_list; }
+   }
+}
+
 Term *Term::add(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_add(t1, t2); 
@@ -134,8 +196,7 @@ Term *Term::add(Term *t1, Term *t2) {
 }
 
 Term *Term::sub(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_sub(t1, t2); 
@@ -158,15 +219,15 @@ Term *Term::sub(Term *t1, Term *t2) {
 }
 
 Term *Term::mult(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_mult(t1, t2); 
    }
    if (t1->t == INT) {
       switch (t2->t) {
-         case INT: { return new Term(t1->ival * t2->ival); }
+         case INT: { Term *res = new Term(t1->ival * t2->ival); 
+            printf("\nthe result is %p: ", res); res->print(); puts(""); return res;}
          case FLOAT: { return new Term(t1->ival * t2->ival); }
          default: break;
       }
@@ -182,8 +243,7 @@ Term *Term::mult(Term *t1, Term *t2) {
 }
 
 Term *Term::div(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_div(t1, t2); 
@@ -206,8 +266,7 @@ Term *Term::div(Term *t1, Term *t2) {
 }
 
 Term *Term::mod(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_mod(t1, t2); 
@@ -222,8 +281,7 @@ Term *Term::mod(Term *t1, Term *t2) {
 }
 
 Term *Term::exp(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_exp(t1, t2); 
@@ -246,7 +304,7 @@ Term *Term::exp(Term *t1, Term *t2) {
 }
 
 Term *Term::neg(Term *t) {
-   eval_update(t);
+   t = eval(t);
    // check if evaluation should proceed
    if (unresolved(t)) { 
       return make_neg(t); 
@@ -259,8 +317,7 @@ Term *Term::neg(Term *t) {
 }
 
 Term *Term::land(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_log_and(t1, t2);
@@ -273,8 +330,7 @@ Term *Term::land(Term *t1, Term *t2) {
 }
 
 Term *Term::lor(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_log_or(t1, t2); 
@@ -287,7 +343,7 @@ Term *Term::lor(Term *t1, Term *t2) {
 }
 
 Term *Term::lnot(Term *t) {
-   eval_update(t);
+   t = eval(t);
    // check if evaluation should proceed
    if (unresolved(t)) { 
       return make_log_not(t); 
@@ -298,10 +354,9 @@ Term *Term::lnot(Term *t) {
 }
 
 Term *Term::eq(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) {
+   if (unresolved(t1) || unresolved(t2)) { 
       return make_eq(t1, t2);
    }
    // we have two resolved expressions
@@ -324,10 +379,9 @@ Term *Term::eq(Term *t1, Term *t2) {
 }
 
 Term *Term::neq(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) {
+   if (unresolved(t1) || unresolved(t2)) { 
       return make_neq(t1, t2);
    }
    // we have two resolved expressions
@@ -350,10 +404,9 @@ Term *Term::neq(Term *t1, Term *t2) {
 }
 
 Term *Term::lt(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) {
+   if (unresolved(t1) || unresolved(t2)) { 
       return make_lt(t1, t2);
    }
    // we have two resolved expressions
@@ -411,10 +464,9 @@ Term *Term::lt(Term *t1, Term *t2) {
 }
 
 Term *Term::gt(Term *t1, Term *t2) {
-   eval_update(t1);
-   eval_update(t2);
+   t1 = eval(t1); t2 = eval(t2);
    // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) {
+   if (unresolved(t1) || unresolved(t2)) { 
       return make_gt(t1, t2);
    }
    // we have two resolved expressions

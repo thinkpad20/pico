@@ -35,6 +35,15 @@ void Initialize() {
    symdic[Term::BIT_XOR] = "^";
    symdic[Term::BIT_NOT] = "~";
    symdic[Term::MOD] = "%";
+   symdic[Term::INT] = "INT";
+   symdic[Term::FLOAT] = "FLOAT";
+   symdic[Term::CHAR] = "CHAR";
+   symdic[Term::STRING] = "STRING";
+   symdic[Term::BOOL] = "BOOL";
+   symdic[Term::VAR] = "VAR";
+   symdic[Term::INVOKE] = "INVOKE";
+   symdic[Term::UNRESOLVED] = "UNRESOLVED";
+   symdic[Term::PARENS] = "PARENS";
 }
 
 Expression::~Expression() { 
@@ -50,15 +59,40 @@ Var::~Var() { delete name; if (type) delete type; }
 
 Term::~Term() {
    switch (t) {
-      case INVOKE:
-      {
-         delete invoke.func; if (invoke.term_list) delete invoke.term_list; 
-         return;
-      }
-      default:
-         printf("Can't delete most types of terms...\n");
-         return;
+      case ADD:   { delete binary.term1; delete binary.term2; break; }
+      case SUB:   { delete binary.term1; delete binary.term2; break; }
+      case MULT:  { delete binary.term1; delete binary.term2; break; }
+      case DIV:   { delete binary.term1; delete binary.term2; break; }
+      case MOD:   { delete binary.term1; delete binary.term2; break; }
+      case EXP:   { delete binary.term1; delete binary.term2; break; }
+      case LOG_AND:  { delete binary.term1; delete binary.term2; break; }
+      case LOG_OR:   { delete binary.term1; delete binary.term2; break; }
+      case LOG_NOT:  { delete unary; break; }
+      case NEG:   { delete unary; break; }
+      case EQ:    { delete binary.term1; delete binary.term2; break; }
+      case NEQ:   { delete binary.term1; delete binary.term2; break; }
+      case LT:    { delete binary.term1; delete binary.term2; break; }
+      case GT:    { delete binary.term1; delete binary.term2; break; }
+      case LEQ:   { delete binary.term1; delete binary.term2; break; }
+      case GEQ:   { delete binary.term1; delete binary.term2; break; }
+      case BIT_AND: { delete binary.term1; delete binary.term2; break; }
+      case BIT_OR:   { delete binary.term1; delete binary.term2; break; }
+      case BIT_NOT:  { delete binary.term1; delete binary.term2; break; }
+      case BIT_XOR:  { delete binary.term1; delete binary.term2; break; }
+      case BOOL:     { delete binary.term1; delete binary.term2; break; }
+      case PARENS:   { delete expr; break; }
+      case INT: case FLOAT: case CHAR: { break; }
+      case STRING:   { fflush(stdout); delete strval; break; }
+      case VAR:      { delete var; break; }
+      case UNRESOLVED:  { break; }
+      case INVOKE:      { delete invoke.func; delete invoke.term_list; break; }
    }
+}
+
+void Term::print_info() {
+   if (symdic.find(t) == symdic.end()) printf("Unknown type\n");
+   else printf("type %s", symdic[t].c_str());
+   if (t == VAR) printf(" (name %s)", var->name->c_str());
 }
 
 void Expression::print() {

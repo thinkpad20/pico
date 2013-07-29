@@ -840,12 +840,12 @@ YY_RULE_SETUP
 case 31:
 YY_RULE_SETUP
 #line 50 "pico.l"
-{ yylval->strval = yytext; return pico::BisonParser::token::TYPENAME; }
+{ yylval->strval = strdup(yytext); return pico::BisonParser::token::TYPENAME; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 51 "pico.l"
-{ yylval->strval = yytext; return pico::BisonParser::token::ID; }
+{ yylval->strval = strdup(yytext); return pico::BisonParser::token::ID; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
@@ -861,7 +861,7 @@ case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
 #line 54 "pico.l"
-{ yylval->strval = yytext; return pico::BisonParser::token::STRING_LITERAL; }
+{ yylval->strval = strdup(yytext); return pico::BisonParser::token::STRING_LITERAL; }
 	YY_BREAK
 case 36:
 /* rule 36 can match eol */

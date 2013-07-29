@@ -9,7 +9,7 @@ pico: lex.yy.cc pico.tab.c ast.cpp ast.h symbol.h symbol.cpp eval.cpp
 lex.yy.cc: pico.l
 	flex pico.l
 
-pico.tab.c: pico.y
+pico.tab.c: pico.y location.hh position.hh
 	bison -v --report=all --debug pico.y
 
 test: pico

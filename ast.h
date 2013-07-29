@@ -10,12 +10,14 @@ namespace pico {
 struct ExpressionList : public std::deque<Expression *> { void print(); };
 struct TermList : public std::deque<Term *> { void print(); };
 
+void upInd(); void dnInd(); void prindent();
+
 struct Var {
    std::string *name, *type;
-   Var(const char *name): name(new std::string(name)), type(NULL) {}
-   Var(const char *name, const char *type): 
+   Var(char *name): name(new std::string(name)), type(NULL) { free(name); }
+   Var(char *name, char *type): 
       name(new std::string(name)), 
-      type(new std::string(type)) {}
+      type(new std::string(type)) {free(name), free(type); }
    ~Var();
 };
 
@@ -49,6 +51,7 @@ struct Term {
    Term(bool b): t(BOOL), bval(b), u(0) {}
    Term(char *str): t(STRING), u(0) {
       strval = new std::string(strndup(str+1, strlen(str) - 2));
+      printf("created string, pointer is %p\n", strval);
       free(str);
    }
 
@@ -63,7 +66,12 @@ struct Term {
    Term(Term *func, TermList *term_list): t(INVOKE), u(func->u - term_list->size())
       { invoke.func = func; invoke.term_list = term_list; }
    ~Term();
+
+   // utils
    void print();
+   void print_info();
+
+   bool is_eq(Term *other);
 
    // Evaluation functions
    bool stop; // flag set when term should not be resolved further
@@ -88,7 +96,6 @@ struct Term {
    static Term *bor(Term *t1, Term *t2);
    static Term *bnot(Term *t1, Term *t2);
    static Term *bxor(Term *t1, Term *t2);
-   static Term *eval_update(Term *&term);
    static unsigned unresolved(Term *term); // recursively counts the number of unresolved symbols in tree
    bool to_bool(void);
 };
@@ -104,10 +111,11 @@ struct Expression {
    Expression(Term *term): t(TERM), term(term) { }
    Expression(Term *cond, Term *if_true, Expression *if_false)
       { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
-   Expression(const char *vname, Term *term, Expression *next)
+   Expression(char *vname, Term *term, Expression *next)
       { t = ASSIGN; assign.var = new Var(vname); assign.term = term; assign.next = next; }
    ~Expression();
    void print();
+   bool is_eq(Expression *other);
    static Term *eval(Expression *expr);
    static unsigned unresolved(Expression *expr);
 };

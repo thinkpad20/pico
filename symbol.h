@@ -3,12 +3,14 @@
 
 #include "common.h"
 
-namespace pico {
+namespace pico 
+{
 
 void sym_push();
 void sym_pop();
-Term *sym_lookup(Var *var);
-void sym_store(Var *var, Term *term);
+Term *sym_lookup(std::string *name);
+void sym_store(std::string *name, Term *term);
+void update_symbol(std::string *str, Term *term);
 
 }
 

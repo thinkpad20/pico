@@ -39,7 +39,7 @@ extern int yylineno;
    double fval;
    int ival;
    char cval;
-   const char *strval;
+   char *strval;
    pico::Expression *expr;
    pico::Term *term;
    pico::Var *var;
@@ -66,10 +66,10 @@ extern int yylineno;
 %type <term_list> term_list
 %type <var> var
 
-%left '<' '>' LEQ GEQ EQ NEQ
-%left AND OR
-%left '+' '-'
-%left '*' '/' '%'
+%right '<' '>' LEQ GEQ EQ NEQ
+%right AND OR
+%right '+' '-'
+%right '*' '/' '%'
 %right NOT UNARY
 
 %start pico
@@ -78,12 +78,22 @@ extern int yylineno;
 
 pico: exprs { $$ = $1; $$->print(); } ;
 
-exprs: expr '.' { $$ = new ExpressionList(); $$->push_back($1); }
+exprs: expr '.' { $$ = new ExpressionList(); 
+                  printf("got an expression: "); 
+                  $1->print(); 
+                  printf("Evaluating: ");
+                  Expression::eval($1);                                    
+                  printf("Second printing: ");
+                  $1->print();
+                  $$->push_back($1); }
     | pico expr '.' { $1->push_back($2); $$ = $1; }
 
 expr
    : term                              { $$ = new Expression($1); }
-   | var_name '=' term ',' expr        { $$ = new Expression($1, $3, $5); }
+   | var_name '=' term ',' expr        { 
+                                          printf("assignment of %s\n", $1);
+                                          $$ = new Expression($1, $3, $5);
+                                       }
    | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
    ;
 
@@ -131,14 +141,14 @@ var: var_name           { $$ = new Var($1); }
    | type_name var_name { $$ = new Var($2, $1); } ;
 
 type_name
-   : ANY       { $$ = "Any"; } 
-   | INT       { $$ = "Int"; }
-   | FLOAT     { $$ = "Float"; }
-   | STRING    { $$ = "String"; }
-   | ARRAY     { $$ = "Array"; }
-   | LIST      { $$ = "List"; }
-   | TABLE     { $$ = "Table"; }
-   | TYPENAME 
+   : ANY       { $$ = strdup("Any"); } 
+   | INT       { $$ = strdup("Int"); }
+   | FLOAT     { $$ = strdup("Float"); }
+   | STRING    { $$ = strdup("String"); }
+   | ARRAY     { $$ = strdup("Array"); }
+   | LIST      { $$ = strdup("List"); }
+   | TABLE     { $$ = strdup("Table"); }
+   | TYPENAME
    ;
 
 literal
