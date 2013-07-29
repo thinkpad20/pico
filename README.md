@@ -86,7 +86,15 @@ fact = (fact' = if n' < 2 then acc else fact'(n'-1, acc*n'), fact'(,1))
 fact(10) <-- 3628800
 ``` 
 
-This works the same way, because `fact(,1)` provides one symbol to `fact'`, leaving still one unresolved. Then `fact` is still a function of one variable. It might be easier to think of the `10` passed into `fact` being effectively handed to `fact'`. This can be illustrated in another example:
+This works the same way, because `fact(,1)` provides one symbol to `fact'` (calling it with `acc` = 1), leaving one symbol (`n'`) unresolved. Then `fact` is still a function of one variable. It might be easier to think of the `10` passed into `fact` being effectively handed to `fact'`. We could also write:
+
+```
+fact = (if n < 2 then acc else %(n-1, acc*n))(,1)
+```
+
+The `%` indicates that the calling expression should be invoked again with the arguments indicated, letting us recurse on anonymous functions.
+
+Let's look at some more complicated examples of partial application, with a first look at function composition.
 
 ```
 foo = (bar = i, bar)
@@ -115,23 +123,23 @@ The easy way to look at it is to find the first unresolved variable and replace 
 
 ### New Functions through Function Combination
 
-Just as we can provide arguments to create new functions, we can add expressions to a function or combine it with other functions and create new functions.
+In the example above, `bar` resolved to `buzz + herp`, but `buzz` and `herp` were each unresolved expressions themselves, so `bar` is a function created by combining two functions. Just as we can provide arguments to create new functions, we can add expressions to a function or combine it with other functions and create new functions.
 
 ```
 foo = a + b <-- foo is a function of two variables
-bar = a - b <-- bar is a function of two variables
+bar = c - d <-- bar is a function of two variables
 baz = foo * bar <-- baz is a function of four variables
 baz(3,4) <-- equivalent to foo(3,4) * bar
 baz(3,4,5,6) <-- equivalent to foo(3,4) * bar(5,6) = (3 + 4) * (5 - 6) = -1
 ``` 
 
-Notice a few things here: one, because functions have separate namespaces, combining two functions can result in namespace collisions. So if we want to use dictionary syntax to call the function, we have to indicate which function's variables we're supplying. This is similar to SQL.
+Note that because functions have separate namespaces, combining two functions can result in namespace collisions. In these cases, if we want to use dictionary syntax to call the function, we have to indicate which function's variables we're supplying. This is similar to SQL.
 
 ```
 foo = a * b
-bar = a / b
-qux = foo^bar
-lux = qux(foo.a = 4, bar.b = 5)
+bar = a / b <-- bar can't see foo's a and b, so they are unrelated variables
+qux = foo^bar <-- this is NOT the same as (a * b) ^ (a * b). It's the same as (foo.a * foo.b) ^ (bar.a * bar.b).
+lux = qux(foo.a = 4, bar.b = 5) <-- lux gives two args to qux, so lux is a function of 2 variables
 bux = lux(,10) <-- second unbound variable is now bar.a, foo.b still unbound
 dux = bux(3)   <-- no unbound variables, now we can resolve:
                <-- bux(3) = lux(1,10) = qux(4,3,10,5) = foo(4,3) / bar(10,5)
@@ -165,32 +173,40 @@ fact6 = fact3(n) <-- constant expression 3628800
 This would also allow the writer to indicate off the bat which unbound variables there were:
 
 ```
+comp = (Int i, j, if i < j then -1 else (if i > j then 0 else 1))
+```
+
+Let's look at a little more significant code, writing binary search over a vector.
+
+```
 bsearchr = (Int start, finish, target, Vector(Int) v, <-- 4 unbound variables
             mid = (start + finish)/2, <-- not unbound
             if target == v[mid] then True, else
             if start == finish then False, else
             if target > v[mid] then bsearchr(mid, finish, target, v), else
-            if target < v[mid] then bsearchr(start, mid, target, v)
-          )
+            if target < v[mid] then bsearchr(start, mid, target, v))
+
 bsearch = bsearchr(0, len(Vector(Int) v), Int target, v) <-- here we've inlined the variable declarations
 
-<-- Now we can use it for some stuff.
+<-- Now we can use bsearch for some stuff.
 contains5 = bsearch(,5)
 v = {1,2,3,4,5,6,7,8,9,10}
 vcontains = bsearch(v)
 vcontains(6) <-- true
 vcontains(11) <-- false
 
-<{ note that the below is a meaningless function; it's just there 
-   to illustrate combining two functions with an OR. }>
+<-- note that the below is a meaningless function; it's just there 
+<-- to illustrate combining two functions with an OR.
 usableVector = (contains5 || vcontains)
 usableVector({1,2,3,4}, 5) <-- true
 usableVector({1,2,3}, 12) <-- false
 
-<{ one interesting thing is that we could make the OR operator short-circuit, so 
-   that the following resolves to True even though it has unbound variables: }>
+<-- one interesting thing is that we could make the OR operator short-circuit, so 
+<-- that the following resolves to True even though it has unbound variables.
 usableVector({1,2,3,4,5}) <-- contains 5, so resolves to true.
 usableVector({1,2,3,4}) <-- is a function equivalent to vcontains
+
+<-- another example of this
 f = (if Int i != i then Int j, else 1) <-- given any argument, f will always resolve to 1
 f(123) <-- 1
 ```
