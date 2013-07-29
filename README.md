@@ -1,4 +1,4 @@
-## Pico - a strange, tiny functional language
+## Pico - a tiny functional language
 
 The main idea behind Pico is that the only difference between a function and a constant expression is that a function leaves some arguments unspecified. What do I mean by that? Well consider the expression:
 
