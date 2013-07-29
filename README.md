@@ -1,5 +1,7 @@
 ## Pico - a tiny functional language
 
+### Functions are Just Underspecified Expressions
+
 The main idea behind Pico is that the only difference between a function and a constant expression is that a function leaves some arguments unspecified. What do I mean by that? Well consider the expression:
 
 ```
@@ -35,7 +37,9 @@ a = fact(10)
 a = 3628800 <-- equivalent
 ```
 
-However, what if we only provide some of an expression's arguments? Consider:
+### Extended Currying via Partial Specification
+
+What if we only provide some of an expression's arguments? Consider:
 
 ```
 foo = a - b * c
@@ -59,7 +63,7 @@ foo4 = foo(1,,2) <-- foo with a=1, c=2
 foo4(5) <-- 3
 ```
 
-Or we could do a dictionary-style syntax:
+Or we could use a dictionary-style syntax:
 
 ```
 bar = (a * b + c^2)^d
@@ -68,7 +72,7 @@ bar1(6, 2) <-- 2116
 bar(a=5, c=4)(b=6, d=2) <-- 2116
 ```
 
-Of course inside of an expression there might be other expressions, or assignments. Then we could have something like this tail-recursive factorial function:
+Of course, inside of an expression there might be other expressions, or assignments. Then we could have something like this tail-recursive factorial function:
 
 ```
 fact = (fact' = if n' < 2 then acc else fact'(n'-1, acc*n'), fact'(n, 1))
@@ -109,7 +113,9 @@ foo' = foo(1) <-- how about this?
 
 The easy way to look at it is to find the first unresolved variable and replace it with `1`, and see what we have. `foo` has no unresolved variables, and neither does `bar`, but `buzz` does: `i`. Resolving `i` resolves `buzz`, leaving `bar` as `baz(1) + derp(j)`. Since `foo` resolves simply to `bar`, `foo' = bar = baz(1) + derp(j)`.
 
-Notice another implication of this: just as we can provide arguments to create new functions, we can add arguments or other functions and create new functions.
+### New Functions through Function Combination
+
+Just as we can provide arguments to create new functions, we can add expressions to a function or combine it with other functions and create new functions.
 
 ```
 foo = a + b <-- foo is a function of two variables
@@ -140,6 +146,8 @@ bar = a / b
 qux = (foo f)^(bar b)
 lux = qux(f.a = 12, f.b = 3, b.a = 4, b.b = 8) <-- = (12 * 3)^(1/2) = 6
 ```
+
+### Typed vs. Dynamic and Unbound Variable Specification
 
 I'm currently debating whether to make Pico a dynamic language. They have their benefits. There are many advantages to typing, however, and one in this case is simply that it better indicates which variables are unbound:
 
@@ -174,7 +182,7 @@ vcontains(6) <-- true
 vcontains(11) <-- false
 
 <{ note that the below is a meaningless function; it's just there 
-   to illustrate combining two functions. }>
+   to illustrate combining two functions with an OR. }>
 usableVector = (contains5 || vcontains)
 usableVector({1,2,3,4}, 5) <-- true
 usableVector({1,2,3}, 12) <-- false
@@ -187,17 +195,18 @@ f = (if Int i != i then Int j, else 1) <-- given any argument, f will always res
 f(123) <-- 1
 ```
 
+### Future: Algebraic Types
+
 As a functional language, Pico will have algebraic types. Consider a List which is either `Empty` or `Cons(elem, List)`, and a `when` statement which acts as a pattern matcher. Note that this vector usage might not be how we actually do it.
 
 ```
-len = (when List l is Empty: Int acc, when l is Cons(_, next): len(next, acc+1))
+len = (when List l is Empty then Int acc, when l is Cons(_, next) then len(next, acc+1))
 fillVector = (List(Int) l, Vector v, Int posn
-               when l is Empty: v,
-               when l is Cons(elem, next): listToVector(next, add(v, posn, elem), posn - 1)
-             )
+               when l is Empty then v,
+               when l is Cons(elem, next) then listToVector(next, add(v, posn, elem), posn - 1)),
 listToVector = (ln = len(List(Int) l, 0),
                 v = Vector(Int)(ln),
-                fillVector(l, v, ln - 1))
+                fillVector(l, v, ln - 1)).
 
 <{
    Note: one curious question is what would happen if we defined it as such:
@@ -207,6 +216,8 @@ listToVector = (ln = len(List(Int) l, 0),
    The call to len supplies one argument, so ln is a function which takes a List as an argument. Then passing in a list to listToVector, the list would be passed to the first unbound variable, which is l in the len function. Then the l on the third line of listToVector would be undefined, which would either mean listToVector requires two (identical or same-length) lists as arguments, or if we require a type declaration in front of every unbound variable, then we have an error.
 }>                
 ```
+
+### Pico Grammar
 
 Pico is designed to be a very small language with minimal syntax. Currently the entire grammar is here (this will be expanded slightly to include algebraic types, pattern matching and possibly interfaces)
 
