@@ -4,26 +4,32 @@
 
 namespace pico {
 
-Term *Expression::eval(Expression *expr) {
+Term *Expression::reduce(Expression *expr) {
    switch(expr->t) {
       case Expression::TERM:
       { 
-         Term *res = Term::eval(expr->term);
-         delete expr->term;
-         expr->term = res;
+         Term *res = Term::reduce(expr->term);
+         if (!res->is_eq(expr->term)) 
+         {  delete expr->term;
+            expr->term = res; }
          return res;
       }
       case Expression::ASSIGN:
       {  sym_store(expr->assign.var->name, expr->assign.term);
-         return eval(expr->assign.next); }
+         return reduce(expr->assign.next); }
       case Expression::IF:
       {
          if (Term::unresolved(expr->if_.cond) > 0) 
-            return new Term(expr); // stop evaluating
-         if (Term::eval(expr->if_.cond)->to_bool()) 
-            return Term::eval(expr->if_.if_true); // only evaluate one of the conditions
+            return new Term(expr); // stop reducing
+         if (Term::reduce(expr->if_.cond)->to_bool()) 
+            return Term::reduce(expr->if_.if_true); // only reduce one of the conditions
          else
-            return eval(expr->if_.if_false);
+            return reduce(expr->if_.if_false);
+      }
+      case Expression::UNRESOLVED:
+      {
+         printf("Unresolved, can't evaluate further.\n");
+         return GLOBAL_UNRESOLVED_TERM;
       }
    }
 }
@@ -31,13 +37,17 @@ Term *Expression::eval(Expression *expr) {
 int e_num = 0;
 int callno = 0;
 
-Term *Term::eval(Term *term) {
+Term *Term::reduce(Term *term) {
+   // int n = e_num++;
+   // printf("==============reducing %d: ", n); term->print(); puts("");
    if (!term) {
       printf("term was null\n");
       return new Term();
    }
+   if (term == GLOBAL_UNRESOLVED_TERM) 
+      return term;
    // int thiscall = callno++;
-   // printf("%d calling eval on term: ", thiscall);
+   // printf("%d calling reduce on term: ", thiscall);
    // term->print_info(); printf(" "); term->print(); puts("");
    switch (term->t) {
       case ADD: { return add(term->binary.term1, term->binary.term2); }
@@ -63,28 +73,45 @@ Term *Term::eval(Term *term) {
       case BIT_NOT: { return bnot(term->binary.term1, term->binary.term2); }
       case BIT_XOR: { return bxor(term->binary.term1, term->binary.term2); }
       //literals
-      case PARENS: { return Expression::eval(term->expr); }
+      case PARENS: { return Expression::reduce(term->expr); }
       case BOOL: case INT: case FLOAT: case CHAR: case STRING: { return term; }
-      case VAR: { 
-                  Term *resolve = sym_lookup(term->var->name);
-                  Term *result = eval(resolve);
-                  // printf("name '%s' resolved to: ", term->var->name->c_str()); puts("");
-                  // to_eval->print();
-                  return result; }
+      case VAR:
+      { 
+         Term *target = sym_lookup(term->var->name);
+         if (target == GLOBAL_UNRESOLVED_TERM) {
+            printf("found an unresolved term\n"); fflush(stdout);
+            add_local(term->var->name);
+            printf("we're going to return: "); term->print(); puts("");
+            printf("which has unresolved of %u\n", unresolved(term));
+            return term;
+         }
+         Term *result = reduce(target);
+         sym_update(term->var->name, result);
+         // printf("finished sym_update\n"); fflush(stdout);
+         return result; 
+      }
       case UNRESOLVED:  { return term; }
       case INVOKE:      { throw std::string("Can't handle invoke yet :(\n"); }
-      // case INVOKE: { printf("Can't handle UNRESOLVED yet :(\n"); exit(1); }
    }
 }
 
 unsigned Term::unresolved(Term *t) {
+   printf("calling unresolved on %p: ", t); fflush(stdout); t->print(); puts("");
    if (!t) return 1;
+   printf("t = %d\n", t->t); fflush(stdout);
    switch (t->t) {
-      case BOOL: case STRING: case CHAR:
-      case INT: case FLOAT:
+      case BOOL: case STRING: case CHAR: case INT: case FLOAT:
       { return 0; }
-      case VAR: 
-      { t->u = unresolved(sym_lookup(t->var->name)); return t->u;}
+      case VAR: {
+         printf("looking up a variable\n"); fflush(stdout);
+         Term *res = sym_lookup(t->var->name);
+         printf("res is: "); fflush(stdout); res->print();
+         if (res->t == UNRESOLVED) {
+            delete res;
+            return 1;
+         }
+         return unresolved(res);
+      }
       case UNRESOLVED: 
       { return 1; }
       case INVOKE:
@@ -112,6 +139,8 @@ unsigned Expression::unresolved(Expression *e) {
       { return Term::unresolved(e->if_.cond) 
                   + Term::unresolved(e->if_.if_true) 
                   + unresolved(e->if_.if_false); }
+      case UNRESOLVED:
+      { return 1; }
    }
 }
 
@@ -126,6 +155,7 @@ bool Expression::is_eq(Expression *other) {
       case IF: { return if_.cond == other->if_.cond
                         && if_.if_true == other->if_.if_true
                         && if_.if_false == other->if_.if_false; }
+      case UNRESOLVED: { return false; }
    }
 }
 
@@ -172,11 +202,21 @@ bool Term::is_eq(Term *other) {
 }
 
 Term *Term::add(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) { 
+   // printf("Adding: "); t1->print(); printf(" and "); t2->print(); puts("");
+   Term *temp1 = t1, *temp2 = t2;
+   // printf("going to subreduceuate, %p %p\n", t1, t2); fflush(stdout);
+   t1 = reduce(t1); t2 = reduce(t2);
+   // printf("add reduceuated, %p %p, seeing if unresolved\n", t1, t2); fflush(stdout);
+   // check if reduceuation should proceed
+   unsigned u1 = unresolved(t1);
+   // printf("u1 = %u\n", u1); fflush(stdout);
+   unsigned u2 = unresolved(t2);
+   // printf("u2 = %u\n", u2); fflush(stdout);
+   if (u1 || u2) { 
+      // printf("add unresolved\n");
       return make_add(t1, t2); 
    }
+   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Term(t1->ival + t2->ival); }
@@ -195,11 +235,15 @@ Term *Term::add(Term *t1, Term *t2) {
 }
 
 Term *Term::sub(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   // printf("Subtracting: "); t1->print(); printf(" and "); t2->print(); puts("");
+   t1 = reduce(t1); t2 = reduce(t2);
+   // printf("sub reduceuated, seeing if unresolved\n"); fflush(stdout);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
+      // printf("sub unresolved\n");
       return make_sub(t1, t2); 
    }
+   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Term(t1->ival - t2->ival); }
@@ -218,11 +262,18 @@ Term *Term::sub(Term *t1, Term *t2) {
 }
 
 Term *Term::mult(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   // printf("Multiplying: "); t1->print(); printf(" and "); t2->print(); puts("");
+   t1 = reduce(t1); 
+   // printf("reduceuating t2\n");
+   t2 = reduce(t2);
+   // printf("done reduceuating t2\n");
+   // printf("mult reduceuated, seeing if unresolved\n"); fflush(stdout);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
+      // printf("mult is unresolved\n");
       return make_mult(t1, t2); 
    }
+   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { Term *res = new Term(t1->ival * t2->ival); 
@@ -243,11 +294,15 @@ Term *Term::mult(Term *t1, Term *t2) {
 }
 
 Term *Term::div(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
-   if (unresolved(t1) || unresolved(t2)) { 
+   // printf("Dividing: "); t1->print(); printf(" and "); t2->print(); puts("");
+   t1 = reduce(t1); t2 = reduce(t2);
+   // printf("div reduceuated, seeing if unresolved\n"); fflush(stdout);
+   // check if reduceuation should proceed
+   if (unresolved(t1) || unresolved(t2)) {
+      // printf("div is unresolved\n");
       return make_div(t1, t2); 
    }
+   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Term(t1->ival / t2->ival); }
@@ -266,8 +321,8 @@ Term *Term::div(Term *t1, Term *t2) {
 }
 
 Term *Term::mod(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_mod(t1, t2); 
    }
@@ -281,8 +336,8 @@ Term *Term::mod(Term *t1, Term *t2) {
 }
 
 Term *Term::exp(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_exp(t1, t2); 
    }
@@ -304,8 +359,8 @@ Term *Term::exp(Term *t1, Term *t2) {
 }
 
 Term *Term::neg(Term *t) {
-   t = eval(t);
-   // check if evaluation should proceed
+   t = reduce(t);
+   // check if reduceuation should proceed
    if (unresolved(t)) { 
       return make_neg(t); 
    }
@@ -317,8 +372,8 @@ Term *Term::neg(Term *t) {
 }
 
 Term *Term::land(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_log_and(t1, t2);
    }
@@ -330,8 +385,8 @@ Term *Term::land(Term *t1, Term *t2) {
 }
 
 Term *Term::lor(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_log_or(t1, t2); 
    }
@@ -343,8 +398,8 @@ Term *Term::lor(Term *t1, Term *t2) {
 }
 
 Term *Term::lnot(Term *t) {
-   t = eval(t);
-   // check if evaluation should proceed
+   t = reduce(t);
+   // check if reduceuation should proceed
    if (unresolved(t)) { 
       return make_log_not(t); 
    }
@@ -354,8 +409,8 @@ Term *Term::lnot(Term *t) {
 }
 
 Term *Term::eq(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_eq(t1, t2);
    }
@@ -379,8 +434,8 @@ Term *Term::eq(Term *t1, Term *t2) {
 }
 
 Term *Term::neq(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_neq(t1, t2);
    }
@@ -404,8 +459,8 @@ Term *Term::neq(Term *t1, Term *t2) {
 }
 
 Term *Term::lt(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_lt(t1, t2);
    }
@@ -464,8 +519,8 @@ Term *Term::lt(Term *t1, Term *t2) {
 }
 
 Term *Term::gt(Term *t1, Term *t2) {
-   t1 = eval(t1); t2 = eval(t2);
-   // check if evaluation should proceed
+   t1 = reduce(t1); t2 = reduce(t2);
+   // check if reduceuation should proceed
    if (unresolved(t1) || unresolved(t2)) { 
       return make_gt(t1, t2);
    }

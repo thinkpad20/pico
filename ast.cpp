@@ -28,12 +28,13 @@ void Initialize() {
    symdic[Term::NEQ] = "!=";
    symdic[Term::GEQ] = ">=";
    symdic[Term::LEQ] = "<=";
+   symdic[Term::EXP] = "^";
    symdic[Term::LOG_AND] = "&&";
    symdic[Term::LOG_OR] = "||";
    symdic[Term::LOG_NOT] = "!";
    symdic[Term::BIT_AND] = "&";
    symdic[Term::BIT_OR] = "|";
-   symdic[Term::BIT_XOR] = "^";
+   symdic[Term::BIT_XOR] = "^^";
    symdic[Term::BIT_NOT] = "~";
    symdic[Term::MOD] = "%";
    symdic[Term::INT] = "INT";
@@ -196,8 +197,9 @@ void Term::print() {
          printf("%s", var->name->c_str()); fflush(stdout);
          return;
       }
-      case ADD: case SUB: case MULT: case DIV: case LT: case GT: case GEQ: case LEQ: case MOD:
-      case EQ: case NEQ: case LOG_AND: case LOG_OR: case BIT_AND: case BIT_OR: case BIT_XOR:
+      case ADD: case SUB: case MULT: case DIV: case LT: case GT: case GEQ: 
+      case LEQ: case MOD: case EQ: case NEQ: case LOG_AND: case LOG_OR: 
+      case BIT_AND: case BIT_OR: case BIT_XOR: case EXP:
       {
          printf("(");
          binary.term1->print(); fflush(stdout);

@@ -70,6 +70,7 @@ extern int yylineno;
 %right AND OR
 %right '+' '-'
 %right '*' '/' '%'
+%right '^'
 %right NOT UNARY
 
 %start pico
@@ -81,9 +82,9 @@ pico: exprs { $$ = $1; $$->print(); } ;
 exprs: expr '.' { $$ = new ExpressionList(); 
                   printf("got an expression: "); 
                   $1->print(); 
-                  printf("Evaluating: ");
-                  Expression::eval($1);                                    
-                  printf("\nDone evaluating. Second printing: ");
+                  printf("\nReducing: "); puts("");
+                  Expression::reduce($1);                                    
+                  printf("\nDone reducing. Second printing: ");
                   $1->print();
                   $$->push_back($1); }
     | pico expr '.' { $1->push_back($2); $$ = $1; }
@@ -112,6 +113,7 @@ term
    | term '*' invocation  { $$ = make_mult($1, $3); }
    | term '/' invocation  { $$ = make_div($1, $3); }
    | term '%' invocation  { $$ = make_mod($1, $3); }
+   | term '^' invocation  { $$ = make_exp($1, $3); }
    | NOT term             { $$ = make_log_not($2); }
    | '-' term %prec UNARY { $$ = make_neg($2);  }
    ;

@@ -75,7 +75,7 @@ struct Term {
 
    // Evaluation functions
    bool stop; // flag set when term should not be resolved further
-   static Term *eval(Term *term);
+   static Term *reduce(Term *term);
    static Term *add(Term *t1, Term *t2);
    static Term *sub(Term *t1, Term *t2);
    static Term *mult(Term *t1, Term *t2);
@@ -101,14 +101,16 @@ struct Term {
 };
 
 struct Expression {
-   enum Type { TERM, ASSIGN, IF } t;
+   enum Type { TERM, ASSIGN, IF, UNRESOLVED } t;
    union {
       Term *term;
       struct {Var *var; Term *term; Expression *next;} assign;
       struct {Term *cond, *if_true; Expression *if_false;} if_;
    };
    unsigned u;
+   Expression(): t(UNRESOLVED) {}
    Expression(Term *term): t(TERM), term(term) { }
+   Expression(Term *term, Type t): t(t), term(term) { }
    Expression(Term *cond, Term *if_true, Expression *if_false)
       { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
    Expression(char *vname, Term *term, Expression *next)
@@ -116,7 +118,7 @@ struct Expression {
    ~Expression();
    void print();
    bool is_eq(Expression *other);
-   static Term *eval(Expression *expr);
+   static Term *reduce(Expression *expr);
    static unsigned unresolved(Expression *expr);
 };
 

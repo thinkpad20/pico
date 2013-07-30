@@ -1,0 +1,9 @@
+<-- Word counter in Pico -->
+wordcount = (wc = (if Int i == len(input) then Int acc else (
+               if input[i] == ' ' || input[i] == '\n' 
+                  then wc(i+1, input, acc+1) 
+                  else wc(i+1, input, acc)))) (0, String input, 1),
+
+filename = get_arg(1), -- get_arg is impure, but specified by one int. filename is a string
+input = to_string(open(filename)), -- input is a string
+println("#{filename} contains #{wordcount(input)} words.").
