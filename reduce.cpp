@@ -98,6 +98,7 @@ Term *Term::reduce(Term *term) {
 unsigned Term::unresolved(Term *t) {
    printf("calling unresolved on %p: ", t); fflush(stdout); t->print(); puts("");
    if (!t) return 1;
+   if (t == GLOBAL_UNRESOLVED_TERM) return 1;
    printf("t = %d\n", t->t); fflush(stdout);
    switch (t->t) {
       case BOOL: case STRING: case CHAR: case INT: case FLOAT:
