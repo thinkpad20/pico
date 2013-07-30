@@ -42,7 +42,7 @@
 
 /* "%code requires" blocks.  */
 /* Line 270 of lalr1.cc  */
-#line 20 "pico.y"
+#line 21 "pico.y"
 
 	// Forward-declare the Scanner class; the Parser needs to be assigned a 
 	// Scanner, but the Scanner can't be declared without the Parser
@@ -71,7 +71,7 @@
 #endif
 
 /* Line 270 of lalr1.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 namespace pico {
 /* Line 270 of lalr1.cc  */
 #line 78 "pico.tab.h"
@@ -85,7 +85,7 @@ namespace pico {
     union semantic_type
     {
 /* Line 270 of lalr1.cc  */
-#line 38 "pico.y"
+#line 39 "pico.y"
 
    double fval;
    int ival;
@@ -249,7 +249,7 @@ namespace pico {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const short int yypgoto_[];
+    static const signed char yypgoto_[];
     static const signed char yydefgoto_[];
 
     /// What to do in a state.
@@ -331,7 +331,7 @@ namespace pico {
     pico::FlexScanner &scanner;
   };
 /* Line 270 of lalr1.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 } // pico
 /* Line 270 of lalr1.cc  */
 #line 338 "pico.tab.h"

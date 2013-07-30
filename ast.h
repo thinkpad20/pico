@@ -7,7 +7,10 @@
 
 namespace pico {
 
-struct ExpressionList : public std::deque<Expression *> { void print(); };
+struct ExpressionList : public std::deque<Expression *> { 
+   void print(); 
+   void reduce_all();
+};
 struct TermList : public std::deque<Term *> { void print(); };
 
 void upInd(); void dnInd(); void prindent();

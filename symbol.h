@@ -16,6 +16,7 @@ void sym_store(std::string *name, Term *term);
 void sym_update(std::string *str, Term *term);
 bool sym_contains(std::string *name);
 void add_local(std::string *str);
+void symtable_print(void);
 }
 
 #endif

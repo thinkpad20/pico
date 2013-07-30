@@ -37,13 +37,14 @@
 
 
 #include "ast.h"
+#include "symbol.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
 
 
 /* Line 283 of lalr1.cc  */
-#line 47 "pico.tab.c"
+#line 48 "pico.tab.c"
 
 
 #include "pico.tab.h"
@@ -51,17 +52,17 @@ extern int yylineno;
 /* User implementation prologue.  */
 
 /* Line 289 of lalr1.cc  */
-#line 55 "pico.tab.c"
+#line 56 "pico.tab.c"
 /* Unqualified %code blocks.  */
 /* Line 290 of lalr1.cc  */
-#line 33 "pico.y"
+#line 34 "pico.y"
 
 	// Prototype for the yylex function
 	static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner);
 
 
 /* Line 290 of lalr1.cc  */
-#line 65 "pico.tab.c"
+#line 66 "pico.tab.c"
 
 
 # ifndef YY_NULL
@@ -154,10 +155,10 @@ do {					\
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 /* Line 357 of lalr1.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 namespace pico {
 /* Line 357 of lalr1.cc  */
-#line 161 "pico.tab.c"
+#line 162 "pico.tab.c"
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -459,275 +460,267 @@ namespace pico {
       {
           case 2:
 /* Line 664 of lalr1.cc  */
-#line 80 "pico.y"
-    { (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); (yyval.expr_list)->print(); }
+#line 81 "pico.y"
+    { (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); (yyval.expr_list)->print(); printf("hey!\n"); fflush(stdout); (yyval.expr_list)->reduce_all(); printf("hey!!!\n"); fflush(stdout); (yyval.expr_list)->print(); }
     break;
 
   case 3:
 /* Line 664 of lalr1.cc  */
-#line 82 "pico.y"
-    { (yyval.expr_list) = new ExpressionList(); 
-                  printf("got an expression: "); 
-                  (yysemantic_stack_[(2) - (1)].expr)->print(); 
-                  printf("\nReducing: "); puts("");
-                  Expression::reduce((yysemantic_stack_[(2) - (1)].expr));                                    
-                  printf("\nDone reducing. Second printing: ");
-                  (yysemantic_stack_[(2) - (1)].expr)->print();
-                  (yyval.expr_list)->push_back((yysemantic_stack_[(2) - (1)].expr)); }
+#line 83 "pico.y"
+    { (yyval.expr_list) = new ExpressionList();
+                       (yyval.expr_list)->push_back((yysemantic_stack_[(2) - (1)].expr)); }
     break;
 
   case 4:
 /* Line 664 of lalr1.cc  */
-#line 90 "pico.y"
-    { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (2)].expr)); (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
+#line 85 "pico.y"
+    { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (2)].expr)); 
+                       (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
     break;
 
   case 5:
 /* Line 664 of lalr1.cc  */
-#line 93 "pico.y"
+#line 89 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].term)); }
     break;
 
   case 6:
 /* Line 664 of lalr1.cc  */
-#line 94 "pico.y"
-    { 
-                                          printf("assignment of %s\n", (yysemantic_stack_[(5) - (1)].strval));
-                                          (yyval.expr) = new Expression((yysemantic_stack_[(5) - (1)].strval), (yysemantic_stack_[(5) - (3)].term), (yysemantic_stack_[(5) - (5)].expr));
-                                       }
+#line 90 "pico.y"
+    { (yyval.expr) = new Expression((yysemantic_stack_[(5) - (1)].strval), (yysemantic_stack_[(5) - (3)].term), (yysemantic_stack_[(5) - (5)].expr)); }
     break;
 
   case 7:
 /* Line 664 of lalr1.cc  */
-#line 98 "pico.y"
+#line 91 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(7) - (2)].term), (yysemantic_stack_[(7) - (4)].term), (yysemantic_stack_[(7) - (7)].expr)); }
     break;
 
   case 9:
 /* Line 664 of lalr1.cc  */
-#line 103 "pico.y"
+#line 96 "pico.y"
     { (yyval.term) = make_lt((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 10:
 /* Line 664 of lalr1.cc  */
-#line 104 "pico.y"
+#line 97 "pico.y"
     { (yyval.term) = make_gt((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 11:
 /* Line 664 of lalr1.cc  */
-#line 105 "pico.y"
+#line 98 "pico.y"
     { (yyval.term) = make_leq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 12:
 /* Line 664 of lalr1.cc  */
-#line 106 "pico.y"
+#line 99 "pico.y"
     { (yyval.term) = make_leq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 13:
 /* Line 664 of lalr1.cc  */
-#line 107 "pico.y"
+#line 100 "pico.y"
     { (yyval.term) = make_eq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 14:
 /* Line 664 of lalr1.cc  */
-#line 108 "pico.y"
+#line 101 "pico.y"
     { (yyval.term) = make_neq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 15:
 /* Line 664 of lalr1.cc  */
-#line 109 "pico.y"
+#line 102 "pico.y"
     { (yyval.term) = make_log_and((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 16:
 /* Line 664 of lalr1.cc  */
-#line 110 "pico.y"
+#line 103 "pico.y"
     { (yyval.term) = make_log_or((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 17:
 /* Line 664 of lalr1.cc  */
-#line 111 "pico.y"
+#line 104 "pico.y"
     { (yyval.term) = make_add((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 18:
 /* Line 664 of lalr1.cc  */
-#line 112 "pico.y"
+#line 105 "pico.y"
     { (yyval.term) = make_sub((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 19:
 /* Line 664 of lalr1.cc  */
-#line 113 "pico.y"
+#line 106 "pico.y"
     { (yyval.term) = make_mult((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 20:
 /* Line 664 of lalr1.cc  */
-#line 114 "pico.y"
+#line 107 "pico.y"
     { (yyval.term) = make_div((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 21:
 /* Line 664 of lalr1.cc  */
-#line 115 "pico.y"
+#line 108 "pico.y"
     { (yyval.term) = make_mod((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 22:
 /* Line 664 of lalr1.cc  */
-#line 116 "pico.y"
+#line 109 "pico.y"
     { (yyval.term) = make_exp((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 23:
 /* Line 664 of lalr1.cc  */
-#line 117 "pico.y"
+#line 110 "pico.y"
     { (yyval.term) = make_log_not((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 24:
 /* Line 664 of lalr1.cc  */
-#line 118 "pico.y"
+#line 111 "pico.y"
     { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term));  }
     break;
 
   case 26:
 /* Line 664 of lalr1.cc  */
-#line 123 "pico.y"
+#line 116 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(4) - (1)].term), (yysemantic_stack_[(4) - (3)].term_list)); }
     break;
 
   case 27:
 /* Line 664 of lalr1.cc  */
-#line 127 "pico.y"
+#line 120 "pico.y"
     { (yyval.term_list) = new TermList(); (yyval.term_list)->push_back((yysemantic_stack_[(1) - (1)].term)); }
     break;
 
   case 28:
 /* Line 664 of lalr1.cc  */
-#line 128 "pico.y"
+#line 121 "pico.y"
     { (yysemantic_stack_[(3) - (1)].term_list)->push_back((yysemantic_stack_[(3) - (3)].term)); (yyval.term_list) = (yysemantic_stack_[(3) - (1)].term_list); }
     break;
 
   case 30:
 /* Line 664 of lalr1.cc  */
-#line 133 "pico.y"
+#line 126 "pico.y"
     { (yyval.term) = new Term(); }
     break;
 
   case 32:
 /* Line 664 of lalr1.cc  */
-#line 138 "pico.y"
+#line 131 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var));}
     break;
 
   case 33:
 /* Line 664 of lalr1.cc  */
-#line 139 "pico.y"
+#line 132 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(3) - (2)].expr)); }
     break;
 
   case 34:
 /* Line 664 of lalr1.cc  */
-#line 142 "pico.y"
+#line 135 "pico.y"
     { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 35:
 /* Line 664 of lalr1.cc  */
-#line 143 "pico.y"
+#line 136 "pico.y"
     { (yyval.var) = new Var((yysemantic_stack_[(2) - (2)].strval), (yysemantic_stack_[(2) - (1)].strval)); }
     break;
 
   case 36:
 /* Line 664 of lalr1.cc  */
-#line 146 "pico.y"
+#line 139 "pico.y"
     { (yyval.strval) = strdup("Any"); }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
-#line 147 "pico.y"
+#line 140 "pico.y"
     { (yyval.strval) = strdup("Int"); }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
-#line 148 "pico.y"
+#line 141 "pico.y"
     { (yyval.strval) = strdup("Float"); }
     break;
 
   case 39:
 /* Line 664 of lalr1.cc  */
-#line 149 "pico.y"
+#line 142 "pico.y"
     { (yyval.strval) = strdup("String"); }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
-#line 150 "pico.y"
+#line 143 "pico.y"
     { (yyval.strval) = strdup("Array"); }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
-#line 151 "pico.y"
+#line 144 "pico.y"
     { (yyval.strval) = strdup("List"); }
     break;
 
   case 42:
 /* Line 664 of lalr1.cc  */
-#line 152 "pico.y"
+#line 145 "pico.y"
     { (yyval.strval) = strdup("Table"); }
     break;
 
   case 44:
 /* Line 664 of lalr1.cc  */
-#line 157 "pico.y"
+#line 150 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 45:
 /* Line 664 of lalr1.cc  */
-#line 158 "pico.y"
+#line 151 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
     break;
 
   case 46:
 /* Line 664 of lalr1.cc  */
-#line 159 "pico.y"
+#line 152 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 47:
 /* Line 664 of lalr1.cc  */
-#line 160 "pico.y"
+#line 153 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
     break;
 
   case 48:
 /* Line 664 of lalr1.cc  */
-#line 161 "pico.y"
+#line 154 "pico.y"
     { (yyval.term) = new Term(true); }
     break;
 
   case 49:
 /* Line 664 of lalr1.cc  */
-#line 162 "pico.y"
+#line 155 "pico.y"
     { (yyval.term) = new Term(false); }
     break;
 
 
 /* Line 664 of lalr1.cc  */
-#line 731 "pico.tab.c"
+#line 724 "pico.tab.c"
       default:
         break;
       }
@@ -1027,19 +1020,19 @@ namespace pico {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char BisonParser::yypact_ninf_ = -64;
+  const signed char BisonParser::yypact_ninf_ = -49;
   const short int
   BisonParser::yypact_[] =
   {
-        73,   -64,   -64,   -64,   -64,   -64,   116,   -64,   -64,   116,
-     -64,   -64,   -64,   -64,   -64,   -64,   -64,   -64,   116,    73,
-      30,   -64,   -46,   234,   -47,   -64,   -64,   -26,   -64,   -43,
-     158,   -64,   -64,   -64,   -45,   -64,   -40,   -64,   159,   159,
-     159,   159,   159,   159,   159,   159,   159,   159,   159,   159,
-     159,   159,   116,   -64,   116,   116,   -64,   -64,   -47,   -47,
-     -47,   -47,   -47,   -47,   -47,   -47,   -47,   -47,   -47,   -47,
-     -47,   -47,   234,   -49,   -64,   191,   203,   116,   -64,    73,
-     -16,   -64,   -64,    73,   -64
+        95,   -49,   -49,   -49,   -49,   -49,   138,   -49,   -49,   138,
+     -49,   -49,   -49,   -49,   -49,   -49,   -49,   -49,   138,    95,
+      52,   -49,   -41,   222,   -43,   -49,   -49,   -14,   -49,   -35,
+     171,   -49,   -49,   -49,   -31,   -49,   -29,   -49,   138,   138,
+     138,   138,   138,   138,   138,   138,   138,   138,   138,   138,
+     138,   138,   138,   -49,   138,   138,   -49,   -49,   141,   141,
+     141,   141,   -40,   -40,   141,   141,   -33,   -33,   -24,   -24,
+     -24,   -49,   222,   -32,   -49,   179,   210,   138,   -49,    95,
+      -3,   -49,   -49,    95,   -49
   };
 
   /* YYDEFACT[S] -- default reduction number in state S.  Performed when
@@ -1060,11 +1053,11 @@ namespace pico {
   };
 
   /* YYPGOTO[NTERM-NUM].  */
-  const short int
+  const signed char
   BisonParser::yypgoto_[] =
   {
-       -64,   -64,   -64,   -17,    -5,   247,   -64,   -63,   -64,   -64,
-     -64,   -64,     0
+       -49,   -49,   -49,   -17,    -5,   -49,   -49,   -48,   -49,   -49,
+     -49,   -49,     0
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -1082,72 +1075,68 @@ namespace pico {
   const unsigned char
   BisonParser::yytable_[] =
   {
-        29,    30,    34,    36,    32,    77,    37,    78,    52,    12,
-      54,    56,    57,    33,    81,    83,     0,     0,     0,    29,
-      29,     0,     0,     0,     0,     0,     0,    53,     0,     0,
-      35,     0,     0,     0,     1,     2,     0,     3,     4,     5,
-       0,     0,     0,     6,     0,     7,     0,    72,     0,    75,
-      76,     8,     0,     0,     0,     0,     0,     0,     0,     0,
-       9,     0,    82,    10,    11,    12,    84,    13,    14,    15,
-      16,    17,    72,     0,     0,     0,    18,     1,     2,    29,
-       3,     4,     5,    29,     0,    19,     6,     0,     7,     0,
-       0,     0,     0,     0,     8,     0,     0,     0,     0,     0,
-       0,     0,     0,     9,     0,     0,    10,    11,    12,     0,
-      13,    14,    15,    16,    17,     0,     0,     0,     0,    18,
-       1,     2,     0,     3,     4,     5,     0,     0,    19,     0,
-       0,     7,     0,     0,     0,     0,     0,     8,     0,     0,
-       0,     0,     0,     0,     0,     0,     9,     0,     0,    10,
-      11,    12,     0,    13,    14,    15,    16,    17,     0,     0,
-       0,     0,    18,     1,     2,     0,     3,     4,     5,     0,
-       0,    19,    55,     0,     7,     0,     0,     0,     0,     0,
-       8,     0,    38,    39,    40,    41,    42,    43,     0,     0,
-       0,     0,    10,    11,    12,     0,    13,    14,    15,    16,
-      17,    44,    45,    46,    47,    48,    49,    50,    51,     0,
-       0,     0,     0,     0,    19,    38,    39,    40,    41,    42,
-      43,     0,     0,     0,     0,     0,     0,    38,    39,    40,
-      41,    42,    43,     0,    44,    45,    46,    47,    48,    49,
-      50,    51,     0,     0,     0,    79,    44,    45,    46,    47,
-      48,    49,    50,    51,     0,     0,     0,    80,    38,    39,
-      40,    41,    42,    43,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,    44,    45,    46,
-      47,    48,    49,    50,    51,    58,    59,    60,    61,    62,
-      63,    64,    65,    66,    67,    68,    69,    70,    71
+        29,    30,    34,    36,    32,    46,    47,    48,    49,    50,
+      51,    37,    52,    33,    48,    49,    50,    51,    54,    29,
+      29,    12,    77,    57,    78,    56,    51,    53,    83,    81,
+       0,     0,     0,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,     0,    75,
+      76,     0,    35,     0,     0,     0,     1,     2,     0,     3,
+       4,     5,    82,     0,     0,     6,    84,     7,     0,     0,
+       0,     0,    72,     8,     0,     0,     0,     0,     0,    29,
+       0,     0,     9,    29,     0,    10,    11,    12,     0,    13,
+      14,    15,    16,    17,     0,     0,     0,     0,    18,     1,
+       2,     0,     3,     4,     5,     0,     0,    19,     6,     0,
+       7,     0,     0,     0,     0,     0,     8,     0,     0,     0,
+       0,     0,     0,     0,     0,     9,     0,     0,    10,    11,
+      12,     0,    13,    14,    15,    16,    17,     0,     0,     0,
+       0,    18,     1,     2,     0,     3,     4,     5,     0,     0,
+      19,     0,     0,     7,     0,     0,     0,     0,     0,     8,
+       0,     0,     0,     0,     0,     0,     0,     0,     9,    42,
+      43,    10,    11,    12,     0,    13,    14,    15,    16,    17,
+       0,     0,     0,     0,    18,    55,    46,    47,    48,    49,
+      50,    51,     0,    19,     0,    38,    39,    40,    41,    42,
+      43,     0,     0,    38,    39,    40,    41,    42,    43,     0,
+       0,     0,     0,     0,    44,    45,    46,    47,    48,    49,
+      50,    51,    44,    45,    46,    47,    48,    49,    50,    51,
+       0,     0,     0,    79,    38,    39,    40,    41,    42,    43,
+       0,     0,     0,     0,     0,     0,    38,    39,    40,    41,
+      42,    43,     0,    44,    45,    46,    47,    48,    49,    50,
+      51,     0,     0,     0,    80,    44,    45,    46,    47,    48,
+      49,    50,    51
   };
 
   /* YYCHECK.  */
   const signed char
   BisonParser::yycheck_[] =
   {
-         0,     6,    19,    20,     9,    54,    52,    56,    55,    35,
-      53,    56,    52,    18,    77,    31,    -1,    -1,    -1,    19,
-      20,    -1,    -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,
-       0,    -1,    -1,    -1,     4,     5,    -1,     7,     8,     9,
-      -1,    -1,    -1,    13,    -1,    15,    -1,    52,    -1,    54,
-      55,    21,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      30,    -1,    79,    33,    34,    35,    83,    37,    38,    39,
-      40,    41,    77,    -1,    -1,    -1,    46,     4,     5,    79,
-       7,     8,     9,    83,    -1,    55,    13,    -1,    15,    -1,
-      -1,    -1,    -1,    -1,    21,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    30,    -1,    -1,    33,    34,    35,    -1,
-      37,    38,    39,    40,    41,    -1,    -1,    -1,    -1,    46,
-       4,     5,    -1,     7,     8,     9,    -1,    -1,    55,    -1,
-      -1,    15,    -1,    -1,    -1,    -1,    -1,    21,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    30,    -1,    -1,    33,
-      34,    35,    -1,    37,    38,    39,    40,    41,    -1,    -1,
-      -1,    -1,    46,     4,     5,    -1,     7,     8,     9,    -1,
-      -1,    55,    14,    -1,    15,    -1,    -1,    -1,    -1,    -1,
-      21,    -1,    24,    25,    26,    27,    28,    29,    -1,    -1,
-      -1,    -1,    33,    34,    35,    -1,    37,    38,    39,    40,
-      41,    43,    44,    45,    46,    47,    48,    49,    50,    -1,
-      -1,    -1,    -1,    -1,    55,    24,    25,    26,    27,    28,
-      29,    -1,    -1,    -1,    -1,    -1,    -1,    24,    25,    26,
-      27,    28,    29,    -1,    43,    44,    45,    46,    47,    48,
-      49,    50,    -1,    -1,    -1,    54,    43,    44,    45,    46,
-      47,    48,    49,    50,    -1,    -1,    -1,    54,    24,    25,
-      26,    27,    28,    29,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    43,    44,    45,
-      46,    47,    48,    49,    50,    38,    39,    40,    41,    42,
-      43,    44,    45,    46,    47,    48,    49,    50,    51
+         0,     6,    19,    20,     9,    45,    46,    47,    48,    49,
+      50,    52,    55,    18,    47,    48,    49,    50,    53,    19,
+      20,    35,    54,    52,    56,    56,    50,    27,    31,    77,
+      -1,    -1,    -1,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    -1,    54,
+      55,    -1,     0,    -1,    -1,    -1,     4,     5,    -1,     7,
+       8,     9,    79,    -1,    -1,    13,    83,    15,    -1,    -1,
+      -1,    -1,    77,    21,    -1,    -1,    -1,    -1,    -1,    79,
+      -1,    -1,    30,    83,    -1,    33,    34,    35,    -1,    37,
+      38,    39,    40,    41,    -1,    -1,    -1,    -1,    46,     4,
+       5,    -1,     7,     8,     9,    -1,    -1,    55,    13,    -1,
+      15,    -1,    -1,    -1,    -1,    -1,    21,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    30,    -1,    -1,    33,    34,
+      35,    -1,    37,    38,    39,    40,    41,    -1,    -1,    -1,
+      -1,    46,     4,     5,    -1,     7,     8,     9,    -1,    -1,
+      55,    -1,    -1,    15,    -1,    -1,    -1,    -1,    -1,    21,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,    28,
+      29,    33,    34,    35,    -1,    37,    38,    39,    40,    41,
+      -1,    -1,    -1,    -1,    46,    14,    45,    46,    47,    48,
+      49,    50,    -1,    55,    -1,    24,    25,    26,    27,    28,
+      29,    -1,    -1,    24,    25,    26,    27,    28,    29,    -1,
+      -1,    -1,    -1,    -1,    43,    44,    45,    46,    47,    48,
+      49,    50,    43,    44,    45,    46,    47,    48,    49,    50,
+      -1,    -1,    -1,    54,    24,    25,    26,    27,    28,    29,
+      -1,    -1,    -1,    -1,    -1,    -1,    24,    25,    26,    27,
+      28,    29,    -1,    43,    44,    45,    46,    47,    48,    49,
+      50,    -1,    -1,    -1,    54,    43,    44,    45,    46,    47,
+      48,    49,    50
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -1160,9 +1149,9 @@ namespace pico {
       58,    59,    60,    61,    62,    65,    66,    67,    68,    69,
       61,    69,    61,    61,    60,     0,    60,    52,    24,    25,
       26,    27,    28,    29,    43,    44,    45,    46,    47,    48,
-      49,    50,    55,    69,    53,    14,    56,    52,    62,    62,
-      62,    62,    62,    62,    62,    62,    62,    62,    62,    62,
-      62,    62,    61,    63,    64,    61,    61,    54,    56,    54,
+      49,    50,    55,    69,    53,    14,    56,    52,    61,    61,
+      61,    61,    61,    61,    61,    61,    61,    61,    61,    61,
+      61,    61,    61,    63,    64,    61,    61,    54,    56,    54,
       54,    64,    60,    31,    60
   };
 
@@ -1230,12 +1219,12 @@ namespace pico {
         58,     0,    -1,    59,    -1,    60,    52,    -1,    58,    60,
       52,    -1,    61,    -1,    69,    53,    61,    54,    60,    -1,
       13,    61,    14,    61,    54,    31,    60,    -1,    62,    -1,
-      61,    43,    62,    -1,    61,    44,    62,    -1,    61,    24,
-      62,    -1,    61,    25,    62,    -1,    61,    26,    62,    -1,
-      61,    27,    62,    -1,    61,    29,    62,    -1,    61,    28,
-      62,    -1,    61,    45,    62,    -1,    61,    46,    62,    -1,
-      61,    47,    62,    -1,    61,    48,    62,    -1,    61,    49,
-      62,    -1,    61,    50,    62,    -1,    30,    61,    -1,    46,
+      61,    43,    61,    -1,    61,    44,    61,    -1,    61,    24,
+      61,    -1,    61,    25,    61,    -1,    61,    26,    61,    -1,
+      61,    27,    61,    -1,    61,    29,    61,    -1,    61,    28,
+      61,    -1,    61,    45,    61,    -1,    61,    46,    61,    -1,
+      61,    47,    61,    -1,    61,    48,    61,    -1,    61,    49,
+      61,    -1,    61,    50,    61,    -1,    30,    61,    -1,    46,
       61,    -1,    65,    -1,    62,    55,    63,    56,    -1,    64,
       -1,    63,    54,    64,    -1,    61,    -1,    -1,    68,    -1,
       66,    -1,    55,    60,    56,    -1,    69,    -1,    67,    69,
@@ -1262,12 +1251,12 @@ namespace pico {
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    80,    80,    82,    90,    93,    94,    98,   102,   103,
-     104,   105,   106,   107,   108,   109,   110,   111,   112,   113,
-     114,   115,   116,   117,   118,   122,   123,   127,   128,   132,
-     133,   137,   138,   139,   142,   143,   146,   147,   148,   149,
-     150,   151,   152,   153,   157,   158,   159,   160,   161,   162,
-     165
+         0,    81,    81,    83,    85,    89,    90,    91,    95,    96,
+      97,    98,    99,   100,   101,   102,   103,   104,   105,   106,
+     107,   108,   109,   110,   111,   115,   116,   120,   121,   125,
+     126,   130,   131,   132,   135,   136,   139,   140,   141,   142,
+     143,   144,   145,   146,   150,   151,   152,   153,   154,   155,
+     158
   };
 
   // Print the state stack on the debug stream.
@@ -1345,7 +1334,7 @@ namespace pico {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 298;
+  const int BisonParser::yylast_ = 272;
   const int BisonParser::yynnts_ = 13;
   const int BisonParser::yyempty_ = -2;
   const int BisonParser::yyfinal_ = 35;
@@ -1357,12 +1346,12 @@ namespace pico {
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 /* Line 1135 of lalr1.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 } // pico
 /* Line 1135 of lalr1.cc  */
-#line 1364 "pico.tab.c"
+#line 1353 "pico.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 167 "pico.y"
+#line 160 "pico.y"
 
 
 // We have to implement the error function

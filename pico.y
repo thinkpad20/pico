@@ -1,6 +1,7 @@
 %{
 
 #include "ast.h"
+#include "symbol.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
@@ -66,54 +67,53 @@ extern int yylineno;
 %type <term_list> term_list
 %type <var> var
 
-%right '<' '>' LEQ GEQ EQ NEQ
-%right AND OR
-%right '+' '-'
-%right '*' '/' '%'
-%right '^'
+%left '<' '>' LEQ GEQ EQ NEQ
+%left AND OR
+%left '+' '-'
+%left '*' '/' '%'
+%left '^'
 %right NOT UNARY
 
 %start pico
 
 %%
 
-pico: exprs { $$ = $1; $$->print(); } ;
+pico: exprs { 
+               $$ = $1; 
+               $$->print(); 
+               printf("Reducing..."); fflush(stdout); 
+               $$->reduce_all(); 
+               printf("Finished reducing!!!\n"); fflush(stdout); 
+               $$->print(); 
+            } ;
 
-exprs: expr '.' { $$ = new ExpressionList(); 
-                  printf("got an expression: "); 
-                  $1->print(); 
-                  printf("\nReducing: "); puts("");
-                  Expression::reduce($1);                                    
-                  printf("\nDone reducing. Second printing: ");
-                  $1->print();
-                  $$->push_back($1); }
-    | pico expr '.' { $1->push_back($2); $$ = $1; }
+exprs: expr '.'      { $$ = new ExpressionList();
+                       $$->push_back($1); }
+    | pico expr '.'  { $1->push_back($2); 
+                       $$ = $1; }
 
 expr
    : term                              { $$ = new Expression($1); }
-   | var_name '=' term ',' expr        { 
-                                          printf("assignment of %s\n", $1);
-                                          $$ = new Expression($1, $3, $5);
-                                       }
+   | var_name '=' term ',' expr        { $$ = new Expression($1, $3, $5); }
    | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
    ;
 
 term
    : invocation 
-   | term '<' invocation  { $$ = make_lt($1, $3); }
-   | term '>' invocation  { $$ = make_gt($1, $3); }
-   | term LEQ invocation  { $$ = make_leq($1, $3); }
-   | term GEQ invocation  { $$ = make_leq($1, $3); }
-   | term EQ invocation   { $$ = make_eq($1, $3); }
-   | term NEQ invocation  { $$ = make_neq($1, $3); }
-   | term AND invocation  { $$ = make_log_and($1, $3); }
-   | term OR invocation   { $$ = make_log_or($1, $3); }
-   | term '+' invocation  { $$ = make_add($1, $3); }
-   | term '-' invocation  { $$ = make_sub($1, $3); }
-   | term '*' invocation  { $$ = make_mult($1, $3); }
-   | term '/' invocation  { $$ = make_div($1, $3); }
-   | term '%' invocation  { $$ = make_mod($1, $3); }
-   | term '^' invocation  { $$ = make_exp($1, $3); }
+   | term '<' term  { $$ = make_lt($1, $3); }
+   | term '>' term  { $$ = make_gt($1, $3); }
+   | term LEQ term  { $$ = make_leq($1, $3); }
+   | term GEQ term  { $$ = make_leq($1, $3); }
+   | term EQ term   { $$ = make_eq($1, $3); }
+   | term NEQ term  { $$ = make_neq($1, $3); }
+   | term AND term  { $$ = make_log_and($1, $3); }
+   | term OR term   { $$ = make_log_or($1, $3); }
+   | term '+' term  { $$ = make_add($1, $3); }
+   | term '-' term  { $$ = make_sub($1, $3); }
+   | term '*' term  { $$ = make_mult($1, $3); }
+   | term '/' term  { $$ = make_div($1, $3); }
+   | term '%' term  { $$ = make_mod($1, $3); }
+   | term '^' term  { $$ = make_exp($1, $3); }
    | NOT term             { $$ = make_log_not($2); }
    | '-' term %prec UNARY { $$ = make_neg($2);  }
    ;

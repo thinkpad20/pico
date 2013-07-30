@@ -32,6 +32,7 @@ void sym_pop() {
 
 static Term *lookup(string *str, Symstack *s) {
    if (!s) { 
+      printf("'%s' was not found!\n", str->c_str());
       if (!GLOBAL_UNRESOLVED_EXPR) {
          GLOBAL_UNRESOLVED_TERM = new Term();
          GLOBAL_UNRESOLVED_EXPR = new Expression(GLOBAL_UNRESOLVED_TERM, 
@@ -55,15 +56,17 @@ Term *sym_lookup(string *str) {
 
 void sym_store(string *str, Term *term) {
    if (!symbol_table) symbol_table = new Symstack();
+   printf("storing '%s'?\n", str->c_str()); fflush(stdout);
    // printf("Storing %s, creating new thunk: ", str->c_str()); term->print(); puts("");
-   if (symbol_table->m.find(*str) != symbol_table->m.end()) {
-      throw string("Error: symbol %s already exists in table, can't assign.\n", str->c_str());
+   if (sym_contains(str)) {
+      char buf[1000]; sprintf(buf, "Error: symbol %s already exists in table, can't assign.\n", str->c_str());
+      throw string(buf);
    }
    symbol_table->m[*str] = new Expression(term);
 }
 
 void sym_update(string *str, Term *term) {
-   // printf("updating symtable!~+~+~+~+~+~+~+~+~+~+\n");
+   printf("updating symtable!~+~+~+~+~+~+~+~+~+~+\n");
    if (symbol_table->m.find(*str) == symbol_table->m.end()) {
       if (term->t != Term::UNRESOLVED) {
          printf("error\n"); fflush(stdout);
@@ -73,18 +76,21 @@ void sym_update(string *str, Term *term) {
       }
    }
    Term *cur = symbol_table->m[*str]->term;
-   // printf("'%s' was previously: ", str->c_str()); cur->print();
-   bool iseq = cur->is_eq(term) || (cur->t == Term::UNRESOLVED && term->t == Term::UNRESOLVED);
-   // printf("\n%s", iseq ? "equal" : "not equal");
+   printf("'%s' was previously %p: ", str->c_str(), cur); cur->print();
+   printf(", is now %p: ", term); term->print(); puts("");
+   bool iseq = cur->is_eq(term);
+   printf("\n%s", iseq ? "equal" : "not equal");
    if (!iseq) {
-      // printf(", so updating: "); term->print(); puts(""); fflush(stdout);
+      printf(", so updating: "); term->print(); puts(""); fflush(stdout);
+      printf("deleting %p\n", symbol_table->m[*str]->term); fflush(stdout);
       delete symbol_table->m[*str]->term;
       symbol_table->m[*str]->term = term;
-      // printf("finished updating %s\n", str->c_str()); fflush(stdout);
+      printf("finished updating %s, is now ", str->c_str()); fflush(stdout);
+      term->print(); puts(""); fflush(stdout);
    }
 }
 
-void sym_print(void) {
+void symtable_print(void) {
    Symstack *s = symbol_table;
    int level = 0;
    printf("Symbol table contains:\n");
@@ -102,10 +108,19 @@ bool sym_contains(string *name) {
 }
 
 void add_local(string *str) {
+   if (symbol_table->m.find(*str) != symbol_table->m.end()) return;  
    size_t index = symbol_table->locals.size();
    symbol_table->locals.push_back(GLOBAL_UNRESOLVED_EXPR); 
    symbol_table->m[*str] = symbol_table->locals[index];
-   printf("added local variable %s pointing to spot %p\n", str->c_str(), symbol_table->locals[index]);
+   printf("added local variable %s\n", str->c_str());
+}
+
+void supply_local(TermList *tlist) {
+   // find first unassigned symbol
+   for (size_t i = 0; i < symbol_table->locals.size(); ++i) {
+
+   }
+   for (TermList::iterator it = tlist->begin(), it != tlist->end()) {}
 }
 
 }

@@ -9,10 +9,23 @@ fact = (if Int i < 2 then Int acc,
 print(fact(10) + "hey")
 ), main. 
 
-}>
+a = 1 + i * 3,
+b = a,
+b.
 
-a = 3*4 - i,
-g = 1 + 15 ^ 4, b = 2 * a, g + a * b.
+<--g = 1 + 15 ^ 4, 
+b = 2 * a,
+c = a * b, 
+c.}>
 
+q = (
+a = 1 + i,
+b = a + 1,
+c = b * 2,
+d = c ^ 3,
+e = d / 4,
+e + 5), q.
+
+p = q(5), p.
 
 <--i.

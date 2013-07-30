@@ -7,7 +7,7 @@ namespace pico {
 Term *Expression::reduce(Expression *expr) {
    switch(expr->t) {
       case Expression::TERM:
-      { 
+      {  printf("this is a term!\n"); fflush(stdout);
          Term *res = Term::reduce(expr->term);
          if (!res->is_eq(expr->term)) 
          {  delete expr->term;
@@ -15,10 +15,15 @@ Term *Expression::reduce(Expression *expr) {
          return res;
       }
       case Expression::ASSIGN:
-      {  sym_store(expr->assign.var->name, expr->assign.term);
+      {  printf("this is an assign! Here's what's in our symbol table:\n"); fflush(stdout);
+         symtable_print(); fflush(stdout);
+         puts("");
+         if (!sym_contains(expr->assign.var->name))
+            sym_store(expr->assign.var->name, expr->assign.term);
          return reduce(expr->assign.next); }
       case Expression::IF:
       {
+         printf("this is an if!\n"); fflush(stdout);
          if (Term::unresolved(expr->if_.cond) > 0) 
             return new Term(expr); // stop reducing
          if (Term::reduce(expr->if_.cond)->to_bool()) 
@@ -28,7 +33,7 @@ Term *Expression::reduce(Expression *expr) {
       }
       case Expression::UNRESOLVED:
       {
-         printf("Unresolved, can't evaluate further.\n");
+         printf("This is unresolved, can't evaluate further.\n");
          return GLOBAL_UNRESOLVED_TERM;
       }
    }
@@ -42,7 +47,7 @@ Term *Term::reduce(Term *term) {
    // printf("==============reducing %d: ", n); term->print(); puts("");
    if (!term) {
       printf("term was null\n");
-      return new Term();
+      return GLOBAL_UNRESOLVED_TERM;
    }
    if (term == GLOBAL_UNRESOLVED_TERM) 
       return term;
@@ -91,26 +96,26 @@ Term *Term::reduce(Term *term) {
          return result; 
       }
       case UNRESOLVED:  { return term; }
-      case INVOKE:      { throw std::string("Can't handle invoke yet :(\n"); }
+      case INVOKE:      { 
+         
+         // throw std::string("Can't handle invoke yet :(\n"); 
+      }
    }
 }
 
 unsigned Term::unresolved(Term *t) {
-   printf("calling unresolved on %p: ", t); fflush(stdout); t->print(); puts("");
+   // printf("calling unresolved on %p: ", t); fflush(stdout); t->print(); puts("");
    if (!t) return 1;
    if (t == GLOBAL_UNRESOLVED_TERM) return 1;
-   printf("t = %d\n", t->t); fflush(stdout);
+   // printf("t = %d\n", t->t); fflush(stdout);
    switch (t->t) {
       case BOOL: case STRING: case CHAR: case INT: case FLOAT:
       { return 0; }
       case VAR: {
-         printf("looking up a variable\n"); fflush(stdout);
+         // printf("looking up a variable %s\n", t->var->name->c_str()); fflush(stdout);
          Term *res = sym_lookup(t->var->name);
-         printf("res is: "); fflush(stdout); res->print();
-         if (res->t == UNRESOLVED) {
-            delete res;
-            return 1;
-         }
+         // printf("res is: "); fflush(stdout); res->print();
+         if (res->t == UNRESOLVED) { return 1; }
          return unresolved(res);
       }
       case UNRESOLVED: 
@@ -183,11 +188,11 @@ bool Term::is_eq(Term *other) {
       case BIT_OR: 
       case BIT_NOT:
       case BIT_XOR:
-      { return binary.term1 == other->binary.term1 && binary.term2 == other->binary.term2; }
+      { return binary.term1->is_eq(other->binary.term1) && binary.term2->is_eq(other->binary.term2); }
       // unary
       case NEG:
       case LOG_NOT:
-      { return unary == other->unary; }
+      { return unary->is_eq(other->unary); }
       //literals
       case PARENS: { return expr == other->expr; }
       case INT: { return ival == other->ival; }
@@ -195,20 +200,21 @@ bool Term::is_eq(Term *other) {
       case CHAR: { return cval == other->cval; }
       case STRING: { return strval == other->strval; }
       case BOOL: { return bval == other->bval; }
-      case VAR: { return var == other->var; }
+      case VAR: { return *var->name == *other->var->name; }
       case UNRESOLVED:  { return false; }
       case INVOKE:      
-      { return invoke.func == other->invoke.func && invoke.term_list == other->invoke.term_list; }
+      {  printf("WARNING, we haven't implemented invoke equality yet\n");
+         return invoke.func->is_eq(other->invoke.func) && invoke.term_list == other->invoke.term_list; }
    }
 }
 
 Term *Term::add(Term *t1, Term *t2) {
    // printf("Adding: "); t1->print(); printf(" and "); t2->print(); puts("");
-   Term *temp1 = t1, *temp2 = t2;
-   // printf("going to subreduceuate, %p %p\n", t1, t2); fflush(stdout);
+   // Term *temp1 = t1, *temp2 = t2;
+   // printf("going to subreduce, %p %p\n", t1, t2); fflush(stdout);
    t1 = reduce(t1); t2 = reduce(t2);
-   // printf("add reduceuated, %p %p, seeing if unresolved\n", t1, t2); fflush(stdout);
-   // check if reduceuation should proceed
+   // printf("add reduced, %p %p, seeing if unresolved\n", t1, t2); fflush(stdout);
+   // check if reduction should proceed
    unsigned u1 = unresolved(t1);
    // printf("u1 = %u\n", u1); fflush(stdout);
    unsigned u2 = unresolved(t2);
@@ -709,6 +715,15 @@ Term *Term::bxor(Term *t1, Term *t2) {
 bool Term::to_bool() {
    if (t == BOOL) return bval;
    throw std::string("Error: to_bool called on something that's not a boolean.");
+}
+
+void ExpressionList::reduce_all() {
+   ExpressionList::iterator it;
+   for (it = begin(); it != end(); ++it) {
+      printf("Reducing: "); fflush(stdout); (*it)->print(); fflush(stdout);
+      Expression::reduce(*it);
+      printf("OK\n"); fflush(stdout);
+   }
 }
 
 }

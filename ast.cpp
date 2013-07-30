@@ -60,35 +60,37 @@ Expression::~Expression() {
 Var::~Var() { delete name; if (type) delete type; }
 
 Term::~Term() {
-   switch (t) {
-      case ADD:   { delete binary.term1; delete binary.term2; break; }
-      case SUB:   { delete binary.term1; delete binary.term2; break; }
-      case MULT:  { delete binary.term1; delete binary.term2; break; }
-      case DIV:   { delete binary.term1; delete binary.term2; break; }
-      case MOD:   { delete binary.term1; delete binary.term2; break; }
-      case EXP:   { delete binary.term1; delete binary.term2; break; }
-      case LOG_AND:  { delete binary.term1; delete binary.term2; break; }
-      case LOG_OR:   { delete binary.term1; delete binary.term2; break; }
-      case LOG_NOT:  { delete unary; break; }
-      case NEG:   { delete unary; break; }
-      case EQ:    { delete binary.term1; delete binary.term2; break; }
-      case NEQ:   { delete binary.term1; delete binary.term2; break; }
-      case LT:    { delete binary.term1; delete binary.term2; break; }
-      case GT:    { delete binary.term1; delete binary.term2; break; }
-      case LEQ:   { delete binary.term1; delete binary.term2; break; }
-      case GEQ:   { delete binary.term1; delete binary.term2; break; }
-      case BIT_AND: { delete binary.term1; delete binary.term2; break; }
-      case BIT_OR:   { delete binary.term1; delete binary.term2; break; }
-      case BIT_NOT:  { delete binary.term1; delete binary.term2; break; }
-      case BIT_XOR:  { delete binary.term1; delete binary.term2; break; }
-      case BOOL:     { delete binary.term1; delete binary.term2; break; }
-      case PARENS:   { delete expr; break; }
-      case INT: case FLOAT: case CHAR: { break; }
-      case STRING:   { fflush(stdout); delete strval; break; }
-      case VAR:      { delete var; break; }
-      case UNRESOLVED:  { break; }
-      case INVOKE:      { delete invoke.func; delete invoke.term_list; break; }
-   }
+   // printf("call to term destruct, t is %d, %p\n", t, this);
+   // switch (t) {
+   //    case ADD:
+   //    case SUB:
+   //    case MULT:  
+   //    case DIV:   
+   //    case MOD:   
+   //    case EXP:   
+   //    case LOG_AND: 
+   //    case LOG_OR:  
+   //    case EQ:    
+   //    case NEQ:   
+   //    case LT:    
+   //    case GT:    
+   //    case LEQ:   
+   //    case GEQ:   
+   //    case BIT_AND: 
+   //    case BIT_OR:  
+   //    case BIT_NOT: 
+   //    case BIT_XOR: { printf("deleting %p and %p\n", binary.term1, binary.term2); 
+   //                    binary.term1->print(); binary.term2->print(); 
+   //                    delete binary.term1; delete binary.term2; break; }
+   //    case LOG_NOT:  { delete unary; break; }
+   //    case NEG:   { delete unary; break; }
+   //    case PARENS:   { delete expr; break; }
+   //    case INT: case FLOAT: case CHAR: case BOOL: { break; }
+   //    case STRING:   { fflush(stdout); delete strval; break; }
+   //    case VAR:      { /*delete var;*/ break; }
+   //    case UNRESOLVED:  { break; }
+   //    case INVOKE:      { delete invoke.func; delete invoke.term_list; break; }
+   // }
 }
 
 void Term::print_info() {

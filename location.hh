@@ -41,7 +41,7 @@
 # include "position.hh"
 
 /* Line 166 of location.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 namespace pico {
 /* Line 166 of location.cc  */
 #line 48 "location.hh"
@@ -175,7 +175,7 @@ namespace pico {
   }
 
 /* Line 296 of location.cc  */
-#line 12 "pico.y"
+#line 13 "pico.y"
 } // pico
 /* Line 296 of location.cc  */
 #line 182 "location.hh"
