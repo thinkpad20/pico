@@ -81,8 +81,12 @@ extern int yylineno;
 pico: exprs { 
                $$ = $1; 
                $$->print(); 
-               printf("Reducing..."); fflush(stdout); 
-               $$->reduce_all(); 
+               printf("Reducing..."); fflush(stdout);
+               try {
+                  $$->reduce_all(); 
+               } catch (std::string msg) {
+                  printf("%s\n", msg.c_str());
+               }
                printf("Finished reducing!!!\n"); fflush(stdout); 
                $$->print(); 
             } ;

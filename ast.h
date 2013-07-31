@@ -64,7 +64,7 @@ struct Term {
    // recursive instantiation
    Term(Term *term1, Term *term2, enum Type type): t(type), u(term1->u + term2->u)
       { binary.term1 = term1; binary.term2 = term2; }
-   Term(Expression *expr); // defined in cpp
+   Term(Expression *expr); // defined in ast.cpp
    Term(Term *term, enum Type type): t(type), unary(term), u(term->u) {}
    Term(Term *func, TermList *term_list): t(INVOKE), u(func->u - term_list->size())
       { invoke.func = func; invoke.term_list = term_list; }

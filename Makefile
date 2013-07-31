@@ -5,6 +5,9 @@ run: pico
 
 pico: lex.yy.cc pico.tab.c ast.cpp ast.h symbol.h symbol.cpp reduce.cpp
 	g++ lex.yy.cc parse.cpp pico.tab.c ast.cpp symbol.cpp reduce.cpp -o pico
+
+pico-mod: lex.yy.cc pico.tab.c ast-mod.cpp ast-mod.h symbol-mod.cpp reduce-mod.cpp
+	g++ lex.yy.cc parse.cpp pico.tab.c ast-mod.cpp symbol-mod.cpp reduce-mod.cpp -o pico-mod
 	
 lex.yy.cc: pico.l
 	flex pico.l
@@ -17,6 +20,9 @@ test: pico
 
 debug_test: pico
 	cat test.pc | ./pico debug
+
+mod-test: pico-mod
+	cat test.pc | ./pico-mod debug	
 
 clean:
 	rm -rf pico.tab.c pico.tab.h location.hh position.hh stack.hh

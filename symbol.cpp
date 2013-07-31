@@ -120,7 +120,7 @@ void supply_local(TermList *tlist) {
    for (size_t i = 0; i < symbol_table->locals.size(); ++i) {
 
    }
-   for (TermList::iterator it = tlist->begin(), it != tlist->end()) {}
+   // for (TermList::iterator it = tlist->begin(), it != tlist->end()) {}
 }
 
 }

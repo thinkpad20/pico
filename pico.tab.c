@@ -461,266 +461,277 @@ namespace pico {
           case 2:
 /* Line 664 of lalr1.cc  */
 #line 81 "pico.y"
-    { (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); (yyval.expr_list)->print(); printf("hey!\n"); fflush(stdout); (yyval.expr_list)->reduce_all(); printf("hey!!!\n"); fflush(stdout); (yyval.expr_list)->print(); }
+    { 
+               (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); 
+               (yyval.expr_list)->print(); 
+               printf("Reducing..."); fflush(stdout);
+               try {
+                  (yyval.expr_list)->reduce_all(); 
+               } catch (std::string msg) {
+                  printf("%s\n", msg.c_str());
+               }
+               printf("Finished reducing!!!\n"); fflush(stdout); 
+               (yyval.expr_list)->print(); 
+            }
     break;
 
   case 3:
 /* Line 664 of lalr1.cc  */
-#line 83 "pico.y"
+#line 94 "pico.y"
     { (yyval.expr_list) = new ExpressionList();
                        (yyval.expr_list)->push_back((yysemantic_stack_[(2) - (1)].expr)); }
     break;
 
   case 4:
 /* Line 664 of lalr1.cc  */
-#line 85 "pico.y"
+#line 96 "pico.y"
     { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (2)].expr)); 
                        (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
     break;
 
   case 5:
 /* Line 664 of lalr1.cc  */
-#line 89 "pico.y"
+#line 100 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].term)); }
     break;
 
   case 6:
 /* Line 664 of lalr1.cc  */
-#line 90 "pico.y"
+#line 101 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(5) - (1)].strval), (yysemantic_stack_[(5) - (3)].term), (yysemantic_stack_[(5) - (5)].expr)); }
     break;
 
   case 7:
 /* Line 664 of lalr1.cc  */
-#line 91 "pico.y"
+#line 102 "pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(7) - (2)].term), (yysemantic_stack_[(7) - (4)].term), (yysemantic_stack_[(7) - (7)].expr)); }
     break;
 
   case 9:
 /* Line 664 of lalr1.cc  */
-#line 96 "pico.y"
+#line 107 "pico.y"
     { (yyval.term) = make_lt((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 10:
 /* Line 664 of lalr1.cc  */
-#line 97 "pico.y"
+#line 108 "pico.y"
     { (yyval.term) = make_gt((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 11:
 /* Line 664 of lalr1.cc  */
-#line 98 "pico.y"
+#line 109 "pico.y"
     { (yyval.term) = make_leq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 12:
 /* Line 664 of lalr1.cc  */
-#line 99 "pico.y"
+#line 110 "pico.y"
     { (yyval.term) = make_leq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 13:
 /* Line 664 of lalr1.cc  */
-#line 100 "pico.y"
+#line 111 "pico.y"
     { (yyval.term) = make_eq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 14:
 /* Line 664 of lalr1.cc  */
-#line 101 "pico.y"
+#line 112 "pico.y"
     { (yyval.term) = make_neq((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 15:
 /* Line 664 of lalr1.cc  */
-#line 102 "pico.y"
+#line 113 "pico.y"
     { (yyval.term) = make_log_and((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 16:
 /* Line 664 of lalr1.cc  */
-#line 103 "pico.y"
+#line 114 "pico.y"
     { (yyval.term) = make_log_or((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 17:
 /* Line 664 of lalr1.cc  */
-#line 104 "pico.y"
+#line 115 "pico.y"
     { (yyval.term) = make_add((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 18:
 /* Line 664 of lalr1.cc  */
-#line 105 "pico.y"
+#line 116 "pico.y"
     { (yyval.term) = make_sub((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 19:
 /* Line 664 of lalr1.cc  */
-#line 106 "pico.y"
+#line 117 "pico.y"
     { (yyval.term) = make_mult((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 20:
 /* Line 664 of lalr1.cc  */
-#line 107 "pico.y"
+#line 118 "pico.y"
     { (yyval.term) = make_div((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 21:
 /* Line 664 of lalr1.cc  */
-#line 108 "pico.y"
+#line 119 "pico.y"
     { (yyval.term) = make_mod((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 22:
 /* Line 664 of lalr1.cc  */
-#line 109 "pico.y"
+#line 120 "pico.y"
     { (yyval.term) = make_exp((yysemantic_stack_[(3) - (1)].term), (yysemantic_stack_[(3) - (3)].term)); }
     break;
 
   case 23:
 /* Line 664 of lalr1.cc  */
-#line 110 "pico.y"
+#line 121 "pico.y"
     { (yyval.term) = make_log_not((yysemantic_stack_[(2) - (2)].term)); }
     break;
 
   case 24:
 /* Line 664 of lalr1.cc  */
-#line 111 "pico.y"
+#line 122 "pico.y"
     { (yyval.term) = make_neg((yysemantic_stack_[(2) - (2)].term));  }
     break;
 
   case 26:
 /* Line 664 of lalr1.cc  */
-#line 116 "pico.y"
+#line 127 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(4) - (1)].term), (yysemantic_stack_[(4) - (3)].term_list)); }
     break;
 
   case 27:
 /* Line 664 of lalr1.cc  */
-#line 120 "pico.y"
+#line 131 "pico.y"
     { (yyval.term_list) = new TermList(); (yyval.term_list)->push_back((yysemantic_stack_[(1) - (1)].term)); }
     break;
 
   case 28:
 /* Line 664 of lalr1.cc  */
-#line 121 "pico.y"
+#line 132 "pico.y"
     { (yysemantic_stack_[(3) - (1)].term_list)->push_back((yysemantic_stack_[(3) - (3)].term)); (yyval.term_list) = (yysemantic_stack_[(3) - (1)].term_list); }
     break;
 
   case 30:
 /* Line 664 of lalr1.cc  */
-#line 126 "pico.y"
+#line 137 "pico.y"
     { (yyval.term) = new Term(); }
     break;
 
   case 32:
 /* Line 664 of lalr1.cc  */
-#line 131 "pico.y"
+#line 142 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].var));}
     break;
 
   case 33:
 /* Line 664 of lalr1.cc  */
-#line 132 "pico.y"
+#line 143 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(3) - (2)].expr)); }
     break;
 
   case 34:
 /* Line 664 of lalr1.cc  */
-#line 135 "pico.y"
+#line 146 "pico.y"
     { (yyval.var) = new Var((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 35:
 /* Line 664 of lalr1.cc  */
-#line 136 "pico.y"
+#line 147 "pico.y"
     { (yyval.var) = new Var((yysemantic_stack_[(2) - (2)].strval), (yysemantic_stack_[(2) - (1)].strval)); }
     break;
 
   case 36:
 /* Line 664 of lalr1.cc  */
-#line 139 "pico.y"
+#line 150 "pico.y"
     { (yyval.strval) = strdup("Any"); }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
-#line 140 "pico.y"
+#line 151 "pico.y"
     { (yyval.strval) = strdup("Int"); }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
-#line 141 "pico.y"
+#line 152 "pico.y"
     { (yyval.strval) = strdup("Float"); }
     break;
 
   case 39:
 /* Line 664 of lalr1.cc  */
-#line 142 "pico.y"
+#line 153 "pico.y"
     { (yyval.strval) = strdup("String"); }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
-#line 143 "pico.y"
+#line 154 "pico.y"
     { (yyval.strval) = strdup("Array"); }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
-#line 144 "pico.y"
+#line 155 "pico.y"
     { (yyval.strval) = strdup("List"); }
     break;
 
   case 42:
 /* Line 664 of lalr1.cc  */
-#line 145 "pico.y"
+#line 156 "pico.y"
     { (yyval.strval) = strdup("Table"); }
     break;
 
   case 44:
 /* Line 664 of lalr1.cc  */
-#line 150 "pico.y"
+#line 161 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 45:
 /* Line 664 of lalr1.cc  */
-#line 151 "pico.y"
+#line 162 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].fval)); }
     break;
 
   case 46:
 /* Line 664 of lalr1.cc  */
-#line 152 "pico.y"
+#line 163 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 47:
 /* Line 664 of lalr1.cc  */
-#line 153 "pico.y"
+#line 164 "pico.y"
     { (yyval.term) = new Term((yysemantic_stack_[(1) - (1)].cval)); }
     break;
 
   case 48:
 /* Line 664 of lalr1.cc  */
-#line 154 "pico.y"
+#line 165 "pico.y"
     { (yyval.term) = new Term(true); }
     break;
 
   case 49:
 /* Line 664 of lalr1.cc  */
-#line 155 "pico.y"
+#line 166 "pico.y"
     { (yyval.term) = new Term(false); }
     break;
 
 
 /* Line 664 of lalr1.cc  */
-#line 724 "pico.tab.c"
+#line 735 "pico.tab.c"
       default:
         break;
       }
@@ -1251,12 +1262,12 @@ namespace pico {
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    81,    81,    83,    85,    89,    90,    91,    95,    96,
-      97,    98,    99,   100,   101,   102,   103,   104,   105,   106,
-     107,   108,   109,   110,   111,   115,   116,   120,   121,   125,
-     126,   130,   131,   132,   135,   136,   139,   140,   141,   142,
-     143,   144,   145,   146,   150,   151,   152,   153,   154,   155,
-     158
+         0,    81,    81,    94,    96,   100,   101,   102,   106,   107,
+     108,   109,   110,   111,   112,   113,   114,   115,   116,   117,
+     118,   119,   120,   121,   122,   126,   127,   131,   132,   136,
+     137,   141,   142,   143,   146,   147,   150,   151,   152,   153,
+     154,   155,   156,   157,   161,   162,   163,   164,   165,   166,
+     169
   };
 
   // Print the state stack on the debug stream.
@@ -1349,9 +1360,9 @@ namespace pico {
 #line 13 "pico.y"
 } // pico
 /* Line 1135 of lalr1.cc  */
-#line 1353 "pico.tab.c"
+#line 1364 "pico.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 160 "pico.y"
+#line 171 "pico.y"
 
 
 // We have to implement the error function
