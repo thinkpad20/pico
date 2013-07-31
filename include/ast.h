@@ -44,36 +44,37 @@ struct Expression {
       struct {std::string *vname; Expression *expr; Expression *next;} assign;
       struct {Expression *cond, *if_true; Expression *if_false;} if_;
    };
+   unsigned u; // num unresolved exprs in this expr
    Expression *parent; // for symbol lookups
    typedef std::map<std::string, Expression *> SymTable;
    SymTable symbol_table, temps;
    std::deque<Expression *> free_vars;
-   unsigned u;
-   Expression(): t(UNRESOLVED), u(1) {}
-   Expression(double f): t(FLOAT), fval(f), u(0) {}
-   Expression(int i): t(INT), ival(i), u(0) {}
-   Expression(char c): t(CHAR), cval(c), u(0) {}
-   Expression(bool b): t(BOOL), bval(b), u(0) {}
-   Expression(char *str): t(STRING), u(0) {
+   Expression(): t(UNRESOLVED), u(1), parent(NULL) {}
+   Expression(double f): t(FLOAT), fval(f), u(0), parent(NULL) {}
+   Expression(int i): t(INT), ival(i), u(0), parent(NULL) {}
+   Expression(char c): t(CHAR), cval(c), u(0), parent(NULL) {}
+   Expression(bool b): t(BOOL), bval(b), u(0), parent(NULL) {}
+   Expression(char *str): t(STRING), u(0), parent(NULL) {
       strval = new std::string(strndup(str+1, strlen(str) - 2));
       printf("created string, pointer is %p\n", strval);
       free(str);
    }
    // binary operation
    Expression(Expression *expr1, Expression *expr2, enum Type type): t(type), u(expr1->u + expr2->u)
-      { binary.expr1 = expr1; binary.expr2 = expr2; }
+      { binary.expr1 = expr1; binary.expr2 = expr2; binary.expr1->parent = binary.expr2->parent = this; }
    // unary operation
-   Expression(Expression *expr, enum Type type): t(type), unary(expr), u(expr->u) {}
+   Expression(Expression *expr, enum Type type): t(type), unary(expr), u(expr->u) { unary->parent = this; }
    // invocation
    Expression(Expression *func, ExpressionList *expr_list): t(INVOKE), u(func->u - expr_list->size())
-      { invoke.func = func; invoke.expr_list = expr_list; }
+      { invoke.func = func; invoke.expr_list = expr_list; func->parent = this; }
    // if statement
    Expression(Expression *cond, Expression *if_true, Expression *if_false)
-      { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
+      { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; 
+         cond->parent = if_true->parent = if_false->parent = this; }
    // assignment statement
    Expression(char *vname, Expression *expr, Expression *next)
       { t = ASSIGN; assign.vname = new std::string(vname); 
-         assign.expr = expr; assign.next = next; }
+         assign.expr = expr; assign.next = next; next->parent = this; }
    ~Expression();
 
    void print();
