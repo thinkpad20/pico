@@ -13,15 +13,15 @@ pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/reduce.o bin/symbol.o
 # generate C source from lex and yac files
 src/lex.yy.cc: src/pico.l
 	flex src/pico.l
-	mv *.cc src
+	@mv *.cc src
 
 src/pico.tab.c: src/lex.yy.cc src/pico.y include/location.hh include/position.hh
 	bison -v --report=all --debug src/pico.y
-	mv *.c src
-	mv *.h src
-	mv *.hh src
-	mkdir -p aux
-	mv *.output aux
+	@mv *.c src
+	@mv *.h src
+	@mv *.hh src
+	@mkdir -p aux
+	@mv *.output aux
 
 # object files
 bin/engine.o: include/picoScanner.h bin/ast.o src/engine.cpp
@@ -36,7 +36,7 @@ bin/reduce.o: src/reduce.cpp include/ast.h
 	@mkdir -p bin
 	$(CPP) -c -o bin/reduce.o src/reduce.cpp
 
-bin/lex.o: src/lex.yy.cc
+bin/lex.o: src/lex.yy.cc bin/parse.o
 	@mkdir -p bin
 	$(CPP) -c -o bin/lex.o src/lex.yy.cc
 
@@ -55,6 +55,6 @@ debug_test: pico
 	cat tests/test.pc | ./pico debug
 
 clean:
-	rm -rf pico.tab.c pico.tab.h location.hh position.hh stack.hh
-	rm -rf lex.yy.cc
-	rm -rf pico
+	-rm src/pico.tab.c src/pico.tab.h src/location.hh src/position.hh src/stack.hh
+	-rm src/lex.yy.cc
+	-rm pico
