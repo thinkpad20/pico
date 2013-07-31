@@ -70,7 +70,7 @@ extern int yylineno;
 
 pico: exprs { 
                $$ = $1; 
-               $$->print(); 
+               cout << $1 << endl;
                printf("Reducing..."); fflush(stdout);
                try {
                   $$->reduce_all(); 
@@ -78,7 +78,7 @@ pico: exprs {
                   printf("%s\n", msg.c_str());
                }
                printf("Finished reducing!!!\n"); fflush(stdout); 
-               $$->print(); 
+               cout << $1 << endl;
             } ;
 
 exprs: expr '.'      { $$ = new ExpressionList(); $$->push_back($1); }

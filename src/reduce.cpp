@@ -3,89 +3,6 @@
 
 namespace pico {
 
-int e_num = 0;
-int callno = 0;
-
-// Expression *Expression::reduce(Expression *expr) {
-//    // int n = e_num++;
-//    // printf("==============reducing %d: ", n); expr->print(); puts("");
-//    if (!expr) {
-//       printf("expr was null\n");
-//       return GLOBAL_UNRESOLVED;
-//    }
-//    if (expr == GLOBAL_UNRESOLVED) 
-//       return this;
-//    // int thiscall = callno++;
-//    // printf("%d calling reduce on expr: ", thiscall);
-//    // expr->print_info(); printf(" "); expr->print(); puts("");
-//    switch(expr->t) {
-//       case ASSIGN:
-//       {  printf("this is an assign! Here's what's in our symbol table:\n"); fflush(stdout);
-//          expr->symtable_print(); fflush(stdout);
-//          puts("");
-//          if (!expr->sym_contains(expr->assign.vname))
-//             expr->sym_store(expr->assign.vname, expr->assign.expr);
-//          return reduce(expr->assign.next); }
-//       case IF:
-//       {
-//          printf("this is an if!\n"); fflush(stdout);
-//          if (expr->if_.cond->unresolved() > 0) 
-//             return new Expression(expr); // stop reducing
-//          if (Expression::reduce(expr->if_.cond)->to_bool()) 
-//             return Expression::reduce(expr->if_.if_true); // only reduce one of the conditions
-//          else
-//             return reduce(expr->if_.if_false);
-//       }
-//       case UNRESOLVED:
-//       {
-//          printf("This is unresolved, can't evaluate further.\n");
-//          return this;
-//       }
-//       case ADD: { return add(expr->binary.expr1, expr->binary.expr2); }
-//       case SUB: { return sub(expr->binary.expr1, expr->binary.expr2); }
-//       case MULT: { Expression *res = mult(expr->binary.expr1, expr->binary.expr2); 
-//                    //printf("finishing call %d, res %p: ", thiscall, res); res->print(); puts(""); 
-//                    return res;}
-//       case DIV: { return div(expr->binary.expr1, expr->binary.expr2); }
-//       case MOD: { return mod(expr->binary.expr1, expr->binary.expr2); }
-//       case EXP: { return exp(expr->binary.expr1, expr->binary.expr2); }
-//       case NEG: { return neg(expr->unary); }
-//       case LOG_AND: { return land(expr->binary.expr1, expr->binary.expr2); }
-//       case LOG_OR: { return lor(expr->binary.expr1, expr->binary.expr2); }
-//       case LOG_NOT: { return lnot(expr->unary); }
-//       case EQ: { return eq(expr->binary.expr1, expr->binary.expr2); }
-//       case NEQ: { return neq(expr->binary.expr1, expr->binary.expr2); }
-//       case LT: { return lt(expr->binary.expr1, expr->binary.expr2); }
-//       case GT: { return gt(expr->binary.expr1, expr->binary.expr2); }
-//       case LEQ: { return leq(expr->binary.expr1, expr->binary.expr2); }
-//       case GEQ: { return geq(expr->binary.expr1, expr->binary.expr2); }
-//       case BIT_AND: { return band(expr->binary.expr1, expr->binary.expr2); }
-//       case BIT_OR: { return bor(expr->binary.expr1, expr->binary.expr2); }
-//       case BIT_NOT: { return bnot(expr->binary.expr1, expr->binary.expr2); }
-//       case BIT_XOR: { return bxor(expr->binary.expr1, expr->binary.expr2); }
-//       //literals
-//       case BOOL: case INT: case FLOAT: case CHAR: case STRING: { return this; }
-//       case VAR:
-//       { 
-//          Expression *target = expr->sym_lookup(expr->var.name);
-//          if (target == GLOBAL_UNRESOLVED) {
-//             printf("found an unresolved expr\n"); fflush(stdout);
-//             expr->add_free_var(expr->var.name);
-//             printf("we're going to return: "); expr->print(); puts("");
-//             printf("which has unresolved of %u\n", expr->unresolved());
-//             return this;
-//          }
-//          Expression *result = reduce(target);
-//          expr->sym_update(expr->var.name, result);
-//          // printf("finished sym_update\n"); fflush(stdout);
-//          return result; 
-//       }
-//       case INVOKE: { 
-//          throw std::string("Can't handle invoke yet :(\n"); 
-//       }
-//    }
-// }
-
 Expression *Expression::reduce() {
    if (this == GLOBAL_UNRESOLVED) 
       return this;
@@ -247,11 +164,7 @@ Expression *Expression::add(Expression *t1, Expression *t2) {
    t1 = t1->reduce(); t2 = t2->reduce();
    // printf("add reduced, %p %p, seeing if unresolved\n", t1, t2); fflush(stdout);
    // check if reduction should proceed
-   unsigned u1 = t1->unresolved();
-   // printf("u1 = %u\n", u1); fflush(stdout);
-   unsigned u2 = t2->unresolved();
-   // printf("u2 = %u\n", u2); fflush(stdout);
-   if (u1 || u2) { 
+   if (t1->unresolved() || t2->unresolved()) { 
       // printf("add unresolved\n");
       return make_add(t1, t2); 
    }
@@ -301,22 +214,14 @@ Expression *Expression::sub(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::mult(Expression *t1, Expression *t2) {
-   // printf("Multiplying: "); t1->print(); printf(" and "); t2->print(); puts("");
    t1 = t1->reduce(); 
-   // printf("reduceuating t2\n");
    t2 = t2->reduce();
-   // printf("done reduceuating t2\n");
-   // printf("mult reduceuated, seeing if unresolved\n"); fflush(stdout);
-   // check if reduceuation should proceed
    if (t1->unresolved() || t2->unresolved()) { 
-      // printf("mult is unresolved\n");
       return make_mult(t1, t2); 
    }
-   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { Expression *res = new Expression(t1->ival * t2->ival); 
-            // printf("\nthe result is %p: ", res); res->print(); puts(""); 
             return res;}
          case FLOAT: { return new Expression(t1->ival * t2->ival); }
          default: break;

@@ -77,6 +77,7 @@ struct Expression {
          assign.expr = expr; assign.next = next; next->parent = this; }
    ~Expression();
 
+   friend std::ostream& operator<<(std::ostream& os, const Expression& expr);
    void print();
    void print_info();
 
@@ -84,18 +85,18 @@ struct Expression {
 
    // static Expression *reduce(Expression *expr);
    Expression *reduce();
-   
+
    unsigned unresolved();
 
    bool to_bool(void);
 
    //symbol table stuff
-   Expression *sym_lookup(std::string *name);
+   Expression *sym_lookup(std::string *name) const;
    void sym_store(std::string *name, Expression *term);
    void sym_update(std::string *str, Expression *term);
-   bool sym_contains(std::string *name);
+   bool sym_contains(std::string *name) const;
    void add_free_var(std::string *str);
-   void symtable_print(unsigned level = 0);
+   void symtable_print(unsigned level = 0) const;
 
    // arithmetic operations
    static Expression *add(Expression *expr1, Expression *expr2);
