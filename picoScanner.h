@@ -10,7 +10,7 @@
 #define YY_DECL int pico::FlexScanner::yylex()
 
 // Include Bison for types / tokens
-#include "pico.tab.h"
+#include "pico-mod.tab.h"
 
 
 namespace pico {

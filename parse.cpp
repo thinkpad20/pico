@@ -1,5 +1,5 @@
 #include "picoScanner.h"
-#include "ast.h"
+#include "ast-mod.h"
 
 namespace pico {
    class Parser {

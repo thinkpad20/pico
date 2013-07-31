@@ -6,14 +6,17 @@ run: pico
 pico: lex.yy.cc pico.tab.c ast.cpp ast.h symbol.h symbol.cpp reduce.cpp
 	g++ lex.yy.cc parse.cpp pico.tab.c ast.cpp symbol.cpp reduce.cpp -o pico
 
-pico-mod: lex.yy.cc pico.tab.c ast-mod.cpp ast-mod.h symbol-mod.cpp reduce-mod.cpp
-	g++ lex.yy.cc parse.cpp pico.tab.c ast-mod.cpp symbol-mod.cpp reduce-mod.cpp -o pico-mod
+pico-mod: lex.yy.cc pico-mod.tab.c ast-mod.cpp ast-mod.h symbol-mod.cpp reduce-mod.cpp
+	g++ lex.yy.cc parse.cpp pico-mod.tab.c ast-mod.cpp symbol-mod.cpp reduce-mod.cpp -o pico-mod
 	
 lex.yy.cc: pico.l
 	flex pico.l
 
 pico.tab.c: pico.y location.hh position.hh
 	bison -v --report=all --debug pico.y
+
+pico-mod.tab.c: pico-mod.y location.hh position.hh
+	bison -v --report=all --debug pico-mod.y
 
 test: pico
 	cat test.pc | ./pico

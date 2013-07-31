@@ -38,10 +38,10 @@ struct Expression {
       double fval;
       std::string *strval; 
       struct {Expression *func; ExpressionList *expr_list;} invoke;
-      Var *var;
+      struct {std::string *name, *type; } var;
       struct {Expression *expr1, *expr2;} binary;
       Expression *unary;
-      struct {Var *var; Expression *expr; Expression *next;} assign;
+      struct {std::string *vname; Expression *expr; Expression *next;} assign;
       struct {Expression *cond, *if_true; Expression *if_false;} if_;
    };
    Expression *parent; // for symbol lookups
@@ -72,7 +72,8 @@ struct Expression {
       { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; }
    // assignment statement
    Expression(char *vname, Expression *expr, Expression *next)
-      { t = ASSIGN; assign.var = new Var(vname); assign.expr = expr; assign.next = next; }
+      { t = ASSIGN; assign.vname = new std::string(vname); 
+         assign.expr = expr; assign.next = next; }
    ~Expression();
 
    void print();
@@ -135,6 +136,8 @@ struct Expression {
    static Expression *make_bit_or(Expression *expr1, Expression *expr2);
    static Expression *make_bit_xor(Expression *expr1, Expression *expr2);
    static Expression *make_neg(Expression *expr);
+   static Expression *make_var(char *name);
+   static Expression *make_var(char *type, char *name);
 };
 
 extern Expression *GLOBAL_UNRESOLVED;

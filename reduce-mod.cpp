@@ -23,8 +23,8 @@ Expression *Expression::reduce(Expression *expr) {
       {  printf("this is an assign! Here's what's in our symbol table:\n"); fflush(stdout);
          expr->symtable_print(); fflush(stdout);
          puts("");
-         if (!expr->sym_contains(expr->assign.var->name))
-            expr->sym_store(expr->assign.var->name, expr->assign.expr);
+         if (!expr->sym_contains(expr->assign.vname))
+            expr->sym_store(expr->assign.vname, expr->assign.expr);
          return reduce(expr->assign.next); }
       case IF:
       {
@@ -67,16 +67,16 @@ Expression *Expression::reduce(Expression *expr) {
       case BOOL: case INT: case FLOAT: case CHAR: case STRING: { return expr; }
       case VAR:
       { 
-         Expression *target = expr->sym_lookup(expr->var->name);
+         Expression *target = expr->sym_lookup(expr->var.name);
          if (target == GLOBAL_UNRESOLVED) {
             printf("found an unresolved expr\n"); fflush(stdout);
-            expr->add_free_var(expr->var->name);
+            expr->add_free_var(expr->var.name);
             printf("we're going to return: "); expr->print(); puts("");
             printf("which has unresolved of %u\n", expr->unresolved());
             return expr;
          }
          Expression *result = reduce(target);
-         expr->sym_update(expr->var->name, result);
+         expr->sym_update(expr->var.name, result);
          // printf("finished sym_update\n"); fflush(stdout);
          return result; 
       }
@@ -101,7 +101,7 @@ unsigned Expression::unresolved() {
       { return 0; }
       case VAR: {
          // printf("looking up a variable %s\n", var->name->c_str()); fflush(stdout);
-         Expression *res = sym_lookup(var->name);
+         Expression *res = sym_lookup(var.name);
          // printf("res is: "); fflush(stdout); res->print();
          if (res->t == UNRESOLVED) { return 1; }
          return res->unresolved();
@@ -124,7 +124,7 @@ bool Expression::is_eq(Expression *other) {
    // printf("Checking if "); print(); printf(" == "); other->print(); puts("");
    if (t != other->t) return false;
    switch (t) {
-      case ASSIGN: { return assign.var == other->assign.var 
+      case ASSIGN: { return assign.vname == other->assign.vname 
                             && assign.expr == other->assign.expr 
                             && assign.next == other->assign.next; }
       case IF: { return if_.cond == other->if_.cond
@@ -160,7 +160,7 @@ bool Expression::is_eq(Expression *other) {
       case CHAR: { return cval == other->cval; }
       case STRING: { return strval == other->strval; }
       case BOOL: { return bval == other->bval; }
-      case VAR: { return *var->name == *other->var->name; }
+      case VAR: { return *var.name == *other->var.name; }
       case UNRESOLVED:  { return false; }
       case INVOKE:      
       {  printf("WARNING, we haven't implemented invoke equality yet\n");

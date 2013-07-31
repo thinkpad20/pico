@@ -92,9 +92,12 @@ Expression::~Expression() {
 }
 
 void Expression::print_info() {
-   if (symdic.find(t) == symdic.end()) printf("Unknown type\n");
-   else printf("type %s", symdic[t].c_str());
-   if (t == VAR) printf(" (name %s)", var->name->c_str());
+   if (symdic.find(t) == symdic.end()) 
+      printf("Unknown type\n");
+   else 
+      printf("type %s", symdic[t].c_str());
+   if (t == VAR) 
+      printf(" (name %s)", var.name->c_str());
 }
 
 void Expression::print() {
@@ -118,10 +121,10 @@ void Expression::print() {
       }
       case ASSIGN:
       {
-         printf("%s = (", assign.var->name->c_str());
+         printf("%s = (", assign.vname->c_str());
          upInd();
-         if (sym_contains(assign.var->name))
-            sym_lookup(assign.var->name)->print();
+         if (sym_contains(assign.vname))
+            sym_lookup(assign.vname)->print();
          else
             assign.expr->print();
          dnInd();
@@ -177,8 +180,8 @@ void Expression::print() {
       }
       case VAR:
       {
-         if (var->type) printf("%s ", var->type->c_str());
-         printf("%s", var->name->c_str()); fflush(stdout);
+         if (var.type) printf("%s ", var.type->c_str());
+         printf("%s", var.name->c_str()); fflush(stdout);
          return;
       }
       case ADD: case SUB: case MULT: case DIV: case LT: case GT: case GEQ: 
@@ -268,6 +271,21 @@ Expression *make_bit_not(Expression *expr) {
 
 Expression *make_neg(Expression *expr) {
    return new Expression(expr, Expression::NEG);
+}
+
+Expression *make_var(char *name) {
+   Expression *expr = new Expression();
+   expr->t = Expression::VAR;
+   expr->var.name = new std::string(name);
+   free(name);
+   return expr;
+}
+
+Expression *make_var(char *type, char *name) {
+   Expression *expr = make_var(name);
+   expr->var.type = new std::string(type);
+   free(type);
+   return expr;
 }
 
 void ExpressionList::print() {
