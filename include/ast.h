@@ -82,8 +82,9 @@ struct Expression {
 
    bool is_eq(Expression *other);
 
-   static Expression *reduce(Expression *expr);
-
+   // static Expression *reduce(Expression *expr);
+   Expression *reduce();
+   
    unsigned unresolved();
 
    bool to_bool(void);
