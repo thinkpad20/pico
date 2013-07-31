@@ -25,21 +25,27 @@ src/pico.tab.c: src/lex.yy.cc src/pico.y include/location.hh include/position.hh
 
 # object files
 bin/engine.o: include/picoScanner.h bin/ast.o src/engine.cpp
+	@mkdir -p bin
 	$(CPP) -c -o bin/engine.o src/engine.cpp
 
 bin/symbol.o: src/symbol.cpp include/ast.h
+	@mkdir -p bin
 	$(CPP) -c -o bin/symbol.o src/symbol.cpp
 
 bin/reduce.o: src/reduce.cpp include/ast.h
+	@mkdir -p bin
 	$(CPP) -c -o bin/reduce.o src/reduce.cpp
 
 bin/lex.o: src/lex.yy.cc
+	@mkdir -p bin
 	$(CPP) -c -o bin/lex.o src/lex.yy.cc
 
 bin/parse.o: src/pico.tab.c
+	@mkdir -p bin
 	$(CPP) -c -o bin/parse.o src/pico.tab.c
 
 bin/ast.o: src/ast.cpp include/ast.h
+	@mkdir -p bin
 	$(CPP) -c -o bin/ast.o src/ast.cpp
 
 test: pico
