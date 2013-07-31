@@ -21,7 +21,7 @@ namespace pico {
 // Entry Point
 int main(int argc, char * argv[]) {
 	pico::Parser parser;
-   pico::Initialize();
+   pico::Expression::init();
    if (argc > 1 && !strcmp(argv[1], "debug"))
       parser.set_debug_level(1);
 	return parser.parse();

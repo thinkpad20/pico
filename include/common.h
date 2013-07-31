@@ -8,9 +8,7 @@
 
 //forward declare 
 namespace pico {
-struct Term;
 struct Expression;
-struct Var;
 }
 
 #endif

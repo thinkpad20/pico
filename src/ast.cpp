@@ -4,50 +4,40 @@ using namespace std;
 
 namespace pico {
 
-static int indent = 0;
 static map<Expression::Type, string> symdic;
 
-void prindent() {
-   puts("");
-   for (int i=0; i<indent; ++i) 
-      printf("\t");
-}
-
-void upInd() { ++indent; prindent(); }
-void dnInd() { --indent; prindent(); }
-
-void Initialize() {
-   symdic[Expression::ADD] = "+";
-   symdic[Expression::SUB] = "-";
-   symdic[Expression::MULT] = "*";
-   symdic[Expression::DIV] = "/";
-   symdic[Expression::LT] = "<";
-   symdic[Expression::GT] = ">";
-   symdic[Expression::EQ] = "==";
-   symdic[Expression::NEQ] = "!=";
-   symdic[Expression::GEQ] = ">=";
-   symdic[Expression::LEQ] = "<=";
-   symdic[Expression::EXP] = "^";
-   symdic[Expression::LOG_AND] = "&&";
-   symdic[Expression::LOG_OR] = "||";
-   symdic[Expression::LOG_NOT] = "!";
-   symdic[Expression::BIT_AND] = "&";
-   symdic[Expression::BIT_OR] = "|";
-   symdic[Expression::BIT_XOR] = "^^";
-   symdic[Expression::BIT_NOT] = "~";
-   symdic[Expression::MOD] = "%";
-   symdic[Expression::INT] = "INT";
-   symdic[Expression::FLOAT] = "FLOAT";
-   symdic[Expression::CHAR] = "CHAR";
-   symdic[Expression::STRING] = "STRING";
-   symdic[Expression::BOOL] = "BOOL";
-   symdic[Expression::VAR] = "VAR";
-   symdic[Expression::INVOKE] = "INVOKE";
-   symdic[Expression::UNRESOLVED] = "UNRESOLVED";
+void Expression::init() {
+   symdic[ADD] = "+";
+   symdic[SUB] = "-";
+   symdic[MULT] = "*";
+   symdic[DIV] = "/";
+   symdic[LT] = "<";
+   symdic[GT] = ">";
+   symdic[EQ] = "==";
+   symdic[NEQ] = "!=";
+   symdic[GEQ] = ">=";
+   symdic[LEQ] = "<=";
+   symdic[EXP] = "^";
+   symdic[LOG_AND] = "&&";
+   symdic[LOG_OR] = "||";
+   symdic[LOG_NOT] = "!";
+   symdic[BIT_AND] = "&";
+   symdic[BIT_OR] = "|";
+   symdic[BIT_XOR] = "^^";
+   symdic[BIT_NOT] = "~";
+   symdic[MOD] = "%";
+   symdic[INT] = "INT";
+   symdic[FLOAT] = "FLOAT";
+   symdic[CHAR] = "CHAR";
+   symdic[STRING] = "STRING";
+   symdic[BOOL] = "BOOL";
+   symdic[VAR] = "VAR";
+   symdic[INVOKE] = "INVOKE";
+   symdic[UNRESOLVED] = "UNRESOLVED";
 }
 
 Expression::~Expression() {
-
+   //TODO
 }
 
 void Expression::print_info() {
@@ -56,115 +46,7 @@ void Expression::print_info() {
    else 
       printf("type %s", symdic[t].c_str());
    if (t == VAR) 
-      printf(" (name %s)", var.name->c_str());
-}
-
-void Expression::print() {
-   // printf("PRINTING EXPR %p, type %d\n", this, t);
-   switch(t) {
-      case IF: 
-      {
-         printf("IF "); fflush(stdout);
-         upInd();
-         if_.cond->print(); puts("");
-         dnInd();
-         printf("THEN "); fflush(stdout);
-         upInd();
-         if_.if_true->print();
-         dnInd();
-         printf("ELSE ");
-         upInd();
-         if_.if_false->print();
-         dnInd();
-         return;
-      }
-      case ASSIGN:
-      {
-         printf("%s = (", assign.vname->c_str());
-         upInd();
-         if (sym_contains(assign.vname))
-            sym_lookup(assign.vname)->print();
-         else
-            assign.expr->print();
-         dnInd();
-         printf("),"); fflush(stdout);
-         --indent;
-         upInd();
-         assign.next->print();
-         ++indent;
-         dnInd();
-         return;
-      }
-      case UNRESOLVED: 
-      {
-         printf("(Empty expr)"); fflush(stdout);
-         return;
-      }
-      case INVOKE:
-      {
-         if (invoke.func->t != Expression::VAR)
-            printf("("); fflush(stdout);
-         invoke.func->print();
-         if (invoke.func->t != Expression::VAR)
-            printf(") on "); fflush(stdout);
-         printf("(");  fflush(stdout);
-         invoke.expr_list->print();
-         printf(")"); fflush(stdout);
-         return;
-      }
-      case FLOAT:
-      {
-         printf("%f", fval); fflush(stdout);
-         return;
-      }
-      case INT:
-      {
-         printf("%d", ival); fflush(stdout);
-         return;
-      }
-      case CHAR:
-      {
-         printf("%c", cval); fflush(stdout);
-         return;
-      }
-      case BOOL:
-      {
-         printf("%s", bval ? "TRUE" : "FALSE"); fflush(stdout);
-         return;
-      }
-      case STRING:
-      {
-         printf("\"%s\"", strval->c_str()); fflush(stdout);
-         return;
-      }
-      case VAR:
-      {
-         if (var.type) printf("%s ", var.type->c_str());
-         printf("%s", var.name->c_str()); fflush(stdout);
-         return;
-      }
-      case ADD: case SUB: case MULT: case DIV: case LT: case GT: case GEQ: 
-      case LEQ: case MOD: case EQ: case NEQ: case LOG_AND: case LOG_OR: 
-      case BIT_AND: case BIT_OR: case BIT_XOR: case EXP:
-      {
-         printf("(");
-         binary.expr1->print(); fflush(stdout);
-         printf(" %s ", symdic[t].c_str()); fflush(stdout);
-         binary.expr2->print(); fflush(stdout);
-         printf(")");
-         break;
-      }
-      case LOG_NOT: case BIT_NOT:
-      {
-         printf("%s(", symdic[t].c_str());
-         unary->print();
-         printf(")");
-         break;
-      }
-      default:
-         printf("UNKNOWN TERM %d\n", t); fflush(stdout);
-         break;
-   }
+      printf(" (name %s)", vname->c_str());
 }
 
 Expression *Expression::make_add(Expression *expr1, Expression *expr2) {
@@ -235,105 +117,83 @@ Expression *Expression::make_neg(Expression *expr) {
 Expression *Expression::make_var(char *name) {
    Expression *expr = new Expression();
    expr->t = Expression::VAR;
-   expr->var.name = new string(name);
+   expr->name = new string(name);
    free(name);
    return expr;
 }
 
 Expression *Expression::make_var(char *type, char *name) {
    Expression *expr = make_var(name);
-   expr->var.type = new string(type);
+   expr->type = new string(type);
    free(type);
    return expr;
 }
 
-void ExpressionList::print() {
-   deque<Expression *>::iterator it;
+ostream& operator<<(ostream& os, ExpressionList *&exprlist) {
+   ExpressionList::iterator it;
    bool first = true;
-   printf("EXPLIST");
-   upInd();
-   for (it = begin(); it != end(); it++) {
-      if (first) first = false; else printf(", ");  fflush(stdout);
-      (*it)->print();
+   os << "ExprList(";
+   for (it = exprlist->begin(); it != exprlist->end(); it++) {
+      if (first) first = false; else os << ", ";
+      os << "Expr(" << *it << ")";
    }
-   dnInd();
+   os << ")";
+   return os;
 }
 
 
-ostream& operator<<(ostream& os, const Expression& expr) {
-   switch(expr.t) {
+ostream& operator<<(ostream& os, Expression *&expr) {
+   switch(expr->t) {
       case Expression::IF: 
       {
-         printf("IF "); fflush(stdout);
-         upInd();
-         expr.if_.cond->print(); puts("");
-         dnInd();
-         printf("THEN "); fflush(stdout);
-         upInd();
-         expr.if_.if_true->print();
-         dnInd();
-         printf("ELSE ");
-         upInd();
-         expr.if_.if_false->print();
-         dnInd();
+         os << "IF " << expr->cond << " THEN " << expr->if_true 
+            << " ELSE " << expr->if_false;
          return os;
       }
       case Expression::ASSIGN:
       {
-         printf("%s = (", expr.assign.vname->c_str());
-         upInd();
-         if (expr.sym_contains(expr.assign.vname))
-            expr.sym_lookup(expr.assign.vname)->print();
-         else
-            expr.assign.expr->print();
-         dnInd();
-         printf("),"); fflush(stdout);
-         --indent;
-         upInd();
-         expr.assign.next->print();
-         ++indent;
-         dnInd();
+         os << *expr->vname << " = (" << expr->right_hand << "), " << expr->next;
          return os;
       }
       case Expression::UNRESOLVED: 
       {
-         printf("(Empty expr)"); fflush(stdout);
+         printf("(empty expr)"); fflush(stdout);
          return os;
       }
       case Expression::INVOKE:
       {
-         os << "(" << expr.invoke.func << ") on (" << expr.invoke.expr_list << ")";
+         os << "(" << expr->func << ") on (" << expr->expr_list << ")";
          return os;
       }
       case Expression::FLOAT:
       {
-         os << expr.fval;
+         os << expr->fval;
          return os;
       }
       case Expression::INT:
       {
-         os << expr.ival;
+         os << expr->ival;
          return os;
       }
       case Expression::CHAR:
       {
-         os << expr.cval;
+         os << expr->cval;
          return os;
       }
       case Expression::BOOL:
       {
-         os << (expr.bval ? "TRUE" : "FALSE");
+         os << (expr->bval ? "TRUE" : "FALSE");
          return os;
       }
       case Expression::STRING:
       {
-         os << expr.strval;
+         os << expr->strval;
          return os;
       }
       case Expression::VAR:
       {
-         if (expr.var.type) os << expr.var.type;
-         os << expr.var.name;
+         if (expr->type) os << *expr->type;
+         os << *expr->name;
          return os;
       }
       case Expression::ADD: case Expression::SUB: case Expression::MULT: 
@@ -343,20 +203,42 @@ ostream& operator<<(ostream& os, const Expression& expr) {
       case Expression::LOG_OR: case Expression::BIT_AND: 
       case Expression::BIT_OR: case Expression::BIT_XOR: case Expression::EXP:
       {
-         os << "(" << expr.binary.expr1 << " " << symdic[expr.t]
-            << " " << expr.binary.expr2 << ")";
+         os << "(" << expr->expr1 << " " << symdic[expr->t]
+            << " " << expr->expr2 << ")";
          break;
       }
       case Expression::LOG_NOT: case Expression::BIT_NOT:
       {
-         os << symdic[expr.t] << "(" << expr.unary << ")";
+         os << symdic[expr->t] << "(" << expr->unary << ")";
          break;
       }
       default:
-         os << "UNKNOWN EXPR " << expr.t;
+         os << "UNKNOWN EXPR " << expr->t;
          break;
    }
    return os;
 }
+
+bool Expression::is_binary() const {
+   switch(t) {
+      case ADD: case SUB: case MULT: 
+      case DIV: case LT: case GT: 
+      case GEQ: case LEQ: case MOD: 
+      case EQ: case NEQ: case LOG_AND: 
+      case LOG_OR: case BIT_AND: 
+      case BIT_OR: case BIT_XOR: case EXP:
+      {
+         return true;
+      }
+      default:
+         return false;
+   }
+}
+
+bool Expression::is_unary() const {
+   return (t == BIT_NOT || t == LOG_NOT || t == NEG);
+}
+
+void Expression::set_parent(Expression *parent) { this->parent = parent; }
 
 }

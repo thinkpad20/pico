@@ -70,22 +70,22 @@ extern int yylineno;
 
 pico: exprs { 
                $$ = $1; 
-               cout << $1 << endl;
-               printf("Reducing..."); fflush(stdout);
+               std::cout << "Parsed: " << $1 << std::endl;
+               std::cout << "Reducing... ";
                try {
                   $$->reduce_all(); 
                } catch (std::string msg) {
                   printf("%s\n", msg.c_str());
                }
-               printf("Finished reducing!!!\n"); fflush(stdout); 
-               cout << $1 << endl;
+               std::cout << "Done. Reduced form is:" << std::endl;
+               std::cout << $1 << std::endl;
             } ;
 
 exprs: expr '.'      { $$ = new ExpressionList(); $$->push_back($1); }
     | pico expr '.'  { $1->push_back($2); $$ = $1; }
 
 expr
-   : term                              { $$ = new Expression($1); }
+   : term
    | var_name '=' term ',' expr        { $$ = new Expression($1, $3, $5); }
    | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
    ;

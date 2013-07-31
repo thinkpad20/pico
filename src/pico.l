@@ -35,7 +35,7 @@ False                   { return pico::BisonParser::token::WHEN; }
 "!="                    { return pico::BisonParser::token::NEQ; }
 "||"                    { return pico::BisonParser::token::OR; }
 "&&"                    { return pico::BisonParser::token::AND; }
-[+\-*/=><,.()%]         { return yytext[0]; }
+[+\-*/=><,.()%^]         { return yytext[0]; }
 
 "<--"                   { BEGIN(LINE_COMMENT); }
 <LINE_COMMENT>.         { /* ignore */ }

@@ -12,7 +12,6 @@
 // Include Bison for types / tokens
 #include "../src/pico.tab.h"
 
-
 namespace pico {
 	class FlexScanner : public yyFlexLexer {
 		public:

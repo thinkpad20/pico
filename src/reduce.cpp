@@ -1,78 +1,71 @@
 #include "../include/ast.h"
 #include <cmath> // for pow
+#include <vector>
+
+using std::map;
+using std::string;
+using std::vector;
+using std::endl;
+using std::cout;
 
 namespace pico {
 
 Expression *Expression::reduce() {
-   if (this == GLOBAL_UNRESOLVED) 
-      return this;
+   if (is_binary()) { reduce_update(expr1); reduce_update(expr2); }
+   if (is_unary()) { reduce_update(unary); }
+   if (t == IF) { reduce_update(cond); }
+   if (t != VAR && t != ASSIGN && unresolved()) return this; // var might need to be stored
    switch(t) {
       case ASSIGN:
-      {  printf("this is an assign! Here's what's in our symbol table:\n"); fflush(stdout);
-         symtable_print(); fflush(stdout);
-         puts("");
-         if (!sym_contains(assign.vname))
-            sym_store(assign.vname, assign.expr);
-         return assign.next->reduce(); }
+      {  reduce_update(right_hand);
+         sym_store(vname, right_hand);
+         return next->reduce(); }
       case IF:
-      {
-         printf("this is an if!\n"); fflush(stdout);
-         if_.cond = if_.cond->reduce(); // should free this memory
-         if (if_.cond->unresolved() > 0) 
-            return this; // stop reducing
-         if (if_.cond->to_bool()) 
-            return if_.if_true->reduce(); // only reduce one of the conditions
-         else
-            return if_.if_false->reduce();
-      }
+      {  if (cond->as_bool()) return if_true->reduce();
+         else return if_false->reduce(); }
       case UNRESOLVED:
-      {
-         printf("This is unresolved, can't evaluate further.\n");
-         return this;
+      {  return this; }
+      case VAR:
+      {  Expression *target = sym_lookup(name);
+         if (target == GLOBAL_UNRESOLVED) {   
+            add_free_var(name);
+            return this; 
+         }
+         return target; // target is already reduced
       }
-      case ADD: { return add(binary.expr1, binary.expr2); }
-      case SUB: { return sub(binary.expr1, binary.expr2); }
-      case MULT: { Expression *res = mult(binary.expr1, binary.expr2); 
-                   //printf("finishing call %d, res %p: ", thiscall, res); res->print(); puts(""); 
-                   return res;}
-      case DIV: { return div(binary.expr1, binary.expr2); }
-      case MOD: { return mod(binary.expr1, binary.expr2); }
-      case EXP: { return exp(binary.expr1, binary.expr2); }
+      case INVOKE:
+      { throw std::string("Can't handle invoke yet :(\n"); }
+      case ADD: { return add(expr1, expr2); }
+      case SUB: { return sub(expr1, expr2); }
+      case MULT: { return mult(expr1, expr2); }
+      case DIV: { return div(expr1, expr2); }
+      case MOD: { return mod(expr1, expr2); }
+      case EXP: { return exp(expr1, expr2); }
       case NEG: { return neg(unary); }
-      case LOG_AND: { return land(binary.expr1, binary.expr2); }
-      case LOG_OR: { return lor(binary.expr1, binary.expr2); }
+      case LOG_AND: { return land(expr1, expr2); }
+      case LOG_OR: { return lor(expr1, expr2); }
       case LOG_NOT: { return lnot(unary); }
-      case EQ: { return eq(binary.expr1, binary.expr2); }
-      case NEQ: { return neq(binary.expr1, binary.expr2); }
-      case LT: { return lt(binary.expr1, binary.expr2); }
-      case GT: { return gt(binary.expr1, binary.expr2); }
-      case LEQ: { return leq(binary.expr1, binary.expr2); }
-      case GEQ: { return geq(binary.expr1, binary.expr2); }
-      case BIT_AND: { return band(binary.expr1, binary.expr2); }
-      case BIT_OR: { return bor(binary.expr1, binary.expr2); }
-      case BIT_NOT: { return bnot(binary.expr1, binary.expr2); }
-      case BIT_XOR: { return bxor(binary.expr1, binary.expr2); }
+      case EQ: { return eq(expr1, expr2); }
+      case NEQ: { return neq(expr1, expr2); }
+      case LT: { return lt(expr1, expr2); }
+      case GT: { return gt(expr1, expr2); }
+      case LEQ: { return leq(expr1, expr2); }
+      case GEQ: { return geq(expr1, expr2); }
+      case BIT_AND: { return band(expr1, expr2); }
+      case BIT_OR: { return bor(expr1, expr2); }
+      case BIT_NOT: { return bnot(expr1, expr2); }
+      case BIT_XOR: { return bxor(expr1, expr2); }
       //literals
       case BOOL: case INT: case FLOAT: case CHAR: case STRING: { return this; }
-      case VAR:
-      { 
-         Expression *target = sym_lookup(var.name);
-         if (target == GLOBAL_UNRESOLVED) {
-            printf("found an unresolved expr\n"); fflush(stdout);
-            add_free_var(var.name);
-            printf("we're going to return: "); print(); puts("");
-            printf("which has unresolved of %u\n", unresolved());
-            return this;
-         }
-         Expression *result = target->reduce();
-         sym_update(var.name, result);
-         // printf("finished sym_update\n"); fflush(stdout);
-         return result; 
-      }
-      case INVOKE:      { 
-         
-         throw std::string("Can't handle invoke yet :(\n"); 
-      }
+   }
+}
+
+void Expression::reduce_update(Expression *&expr) {
+   Expression *reduced = expr->reduce();
+   if (reduced != expr) {
+      // cout << "Reduced " << expr << " to " << reduced << endl;
+      delete expr;
+      expr = reduced;
    }
 }
 
@@ -81,16 +74,16 @@ unsigned Expression::unresolved() {
    // printf("t = %d\n", t->t); fflush(stdout);
    switch (t) {
       case ASSIGN: 
-      { return assign.expr->unresolved() + assign.next->unresolved(); }
+      { return right_hand->unresolved() + next->unresolved(); }
       case IF: 
-      { return if_.cond->unresolved() 
-                  + if_.if_true->unresolved() 
-                  + if_.if_false->unresolved(); }
+      { return cond->unresolved() 
+                  + if_true->unresolved() 
+                  + if_false->unresolved(); }
       case BOOL: case STRING: case CHAR: case INT: case FLOAT:
       { return 0; }
       case VAR: {
          // printf("looking up a variable %s\n", var->name->c_str()); fflush(stdout);
-         Expression *res = sym_lookup(var.name);
+         Expression *res = sym_lookup(name);
          // printf("res is: "); fflush(stdout); res->print();
          if (res->t == UNRESOLVED) { return 1; }
          return res->unresolved();
@@ -98,12 +91,12 @@ unsigned Expression::unresolved() {
       case UNRESOLVED: 
       { return 1; }
       case INVOKE:
-      { u = invoke.func->unresolved() - invoke.expr_list->size(); return u; }
+      { u = func->unresolved() - expr_list->size(); return u; }
       case ADD: case SUB: case MOD: case MULT:
       case DIV: case BIT_AND: case BIT_OR: case BIT_XOR:
       case LOG_AND: case LOG_OR: case EXP: case EQ:
       case NEQ: case LT: case GT: case LEQ: case GEQ:
-      { u = binary.expr1->unresolved() + binary.expr2->unresolved(); return u; }
+      { u = expr1->unresolved() + expr2->unresolved(); return u; }
       case LOG_NOT: case NEG: case BIT_NOT:
       { u = unary->unresolved(); return u; }
    }
@@ -113,12 +106,12 @@ bool Expression::is_eq(Expression *other) {
    // printf("Checking if "); print(); printf(" == "); other->print(); puts("");
    if (t != other->t) return false;
    switch (t) {
-      case ASSIGN: { return assign.vname == other->assign.vname 
-                            && assign.expr == other->assign.expr 
-                            && assign.next == other->assign.next; }
-      case IF: { return if_.cond == other->if_.cond
-                        && if_.if_true == other->if_.if_true
-                        && if_.if_false == other->if_.if_false; }
+      case ASSIGN: { return vname == other->vname 
+                            && right_hand == other->right_hand 
+                            && next == other->next; }
+      case IF: { return cond == other->cond
+                        && if_true == other->if_true
+                        && if_false == other->if_false; }
       // binary
       case ADD: 
       case SUB: 
@@ -138,7 +131,7 @@ bool Expression::is_eq(Expression *other) {
       case BIT_OR: 
       case BIT_NOT:
       case BIT_XOR:
-      { return binary.expr1->is_eq(other->binary.expr1) && binary.expr2->is_eq(other->binary.expr2); }
+      { return expr1->is_eq(other->expr1) && expr2->is_eq(other->expr2); }
       // unary
       case NEG:
       case LOG_NOT:
@@ -149,37 +142,26 @@ bool Expression::is_eq(Expression *other) {
       case CHAR: { return cval == other->cval; }
       case STRING: { return strval == other->strval; }
       case BOOL: { return bval == other->bval; }
-      case VAR: { return *var.name == *other->var.name; }
+      case VAR: { return *vname == *other->vname; }
       case UNRESOLVED:  { return false; }
       case INVOKE:      
       {  printf("WARNING, we haven't implemented invoke equality yet\n");
-         return invoke.func->is_eq(other->invoke.func) && invoke.expr_list == other->invoke.expr_list; }
+         return func->is_eq(other->func) && expr_list == other->expr_list; }
    }
 }
 
-Expression *Expression::add(Expression *t1, Expression *t2) {
-   // printf("Adding: "); t1->print(); printf(" and "); t2->print(); puts("");
-   // Expression *temp1 = t1, *temp2 = t2;
-   // printf("going to subreduce, %p %p\n", t1, t2); fflush(stdout);
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // printf("add reduced, %p %p, seeing if unresolved\n", t1, t2); fflush(stdout);
-   // check if reduction should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      // printf("add unresolved\n");
-      return make_add(t1, t2); 
-   }
-   // printf("not unresolved, constant expr\n");
-   if (t1->t == INT) {
-      switch (t2->t) {
-         case INT: { return new Expression(t1->ival + t2->ival); }
-         case FLOAT: { return new Expression(t1->ival + t2->ival); }
+Expression *Expression::add(Expression *expr1, Expression *expr2) {
+   if (expr1->t == INT) {
+      switch (expr2->t) {
+         case INT: { return new Expression(expr1->ival + expr2->ival); }
+         case FLOAT: { return new Expression(expr1->ival + expr2->ival); }
          default: break;
       }
    }
-   if (t1->t == FLOAT) {
-      switch (t2->t) {
-         case INT: { return new Expression(t1->ival + t2->ival); }
-         case FLOAT: { return new Expression(t1->ival + t2->ival); }
+   if (expr1->t == FLOAT) {
+      switch (expr2->t) {
+         case INT: { return new Expression(expr1->ival + expr2->ival); }
+         case FLOAT: { return new Expression(expr1->ival + expr2->ival); }
          default: break;
       }
    }
@@ -187,15 +169,6 @@ Expression *Expression::add(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::sub(Expression *t1, Expression *t2) {
-   // printf("Subtracting: "); t1->print(); printf(" and "); t2->print(); puts("");
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // printf("sub reduceuated, seeing if unresolved\n"); fflush(stdout);
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      // printf("sub unresolved\n");
-      return make_sub(t1, t2); 
-   }
-   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Expression(t1->ival - t2->ival); }
@@ -214,11 +187,6 @@ Expression *Expression::sub(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::mult(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); 
-   t2 = t2->reduce();
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_mult(t1, t2); 
-   }
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { Expression *res = new Expression(t1->ival * t2->ival); 
@@ -238,15 +206,6 @@ Expression *Expression::mult(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::div(Expression *t1, Expression *t2) {
-   // printf("Dividing: "); t1->print(); printf(" and "); t2->print(); puts("");
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // printf("div reduceuated, seeing if unresolved\n"); fflush(stdout);
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) {
-      // printf("div is unresolved\n");
-      return make_div(t1, t2); 
-   }
-   // printf("not unresolved, constant expr\n");
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Expression(t1->ival / t2->ival); }
@@ -265,11 +224,6 @@ Expression *Expression::div(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::mod(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_mod(t1, t2); 
-   }
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Expression(t1->ival % t2->ival); }
@@ -280,11 +234,6 @@ Expression *Expression::mod(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::exp(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_exp(t1, t2); 
-   }
    if (t1->t == INT) {
       switch (t2->t) {
          case INT: { return new Expression((int)pow(t1->ival, t2->ival)); }
@@ -303,11 +252,6 @@ Expression *Expression::exp(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::neg(Expression *t) {
-   t = t->reduce();
-   // check if reduceuation should proceed
-   if (t->unresolved()) { 
-      return make_neg(t); 
-   }
    if (t->t == INT)
       return new Expression(-t->ival);
    if (t->t == FLOAT)
@@ -316,11 +260,6 @@ Expression *Expression::neg(Expression *t) {
 }
 
 Expression *Expression::land(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_log_and(t1, t2);
-   }
    // we have two resolved expressions, check if both bools
    if (t1->t == BOOL && t2->t == BOOL) {
       return new Expression(t1->bval && t2->bval);
@@ -329,11 +268,6 @@ Expression *Expression::land(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::lor(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_log_or(t1, t2); 
-   }
    // we have two resolved expressions, check if both bools
    if (t1->t == BOOL && t2->t == BOOL) {
       return new Expression(t1->bval || t2->bval);
@@ -342,22 +276,12 @@ Expression *Expression::lor(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::lnot(Expression *t) {
-   t = t->reduce();
-   // check if reduceuation should proceed
-   if (t->unresolved()) { 
-      return make_log_not(t); 
-   }
    if (t->t == BOOL)
       return new Expression(!t->bval);
    throw std::string("We can only NOT bools so far");
 }
 
 Expression *Expression::eq(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_eq(t1, t2);
-   }
    // we have two resolved expressions
    if (t1->t == t2->t) {
       switch (t1->t) {
@@ -378,11 +302,6 @@ Expression *Expression::eq(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::neq(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_neq(t1, t2);
-   }
    // we have two resolved expressions
    if (t1->t == t2->t) {
       switch (t1->t) {
@@ -403,11 +322,6 @@ Expression *Expression::neq(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::lt(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_lt(t1, t2);
-   }
    // we have two resolved expressions
    if (t1->t == INT) {
       switch (t2->t) {
@@ -463,11 +377,6 @@ Expression *Expression::lt(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::gt(Expression *t1, Expression *t2) {
-   t1 = t1->reduce(); t2 = t2->reduce();
-   // check if reduceuation should proceed
-   if (t1->unresolved() || t2->unresolved()) { 
-      return make_gt(t1, t2);
-   }
    // we have two resolved expressions
    if (t1->t == INT) {
       switch (t2->t) {
@@ -649,17 +558,17 @@ Expression *Expression::bxor(Expression *t1, Expression *t2) {
    throw std::string("bitwise bxor not implemented yet");
 }
 
-bool Expression::to_bool() {
+bool Expression::as_bool() {
    if (t == BOOL) return bval;
-   throw std::string("Error: to_bool called on something that's not a boolean.");
+   throw std::string("Error: as_bool called on something that's not a boolean.");
 }
 
 void ExpressionList::reduce_all() {
    ExpressionList::iterator it;
    for (it = begin(); it != end(); ++it) {
-      printf("Reducing: "); fflush(stdout); (*it)->print(); fflush(stdout);
-      (*it)->reduce();
-      printf("OK\n"); fflush(stdout);
+      // cout << "Reducing: " << (*it) << endl;
+      *it = (*it)->reduce();
+      // cout << "OK" << endl;
    }
 }
 

@@ -12,7 +12,6 @@ Expression *Expression::sym_lookup(string *str) {
    // printf("looking up %s\n", str->c_str());
    if (symbol_table.find(*str) != symbol_table.end())
       return symbol_table[*str];
-   printf("'%s' not found in table!\n", str->c_str());
    if (!parent) { 
       if (!GLOBAL_UNRESOLVED) GLOBAL_UNRESOLVED = new Expression(); 
       return GLOBAL_UNRESOLVED;
@@ -23,13 +22,13 @@ Expression *Expression::sym_lookup(string *str) {
 }
 
 void Expression::sym_store(string *str, Expression *expr) {
-   printf("storing '%s'?\n", str->c_str()); fflush(stdout);
-   // printf("Storing %s, creating new thunk: ", str->c_str()); expr->print(); puts("");
+   // cout << "storing '" << *str << "' to " << expr << endl;
    if (sym_contains(str)) {
-      char buf[1000]; sprintf(buf, "Error: symbol %s already exists in table, can't assign.\n", str->c_str());
+      char buf[1000]; 
+      sprintf(buf, "Error: symbol %s already exists in table, can't assign.\n", str->c_str());
       throw string(buf);
    }
-   symbol_table[*str] = new Expression(expr);
+   symbol_table[*str] = expr;
 }
 
 void Expression::sym_update(string *str, Expression *expr) {
@@ -43,41 +42,41 @@ void Expression::sym_update(string *str, Expression *expr) {
       }
    }
    Expression *cur = symbol_table[*str];
-   printf("'%s' was previously %p: ", str->c_str(), cur); cur->print();
-   printf(", is now %p: ", expr); expr->print(); puts("");
+   cout << '\'' << str << "' was previously " << cur << ", is now " << expr << endl;
    bool iseq = cur->is_eq(expr);
    printf("\n%s", iseq ? "equal" : "not equal");
    if (!iseq) {
-      printf(", so updating: "); expr->print(); puts(""); fflush(stdout);
-      printf("deleting %p\n", symbol_table[*str]); fflush(stdout);
-      delete symbol_table[*str];
-      symbol_table[*str] = expr;
-      printf("finished updating %s, is now ", str->c_str()); fflush(stdout);
-      expr->print(); puts(""); fflush(stdout);
+      cout << ", so updating to: " << cout << expr << endl;
    }
 }
 
 void Expression::symtable_print(unsigned level) {
-   if (!level) printf("Symbol table contains:\n");
-   printf("Level %d:\n", level);
+   if (!level) cout << "Symbol for expression " << this << " contains:" << endl;
+   printf("Level %d: (", level);
    std::map<string, Expression *>::iterator it;
+   bool first = true;
    for (it=symbol_table.begin(); it!=symbol_table.end(); ++it) {
-      printf("'%s' -> ", it->first.c_str()); it->second->print(); puts("");
+      if (first) first = false; else cout << ", ";
+      cout << it->first << " -> " << it->second;
    }
+   cout << ")" << endl;
+   // printf("this is %p, parent is %p\n", this, parent);
    if (parent) parent->symtable_print(level + 1);
 }
 
-bool Expression::sym_contains(string *name) {
+bool Expression::sym_contains(string *name) const {
    return symbol_table.find(*name) != symbol_table.end();
 }
 
 void Expression::add_free_var(string *str) {
+   // cout << "adding a new variable " << *str << endl;
+   // symtable_print();
    if (symbol_table.find(*str) != symbol_table.end()) 
       return;  
    size_t index = free_vars.size();
    free_vars.push_back(GLOBAL_UNRESOLVED); 
    symbol_table[*str] = free_vars[index];
-   printf("added local variable %s into slot %lu\n", str->c_str(), index);
+   // cout << "added local variable " << *str << " into slot " << index << endl;
 }
 
 }

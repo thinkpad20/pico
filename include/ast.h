@@ -8,7 +8,7 @@
 namespace pico {
 
 struct ExpressionList : public std::deque<Expression *> { 
-   void print(); 
+   friend std::ostream& operator<<(std::ostream&, ExpressionList *&);
    void reduce_all();
 };
 
@@ -25,78 +25,84 @@ struct Var {
 
 struct Expression {
    enum Type { 
-      ASSIGN, IF, UNRESOLVED,       
-      INVOKE, FLOAT, INT, STRING, VAR, CHAR,
-      ADD, SUB, MULT, DIV, LT, BOOL, EXP,
-      GT, LEQ, GEQ, EQ, NEQ, MOD,
-      LOG_AND, LOG_OR, LOG_NOT, BIT_AND,
-      BIT_OR, BIT_XOR, BIT_NOT, NEG, } t;
+      ASSIGN, IF, UNRESOLVED, INVOKE, FLOAT, INT, STRING, VAR, CHAR,
+      ADD, SUB, MULT, DIV, LT, BOOL, EXP, GT, LEQ, GEQ, EQ, NEQ, MOD,
+      LOG_AND, LOG_OR, LOG_NOT, BIT_AND, BIT_OR, BIT_XOR, BIT_NOT, NEG, 
+   } t;
    union {
       int ival;
       char cval;
       bool bval;
       double fval;
-      std::string *strval; 
-      struct {Expression *func; ExpressionList *expr_list;} invoke;
-      struct {std::string *name, *type; } var;
-      struct {Expression *expr1, *expr2;} binary;
+      std::string *strval;
+      struct {Expression *func; ExpressionList *expr_list;};
+      struct {std::string *name, *type; };
+      struct {Expression *expr1, *expr2;};
       Expression *unary;
-      struct {std::string *vname; Expression *expr; Expression *next;} assign;
-      struct {Expression *cond, *if_true; Expression *if_false;} if_;
+      struct {std::string *vname; Expression *right_hand; Expression *next;};
+      struct {Expression *cond, *if_true; Expression *if_false;};
    };
    unsigned u; // num unresolved exprs in this expr
    Expression *parent; // for symbol lookups
    typedef std::map<std::string, Expression *> SymTable;
    SymTable symbol_table, temps;
    std::deque<Expression *> free_vars;
-   Expression(): t(UNRESOLVED), u(1), parent(NULL) {}
+   Expression(): t(UNRESOLVED), u(1), parent(NULL) {
+      // std::cout << "Creating new expression at address " << this << std::endl;
+   }
    Expression(double f): t(FLOAT), fval(f), u(0), parent(NULL) {}
    Expression(int i): t(INT), ival(i), u(0), parent(NULL) {}
    Expression(char c): t(CHAR), cval(c), u(0), parent(NULL) {}
-   Expression(bool b): t(BOOL), bval(b), u(0), parent(NULL) {}
+   Expression(bool b): t(BOOL), bval(b), u(0), parent(NULL) { }
    Expression(char *str): t(STRING), u(0), parent(NULL) {
       strval = new std::string(strndup(str+1, strlen(str) - 2));
       printf("created string, pointer is %p\n", strval);
       free(str);
    }
    // binary operation
-   Expression(Expression *expr1, Expression *expr2, enum Type type): t(type), u(expr1->u + expr2->u)
-      { binary.expr1 = expr1; binary.expr2 = expr2; binary.expr1->parent = binary.expr2->parent = this; }
+   Expression(Expression *expr1, Expression *expr2, enum Type type): 
+      t(type), expr1(expr1), expr2(expr2), u(expr1->u + expr2->u)
+      { expr1->parent = expr2->parent = this; }
    // unary operation
-   Expression(Expression *expr, enum Type type): t(type), unary(expr), u(expr->u) { unary->parent = this; }
+   Expression(Expression *expr, enum Type type): t(type), unary(expr), u(expr->u) 
+      { unary->parent = this; }
    // invocation
-   Expression(Expression *func, ExpressionList *expr_list): t(INVOKE), u(func->u - expr_list->size())
-      { invoke.func = func; invoke.expr_list = expr_list; func->parent = this; }
+   Expression(Expression *func, ExpressionList *expr_list): 
+      t(INVOKE), func(func), expr_list(expr_list), u(func->u - expr_list->size())
+      { func->parent = this; }
    // if statement
-   Expression(Expression *cond, Expression *if_true, Expression *if_false)
-      { t = IF; if_.cond = cond; if_.if_true = if_true; if_.if_false = if_false; 
-         cond->parent = if_true->parent = if_false->parent = this; }
+   Expression(Expression *cond, Expression *if_true, Expression *if_false): 
+      t(IF), cond(cond), if_true(if_true), if_false(if_false)
+      { cond->set_parent(this); if_true->set_parent(this); if_false->set_parent(this); }
    // assignment statement
-   Expression(char *vname, Expression *expr, Expression *next)
-      { t = ASSIGN; assign.vname = new std::string(vname); 
-         assign.expr = expr; assign.next = next; next->parent = this; }
+   Expression(char *vname, Expression *expr, Expression *next):
+      t(ASSIGN), vname(new std::string(vname)), right_hand(expr), next(next)
+      {  expr->set_parent(this); next->set_parent(expr); }
    ~Expression();
 
-   friend std::ostream& operator<<(std::ostream& os, const Expression& expr);
-   void print();
+   friend std::ostream& operator<<(std::ostream& os, Expression *&expr);
    void print_info();
 
    bool is_eq(Expression *other);
 
    // static Expression *reduce(Expression *expr);
    Expression *reduce();
+   void reduce_update(Expression *&expr);
 
    unsigned unresolved();
 
-   bool to_bool(void);
+   bool as_bool(void);
+   bool is_binary() const; // useful check to see if it's a binary type
+   bool is_unary() const;
 
+   void set_parent(Expression *parent);
    //symbol table stuff
-   Expression *sym_lookup(std::string *name) const;
+   Expression *sym_lookup(std::string *name);
    void sym_store(std::string *name, Expression *term);
    void sym_update(std::string *str, Expression *term);
    bool sym_contains(std::string *name) const;
    void add_free_var(std::string *str);
-   void symtable_print(unsigned level = 0) const;
+   void symtable_print(unsigned level = 0);
 
    // arithmetic operations
    static Expression *add(Expression *expr1, Expression *expr2);
@@ -142,11 +148,10 @@ struct Expression {
    static Expression *make_neg(Expression *expr);
    static Expression *make_var(char *name);
    static Expression *make_var(char *type, char *name);
+   static void init();
 };
 
 extern Expression *GLOBAL_UNRESOLVED;
-
-void Initialize();
 
 }
 

@@ -462,15 +462,15 @@ namespace pico {
 #line 71 "src/pico.y"
     { 
                (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); 
-               (yyval.expr_list)->print(); 
-               printf("Reducing..."); fflush(stdout);
+               std::cout << "Parsed: " << (yysemantic_stack_[(1) - (1)].expr_list) << std::endl;
+               std::cout << "Reducing... ";
                try {
                   (yyval.expr_list)->reduce_all(); 
                } catch (std::string msg) {
                   printf("%s\n", msg.c_str());
                }
-               printf("Finished reducing!!!\n"); fflush(stdout); 
-               (yyval.expr_list)->print(); 
+               std::cout << "Done. Reduced form is:" << std::endl;
+               std::cout << (yysemantic_stack_[(1) - (1)].expr_list) << std::endl;
             }
     break;
 
@@ -484,12 +484,6 @@ namespace pico {
 /* Line 664 of lalr1.cc  */
 #line 85 "src/pico.y"
     { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (2)].expr)); (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
-    break;
-
-  case 5:
-/* Line 664 of lalr1.cc  */
-#line 88 "src/pico.y"
-    { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].expr)); }
     break;
 
   case 6:
@@ -722,7 +716,7 @@ namespace pico {
 
 
 /* Line 664 of lalr1.cc  */
-#line 726 "pico.tab.c"
+#line 720 "pico.tab.c"
       default:
         break;
       }
@@ -1351,7 +1345,7 @@ namespace pico {
 #line 12 "src/pico.y"
 } // pico
 /* Line 1135 of lalr1.cc  */
-#line 1355 "pico.tab.c"
+#line 1349 "pico.tab.c"
 /* Line 1136 of lalr1.cc  */
 #line 159 "src/pico.y"
 
