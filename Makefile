@@ -1,31 +1,52 @@
+CPP=g++
+LIBS=bin/ast.o bin/symbol.o bin/reduce.o
+PARSE=bin/lex.o bin/parse.o
+
 all: pico
 
 run: pico
 	./pico
 
-pico: lex.yy.cc pico.tab.c ast.cpp ast.h symbol.h symbol.cpp reduce.cpp
-	g++ lex.yy.cc parse.cpp pico.tab.c ast.cpp symbol.cpp reduce.cpp -o pico
+pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/reduce.o bin/symbol.o
+	g++ -o pico bin/engine.o $(PARSE) $(LIBS)
 
-pico-mod: lex.yy.cc pico-mod.tab.c ast-mod.cpp ast-mod.h symbol-mod.cpp reduce-mod.cpp
-	g++ lex.yy.cc parse.cpp pico-mod.tab.c ast-mod.cpp symbol-mod.cpp reduce-mod.cpp -o pico-mod
-	
-lex.yy.cc: pico.l
-	flex pico.l
+# generate C source from lex and yac files
+src/lex.yy.cc: src/pico.l
+	flex src/pico.l
+	mv *.cc src
 
-pico.tab.c: pico.y location.hh position.hh
-	bison -v --report=all --debug pico.y
+src/pico.tab.c: src/lex.yy.cc src/pico.y include/location.hh include/position.hh
+	bison -v --report=all --debug src/pico.y
+	mv *.c src
+	mv *.h src
+	mv *.hh src
+	mkdir -p aux
+	mv *.output aux
 
-pico-mod.tab.c: pico-mod.y location.hh position.hh
-	bison -v --report=all --debug pico-mod.y
+# object files
+bin/engine.o: include/picoScanner.h bin/ast.o src/engine.cpp
+	$(CPP) -c -o bin/engine.o src/engine.cpp
+
+bin/symbol.o: src/symbol.cpp include/ast.h
+	$(CPP) -c -o bin/symbol.o src/symbol.cpp
+
+bin/reduce.o: src/reduce.cpp include/ast.h
+	$(CPP) -c -o bin/reduce.o src/reduce.cpp
+
+bin/lex.o: src/lex.yy.cc
+	$(CPP) -c -o bin/lex.o src/lex.yy.cc
+
+bin/parse.o: src/pico.tab.c
+	$(CPP) -c -o bin/parse.o src/pico.tab.c
+
+bin/ast.o: src/ast.cpp include/ast.h
+	$(CPP) -c -o bin/ast.o src/ast.cpp
 
 test: pico
-	cat test.pc | ./pico
+	cat tests/test.pc | ./pico
 
 debug_test: pico
-	cat test.pc | ./pico debug
-
-mod-test: pico-mod
-	cat test.pc | ./pico-mod debug	
+	cat tests/test.pc | ./pico debug
 
 clean:
 	rm -rf pico.tab.c pico.tab.h location.hh position.hh stack.hh
