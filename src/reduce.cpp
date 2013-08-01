@@ -27,7 +27,7 @@ Expression *Expression::reduce() {
       {  return this; }
       case VAR:
       {  Expression *target = sym_lookup(name);
-         if (target == GLOBAL_UNRESOLVED) {   
+         if (target == GLOBAL_UNRESOLVED()) {   
             add_free_var(name);
             return this; 
          }
@@ -105,38 +105,27 @@ unsigned Expression::unresolved() {
 bool Expression::is_eq(Expression *other) {
    // printf("Checking if "); print(); printf(" == "); other->print(); puts("");
    if (t != other->t) return false;
+   if (is_binary()) {
+      return expr1->is_eq(other->expr1) && expr2->is_eq(other->expr2);
+   }
+   if (is_unary()) {
+      return unary->is_eq(other->unary);
+   }
+   if (t == ASSIGN) { 
+      return vname == other->vname 
+            && right_hand == other->right_hand 
+            && next == other->next; 
+   }
+   if (t == IF) { 
+      return cond == other->cond
+         && if_true == other->if_true
+         && if_false == other->if_false;
+   }
+   if (t == INVOKE) {
+      cout << "WARNING, we haven't implemented invoke equality yet" << endl;
+      return func->is_eq(other->func) && expr_list == other->expr_list;
+   }
    switch (t) {
-      case ASSIGN: { return vname == other->vname 
-                            && right_hand == other->right_hand 
-                            && next == other->next; }
-      case IF: { return cond == other->cond
-                        && if_true == other->if_true
-                        && if_false == other->if_false; }
-      // binary
-      case ADD: 
-      case SUB: 
-      case MULT:                
-      case DIV: 
-      case MOD: 
-      case EXP: 
-      case LOG_AND:
-      case LOG_OR: 
-      case EQ: 
-      case NEQ:
-      case LT: 
-      case GT: 
-      case LEQ:
-      case GEQ:
-      case BIT_AND:
-      case BIT_OR: 
-      case BIT_NOT:
-      case BIT_XOR:
-      { return expr1->is_eq(other->expr1) && expr2->is_eq(other->expr2); }
-      // unary
-      case NEG:
-      case LOG_NOT:
-      { return unary->is_eq(other->unary); }
-      //literals
       case INT: { return ival == other->ival; }
       case FLOAT: { return fval == other->fval; }
       case CHAR: { return cval == other->cval; }
@@ -144,9 +133,8 @@ bool Expression::is_eq(Expression *other) {
       case BOOL: { return bval == other->bval; }
       case VAR: { return *vname == *other->vname; }
       case UNRESOLVED:  { return false; }
-      case INVOKE:      
-      {  printf("WARNING, we haven't implemented invoke equality yet\n");
-         return func->is_eq(other->func) && expr_list == other->expr_list; }
+      default:
+         throw new string("Type unaccounted for in is_eq");
    }
 }
 
@@ -566,9 +554,7 @@ bool Expression::as_bool() {
 void ExpressionList::reduce_all() {
    ExpressionList::iterator it;
    for (it = begin(); it != end(); ++it) {
-      // cout << "Reducing: " << (*it) << endl;
-      *it = (*it)->reduce();
-      // cout << "OK" << endl;
+      Expression::reduce_update(*it);
    }
 }
 

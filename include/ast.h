@@ -10,6 +10,7 @@ namespace pico {
 struct ExpressionList : public std::deque<Expression *> { 
    friend std::ostream& operator<<(std::ostream&, ExpressionList *&);
    void reduce_all();
+   void symtables_print();
 };
 
 void upInd(); void dnInd(); void prindent();
@@ -45,8 +46,8 @@ struct Expression {
    unsigned u; // num unresolved exprs in this expr
    Expression *parent; // for symbol lookups
    typedef std::map<std::string, Expression *> SymTable;
-   SymTable symbol_table, temps;
-   std::deque<Expression *> free_vars;
+   SymTable *symbol_table, *temps;
+   std::deque<Expression *> *free_vars;
    Expression(): t(UNRESOLVED), u(1), parent(NULL) {
       // std::cout << "Creating new expression at address " << this << std::endl;
    }
@@ -87,7 +88,7 @@ struct Expression {
 
    // static Expression *reduce(Expression *expr);
    Expression *reduce();
-   void reduce_update(Expression *&expr);
+   static void reduce_update(Expression *&expr);
 
    unsigned unresolved();
 
@@ -102,7 +103,9 @@ struct Expression {
    void sym_update(std::string *str, Expression *term);
    bool sym_contains(std::string *name) const;
    void add_free_var(std::string *str);
-   void symtable_print(unsigned level = 0);
+   void symtable_print(unsigned level = 0); // bottom-up symbol table print
+   void symtable_print_forward(unsigned level = 0); //top-down symbol table print
+   void symtable_print_single(); //top-down symbol table print
 
    // arithmetic operations
    static Expression *add(Expression *expr1, Expression *expr2);
@@ -151,7 +154,7 @@ struct Expression {
    static void init();
 };
 
-extern Expression *GLOBAL_UNRESOLVED;
+Expression *GLOBAL_UNRESOLVED();
 
 }
 

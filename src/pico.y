@@ -79,6 +79,7 @@ pico: exprs {
                }
                std::cout << "Done. Reduced form is:" << std::endl;
                std::cout << $1 << std::endl;
+               $1->symtables_print();
             } ;
 
 exprs: expr '.'      { $$ = new ExpressionList(); $$->push_back($1); }
@@ -122,7 +123,7 @@ term_list
 
 opt_term
    : term
-   | { $$ = GLOBAL_UNRESOLVED; }
+   | { $$ = GLOBAL_UNRESOLVED(); }
    ;
 
 primary
