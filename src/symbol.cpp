@@ -65,6 +65,7 @@ void Expression::symtable_print(unsigned level) {
 }
 
 bool Expression::sym_contains(string *name) const {
+   if (!symbol_table) return false;
    return symbol_table->find(*name) != symbol_table->end();
 }
 

@@ -118,6 +118,7 @@ Expression *Expression::make_var(char *name) {
    Expression *expr = new Expression();
    expr->t = Expression::VAR;
    expr->name = new string(name);
+   expr->type = NULL;
    free(name);
    return expr;
 }

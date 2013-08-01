@@ -13,17 +13,6 @@ struct ExpressionList : public std::deque<Expression *> {
    void symtables_print();
 };
 
-void upInd(); void dnInd(); void prindent();
-
-struct Var {
-   std::string *name, *type;
-   Var(char *name): name(new std::string(name)), type(NULL) { free(name); }
-   Var(char *name, char *type): 
-      name(new std::string(name)), 
-      type(new std::string(type)) {free(name), free(type); }
-   ~Var();
-};
-
 struct Expression {
    enum Type { 
       ASSIGN, IF, UNRESOLVED, INVOKE, FLOAT, INT, STRING, VAR, CHAR,

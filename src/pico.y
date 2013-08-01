@@ -79,7 +79,9 @@ pico: exprs {
                }
                std::cout << "Done. Reduced form is:" << std::endl;
                std::cout << $1 << std::endl;
+               std::cout << "going to print the symbol tables..." << std::endl;
                $1->symtables_print();
+               std::cout << "printed the symbol tables..." << std::endl;
             } ;
 
 exprs: expr '.'      { $$ = new ExpressionList(); $$->push_back($1); }
