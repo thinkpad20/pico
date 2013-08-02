@@ -1,6 +1,7 @@
 %{
 
 #include "../include/ast.h"
+#include "../include/compile.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
@@ -71,14 +72,16 @@ extern int yylineno;
 pico: exprs { 
                $$ = $1; 
                std::cout << "Parsed: " << $1 << std::endl;
-               std::cout << "Reducing... ";
-               try {
-                  $$->reduce_all(); 
-               } catch (std::string msg) {
-                  printf("%s\n", msg.c_str());
-               }
-               std::cout << "Done. Reduced form is:" << std::endl;
-               std::cout << $1 << std::endl;
+               //std::cout << "Reducing... ";
+               //try {
+               //   $$->reduce_all(); 
+               //} catch (std::string msg) {
+               //   printf("%s\n", msg.c_str());
+               //}
+               //std::cout << "Done. Reduced form is:" << std::endl;
+               //std::cout << $1 << std::endl;
+               std::cout << "Let's try compiling it!" << std::endl;
+               compile_all($$);
                std::cout << "going to print the symbol tables..." << std::endl;
                $1->symtables_print();
                std::cout << "printed the symbol tables..." << std::endl;

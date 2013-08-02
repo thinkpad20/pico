@@ -37,13 +37,14 @@
 
 
 #include "../include/ast.h"
+#include "../include/compile.h"
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
 
 
 /* Line 283 of lalr1.cc  */
-#line 47 "pico.tab.c"
+#line 48 "pico.tab.c"
 
 
 #include "pico.tab.h"
@@ -51,17 +52,17 @@ extern int yylineno;
 /* User implementation prologue.  */
 
 /* Line 289 of lalr1.cc  */
-#line 55 "pico.tab.c"
+#line 56 "pico.tab.c"
 /* Unqualified %code blocks.  */
 /* Line 290 of lalr1.cc  */
-#line 30 "src/pico.y"
+#line 31 "src/pico.y"
 
 	// Prototype for the yylex function
 	static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner);
 
 
 /* Line 290 of lalr1.cc  */
-#line 65 "pico.tab.c"
+#line 66 "pico.tab.c"
 
 
 # ifndef YY_NULL
@@ -154,10 +155,10 @@ do {					\
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 /* Line 357 of lalr1.cc  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 namespace pico {
 /* Line 357 of lalr1.cc  */
-#line 161 "pico.tab.c"
+#line 162 "pico.tab.c"
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -459,18 +460,20 @@ namespace pico {
       {
           case 2:
 /* Line 664 of lalr1.cc  */
-#line 71 "src/pico.y"
+#line 72 "src/pico.y"
     { 
                (yyval.expr_list) = (yysemantic_stack_[(1) - (1)].expr_list); 
                std::cout << "Parsed: " << (yysemantic_stack_[(1) - (1)].expr_list) << std::endl;
-               std::cout << "Reducing... ";
-               try {
-                  (yyval.expr_list)->reduce_all(); 
-               } catch (std::string msg) {
-                  printf("%s\n", msg.c_str());
-               }
-               std::cout << "Done. Reduced form is:" << std::endl;
-               std::cout << (yysemantic_stack_[(1) - (1)].expr_list) << std::endl;
+               //std::cout << "Reducing... ";
+               //try {
+               //   $$->reduce_all(); 
+               //} catch (std::string msg) {
+               //   printf("%s\n", msg.c_str());
+               //}
+               //std::cout << "Done. Reduced form is:" << std::endl;
+               //std::cout << $1 << std::endl;
+               std::cout << "Let's try compiling it!" << std::endl;
+               compile_all((yyval.expr_list));
                std::cout << "going to print the symbol tables..." << std::endl;
                (yysemantic_stack_[(1) - (1)].expr_list)->symtables_print();
                std::cout << "printed the symbol tables..." << std::endl;
@@ -479,247 +482,247 @@ namespace pico {
 
   case 3:
 /* Line 664 of lalr1.cc  */
-#line 87 "src/pico.y"
+#line 90 "src/pico.y"
     { (yyval.expr_list) = new ExpressionList(); (yyval.expr_list)->push_back((yysemantic_stack_[(2) - (1)].expr)); }
     break;
 
   case 4:
 /* Line 664 of lalr1.cc  */
-#line 88 "src/pico.y"
+#line 91 "src/pico.y"
     { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (2)].expr)); (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
     break;
 
   case 6:
 /* Line 664 of lalr1.cc  */
-#line 92 "src/pico.y"
+#line 95 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(5) - (1)].strval), (yysemantic_stack_[(5) - (3)].expr), (yysemantic_stack_[(5) - (5)].expr)); }
     break;
 
   case 7:
 /* Line 664 of lalr1.cc  */
-#line 93 "src/pico.y"
+#line 96 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(7) - (2)].expr), (yysemantic_stack_[(7) - (4)].expr), (yysemantic_stack_[(7) - (7)].expr)); }
     break;
 
   case 9:
 /* Line 664 of lalr1.cc  */
-#line 98 "src/pico.y"
+#line 101 "src/pico.y"
     { (yyval.expr) = Expression::make_lt((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 10:
 /* Line 664 of lalr1.cc  */
-#line 99 "src/pico.y"
+#line 102 "src/pico.y"
     { (yyval.expr) = Expression::make_gt((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 11:
 /* Line 664 of lalr1.cc  */
-#line 100 "src/pico.y"
+#line 103 "src/pico.y"
     { (yyval.expr) = Expression::make_leq((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 12:
 /* Line 664 of lalr1.cc  */
-#line 101 "src/pico.y"
+#line 104 "src/pico.y"
     { (yyval.expr) = Expression::make_leq((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 13:
 /* Line 664 of lalr1.cc  */
-#line 102 "src/pico.y"
+#line 105 "src/pico.y"
     { (yyval.expr) = Expression::make_eq((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 14:
 /* Line 664 of lalr1.cc  */
-#line 103 "src/pico.y"
+#line 106 "src/pico.y"
     { (yyval.expr) = Expression::make_neq((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 15:
 /* Line 664 of lalr1.cc  */
-#line 104 "src/pico.y"
+#line 107 "src/pico.y"
     { (yyval.expr) = Expression::make_log_and((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 16:
 /* Line 664 of lalr1.cc  */
-#line 105 "src/pico.y"
+#line 108 "src/pico.y"
     { (yyval.expr) = Expression::make_log_or((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 17:
 /* Line 664 of lalr1.cc  */
-#line 106 "src/pico.y"
+#line 109 "src/pico.y"
     { (yyval.expr) = Expression::make_add((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 18:
 /* Line 664 of lalr1.cc  */
-#line 107 "src/pico.y"
+#line 110 "src/pico.y"
     { (yyval.expr) = Expression::make_sub((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 19:
 /* Line 664 of lalr1.cc  */
-#line 108 "src/pico.y"
+#line 111 "src/pico.y"
     { (yyval.expr) = Expression::make_mult((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 20:
 /* Line 664 of lalr1.cc  */
-#line 109 "src/pico.y"
+#line 112 "src/pico.y"
     { (yyval.expr) = Expression::make_div((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 21:
 /* Line 664 of lalr1.cc  */
-#line 110 "src/pico.y"
+#line 113 "src/pico.y"
     { (yyval.expr) = Expression::make_mod((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 22:
 /* Line 664 of lalr1.cc  */
-#line 111 "src/pico.y"
+#line 114 "src/pico.y"
     { (yyval.expr) = Expression::make_exp((yysemantic_stack_[(3) - (1)].expr), (yysemantic_stack_[(3) - (3)].expr)); }
     break;
 
   case 23:
 /* Line 664 of lalr1.cc  */
-#line 112 "src/pico.y"
+#line 115 "src/pico.y"
     { (yyval.expr) = Expression::make_log_not((yysemantic_stack_[(2) - (2)].expr)); }
     break;
 
   case 24:
 /* Line 664 of lalr1.cc  */
-#line 113 "src/pico.y"
+#line 116 "src/pico.y"
     { (yyval.expr) = Expression::make_neg((yysemantic_stack_[(2) - (2)].expr));  }
     break;
 
   case 26:
 /* Line 664 of lalr1.cc  */
-#line 118 "src/pico.y"
+#line 121 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(4) - (1)].expr), (yysemantic_stack_[(4) - (3)].expr_list)); }
     break;
 
   case 27:
 /* Line 664 of lalr1.cc  */
-#line 122 "src/pico.y"
+#line 125 "src/pico.y"
     { (yyval.expr_list) = new ExpressionList(); (yyval.expr_list)->push_back((yysemantic_stack_[(1) - (1)].expr)); }
     break;
 
   case 28:
 /* Line 664 of lalr1.cc  */
-#line 123 "src/pico.y"
+#line 126 "src/pico.y"
     { (yysemantic_stack_[(3) - (1)].expr_list)->push_back((yysemantic_stack_[(3) - (3)].expr)); (yyval.expr_list) = (yysemantic_stack_[(3) - (1)].expr_list); }
     break;
 
   case 30:
 /* Line 664 of lalr1.cc  */
-#line 128 "src/pico.y"
+#line 131 "src/pico.y"
     { (yyval.expr) = GLOBAL_UNRESOLVED(); }
     break;
 
   case 33:
 /* Line 664 of lalr1.cc  */
-#line 134 "src/pico.y"
+#line 137 "src/pico.y"
     { (yyval.expr) = (yysemantic_stack_[(3) - (2)].expr); }
     break;
 
   case 34:
 /* Line 664 of lalr1.cc  */
-#line 137 "src/pico.y"
+#line 140 "src/pico.y"
     { (yyval.expr) = Expression::make_var((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 35:
 /* Line 664 of lalr1.cc  */
-#line 138 "src/pico.y"
+#line 141 "src/pico.y"
     { (yyval.expr) = Expression::make_var((yysemantic_stack_[(2) - (1)].strval), (yysemantic_stack_[(2) - (2)].strval)); }
     break;
 
   case 36:
 /* Line 664 of lalr1.cc  */
-#line 141 "src/pico.y"
+#line 144 "src/pico.y"
     { (yyval.strval) = strdup("Any"); }
     break;
 
   case 37:
 /* Line 664 of lalr1.cc  */
-#line 142 "src/pico.y"
+#line 145 "src/pico.y"
     { (yyval.strval) = strdup("Int"); }
     break;
 
   case 38:
 /* Line 664 of lalr1.cc  */
-#line 143 "src/pico.y"
+#line 146 "src/pico.y"
     { (yyval.strval) = strdup("Float"); }
     break;
 
   case 39:
 /* Line 664 of lalr1.cc  */
-#line 144 "src/pico.y"
+#line 147 "src/pico.y"
     { (yyval.strval) = strdup("String"); }
     break;
 
   case 40:
 /* Line 664 of lalr1.cc  */
-#line 145 "src/pico.y"
+#line 148 "src/pico.y"
     { (yyval.strval) = strdup("Array"); }
     break;
 
   case 41:
 /* Line 664 of lalr1.cc  */
-#line 146 "src/pico.y"
+#line 149 "src/pico.y"
     { (yyval.strval) = strdup("List"); }
     break;
 
   case 42:
 /* Line 664 of lalr1.cc  */
-#line 147 "src/pico.y"
+#line 150 "src/pico.y"
     { (yyval.strval) = strdup("Table"); }
     break;
 
   case 44:
 /* Line 664 of lalr1.cc  */
-#line 152 "src/pico.y"
+#line 155 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 45:
 /* Line 664 of lalr1.cc  */
-#line 153 "src/pico.y"
+#line 156 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].fval)); }
     break;
 
   case 46:
 /* Line 664 of lalr1.cc  */
-#line 154 "src/pico.y"
+#line 157 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].strval)); }
     break;
 
   case 47:
 /* Line 664 of lalr1.cc  */
-#line 155 "src/pico.y"
+#line 158 "src/pico.y"
     { (yyval.expr) = new Expression((yysemantic_stack_[(1) - (1)].cval)); }
     break;
 
   case 48:
 /* Line 664 of lalr1.cc  */
-#line 156 "src/pico.y"
+#line 159 "src/pico.y"
     { (yyval.expr) = new Expression(true); }
     break;
 
   case 49:
 /* Line 664 of lalr1.cc  */
-#line 157 "src/pico.y"
+#line 160 "src/pico.y"
     { (yyval.expr) = new Expression(false); }
     break;
 
 
 /* Line 664 of lalr1.cc  */
-#line 723 "pico.tab.c"
+#line 726 "pico.tab.c"
       default:
         break;
       }
@@ -1250,12 +1253,12 @@ namespace pico {
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    71,    71,    87,    88,    91,    92,    93,    97,    98,
-      99,   100,   101,   102,   103,   104,   105,   106,   107,   108,
-     109,   110,   111,   112,   113,   117,   118,   122,   123,   127,
-     128,   132,   133,   134,   137,   138,   141,   142,   143,   144,
-     145,   146,   147,   148,   152,   153,   154,   155,   156,   157,
-     160
+         0,    72,    72,    90,    91,    94,    95,    96,   100,   101,
+     102,   103,   104,   105,   106,   107,   108,   109,   110,   111,
+     112,   113,   114,   115,   116,   120,   121,   125,   126,   130,
+     131,   135,   136,   137,   140,   141,   144,   145,   146,   147,
+     148,   149,   150,   151,   155,   156,   157,   158,   159,   160,
+     163
   };
 
   // Print the state stack on the debug stream.
@@ -1345,12 +1348,12 @@ namespace pico {
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 /* Line 1135 of lalr1.cc  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 } // pico
 /* Line 1135 of lalr1.cc  */
-#line 1352 "pico.tab.c"
+#line 1355 "pico.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 162 "src/pico.y"
+#line 165 "src/pico.y"
 
 
 // We have to implement the error function

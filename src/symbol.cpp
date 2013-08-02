@@ -26,22 +26,21 @@ Expression *Expression::sym_lookup(string *str) {
 }
 
 void Expression::sym_store(string *str, Expression *expr) {
-   cout << "storing '" << *str << "' to " << expr << endl;
+   if (!symbol_table) symbol_table = new map<string, Expression *>();
+   cout << "storing '" << *str << "' to " << expr << " in symtable " << symbol_table << " (this = " << this << ")" << endl;
    if (sym_contains(str)) {
       char buf[1000]; 
       sprintf(buf, "Error: symbol %s already exists in table, can't assign.\n", str->c_str());
       throw string(buf);
    }
-   if (!symbol_table) symbol_table = new map<string, Expression *>();
    (*symbol_table)[*str] = expr;
 }
 
 void Expression::sym_update(string *str, Expression *expr) {
-   printf("updating symtable!~+~+~+~+~+~+~+~+~+~+\n");
    if (!symbol_table)
-      throw std::string("Error, can't update an empty symbol table");
+      throw string("Error, can't update an empty symbol table");
    if (symbol_table->find(*str) == symbol_table->end()) {
-      if (expr->t != Expression::UNRESOLVED) {
+      if (expr->t != UNRESOLVED) {
          printf("error\n"); fflush(stdout);
          throw string("Hey, I can't update a variable that doesn't exist!");
       } else {
@@ -113,6 +112,7 @@ void Expression::symtable_print_forward(unsigned level) {
 void Expression::symtable_print_single() {
    std::map<string, Expression *>::iterator it;
    if (!symbol_table) {cout << "(no symbol table allocated)" << endl; return;}
+   cout << "symtable at " << symbol_table << ", this = " << this << endl;
    bool first = true;
    cout << "(";
    for (it=symbol_table->begin(); it!=symbol_table->end(); ++it) {

@@ -42,7 +42,7 @@
 
 /* "%code requires" blocks.  */
 /* Line 270 of lalr1.cc  */
-#line 20 "src/pico.y"
+#line 21 "src/pico.y"
 
 	// Forward-declare the Scanner class; the Parser needs to be assigned a 
 	// Scanner, but the Scanner can't be declared without the Parser
@@ -68,7 +68,7 @@
 #endif
 
 /* Line 270 of lalr1.cc  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 namespace pico {
 /* Line 270 of lalr1.cc  */
 #line 75 "pico.tab.h"
@@ -82,7 +82,7 @@ namespace pico {
     union semantic_type
     {
 /* Line 270 of lalr1.cc  */
-#line 35 "src/pico.y"
+#line 36 "src/pico.y"
 
    double fval;
    int ival;
@@ -325,7 +325,7 @@ namespace pico {
     pico::FlexScanner &scanner;
   };
 /* Line 270 of lalr1.cc  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 } // pico
 /* Line 270 of lalr1.cc  */
 #line 332 "pico.tab.h"

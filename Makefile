@@ -1,5 +1,5 @@
-CPP=g++
-LIBS=bin/ast.o bin/symbol.o bin/reduce.o
+CPP=clang++
+LIBS=bin/ast.o bin/symbol.o bin/reduce.o bin/compile.o bin/vm.o
 PARSE=bin/lex.o bin/parse.o
 
 all: pico
@@ -7,7 +7,8 @@ all: pico
 run: pico
 	./pico
 
-pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/reduce.o bin/symbol.o
+pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/reduce.o bin/symbol.o \
+		bin/compile.o bin/vm.o
 	g++ -o pico bin/engine.o $(PARSE) $(LIBS)
 
 # generate C source from lex and yac files
@@ -32,9 +33,17 @@ bin/symbol.o: src/symbol.cpp include/ast.h
 	@mkdir -p bin
 	$(CPP) -c -o bin/symbol.o src/symbol.cpp
 
+bin/vm.o: src/vm.cpp include/ast.h
+	@mkdir -p bin
+	$(CPP) -c -o bin/vm.o src/vm.cpp
+
 bin/reduce.o: src/reduce.cpp include/ast.h
 	@mkdir -p bin
 	$(CPP) -c -o bin/reduce.o src/reduce.cpp
+
+bin/compile.o: src/compile.cpp include/ast.h
+	@mkdir -p bin
+	$(CPP) -c -o bin/compile.o src/compile.cpp
 
 bin/lex.o: src/lex.yy.cc bin/parse.o
 	@mkdir -p bin

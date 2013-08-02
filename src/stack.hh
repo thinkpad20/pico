@@ -41,7 +41,7 @@
 # include <deque>
 
 /* Line 34 of stack.hh  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 namespace pico {
 /* Line 34 of stack.hh  */
 #line 48 "stack.hh"
@@ -135,7 +135,7 @@ namespace pico {
     unsigned int range_;
   };
 /* Line 124 of stack.hh  */
-#line 12 "src/pico.y"
+#line 13 "src/pico.y"
 } // pico
 /* Line 124 of stack.hh  */
 #line 142 "stack.hh"

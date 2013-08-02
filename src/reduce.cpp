@@ -535,7 +535,7 @@ Expression *Expression::band(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::bor(Expression *t1, Expression *t2) {
-   throw std::string("bitwise bor not implemented yet");
+   throw std::string("bitwise or not implemented yet");
 }
 
 Expression *Expression::bnot(Expression *t1, Expression *t2) {
@@ -543,7 +543,7 @@ Expression *Expression::bnot(Expression *t1, Expression *t2) {
 }
 
 Expression *Expression::bxor(Expression *t1, Expression *t2) {
-   throw std::string("bitwise bxor not implemented yet");
+   throw std::string("bitwise xor not implemented yet");
 }
 
 bool Expression::as_bool() {
