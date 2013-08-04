@@ -6,8 +6,15 @@
 
 namespace pico {
 
-InstructionList compile(Expression *expr);
-void compile_all(ExpressionList *elist);
+struct Assignment {
+   std::string vname;
+   Expression *rval;
+   Assignment(std::string vname, Expression *rval): vname(vname), rval(rval) {}
+   friend std::ostream &operator<<(std::ostream &os, const Assignment &asn);
+};
+
+std::deque<Assignment> compile(Expression *, std::deque<Assignment> &);
+std::deque<Assignment> compile(ExpressionList *);
 
 }
 

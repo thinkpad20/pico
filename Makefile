@@ -1,5 +1,5 @@
 CPP=clang++
-LIBS=bin/ast.o # bin/symbol.o bin/reduce.o bin/compile.o bin/vm.o
+LIBS=bin/ast.o bin/compile.o # bin/symbol.o bin/reduce.o bin/vm.o
 PARSE=bin/lex.o bin/parse.o
 
 all: pico
@@ -7,7 +7,7 @@ all: pico
 run: pico
 	./pico
 
-pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o 
+pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/compile.o
 	$(CPP) -o pico bin/engine.o $(PARSE) $(LIBS)
 
 pico-simple: bin/lex.o bin/parse.o bin/engine.o bin/simple-ast.o

@@ -75,23 +75,23 @@ static void pop_symtable() {
    delete temp;
 }
 
-static void initialize() {
-   push_symtable();
-   func_map["+"] = Add;
-   func_map["-"] = Sub;
-   func_map["*"] = Mult;
-   func_map["/"] = Div;
-   func_map["%"] = Mod;
-   func_map["=="]= Eq;
-   func_map["<"] = Lt;
-   func_map[">"] = Gt;
-   func_map["<="] = Leq;
-   func_map[">="] = Geq;
-   func_map["&&"] = And;
-   func_map["||"] = Or;
-   func_map["!"] = Not;
-   func_map["^"] = Exp;
-}
+// static void initialize() {
+//    push_symtable();
+//    func_map["+"] = Add;
+//    func_map["-"] = Sub;
+//    func_map["*"] = Mult;
+//    func_map["/"] = Div;
+//    func_map["%"] = Mod;
+//    func_map["=="]= Eq;
+//    func_map["<"] = Lt;
+//    func_map[">"] = Gt;
+//    func_map["<="] = Leq;
+//    func_map[">="] = Geq;
+//    func_map["&&"] = And;
+//    func_map["||"] = Or;
+//    func_map["!"] = Not;
+//    func_map["^"] = Exp;
+// }
 
 // for bound variables
 static void store(string name, string full_name, Expression *expr) {
@@ -128,29 +128,33 @@ static SymbolInfo lookup(string var) {
    return SymbolInfo();
 }
 
-InstructionList instructions;
+ostream &operator<<(ostream &os, const Assignment &asn) {
+   os << asn.vname << " -> " << asn.rval;
+   return os;
+}
 
-struct Assignment {
-   string vname;
-   Expression *rval;
-   Assignment(string vname, Expression *rval): vname(vname), rval(rval) {}
-   friend ostream &operator<<(ostream &os, const Assignment &asn) {
-      os << vname << " -> " << rval;
-      return os;
+deque<Assignment> compile(Expression *expr, deque<Assignment> &assignments) {
+   // cout << "call to compile on expression " << expr << endl;
+   if (expr->t != Expression::ASSIGN) {
+      // cout << "This isn't an assignment expression. Weird?" << endl;
+      return assignments;
    }
-};
-
-static deque<Assignment> _compile(Expression *expr, deque<Assignment> &assignments) {
    Expression *rhs = expr->rhs;
+   // cout << "rhs of this assignment is " << rhs << endl;
    while (rhs->t == Expression::ASSIGN) {
-      _compile(rhs);
+      compile(rhs, assignments);
       rhs = rhs->next;
    }
    assignments.push_back(Assignment(*expr->alias, rhs));
+   return assignments;
 }
 
-deque<Assignment> Assignment::compile(Expression *expr) {
-   return _compile(Expression *expr, deque<Assignment>);
+deque<Assignment> compile(ExpressionList *elist) {
+   deque<Assignment> assignments;
+   for (int i = 0; i < elist->size(); ++i) {
+      compile((*elist)[i], assignments);
+   }
+   return assignments;
 }
 
 }

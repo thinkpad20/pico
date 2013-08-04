@@ -1,5 +1,6 @@
 #include "../include/picoScanner.h"
 #include "../include/ast.h"
+#include "../include/compile.h"
 
 namespace pico {
    class Parser {
@@ -29,6 +30,11 @@ int main(int argc, char * argv[]) {
       parser.set_debug_level(1);
 	parser.parse();
    cout << parsed_expressions << endl;
+   std::deque<Assignment> asns = compile(parsed_expressions);
+   cout << "Found these assignments: " << endl;
+   for (int i = 0; i < asns.size(); ++i) {
+      cout << asns[i] << endl;
+   }
    return 0;
 }
 

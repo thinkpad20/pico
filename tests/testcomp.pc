@@ -1,2 +1,41 @@
+a = (
+   b = (
+      c = 5 + Int i,
+      d = c^2,
+      d + c
+   ),
+   (Int j + Int k + Float z)(6, a, c)
+), 
+0.
+
+print(a).
+
+
+<{ 
 foocomp = if Int i < Float j then -1.5 else if i > j then 1.6 else 0.0, 
 1. 
+
+<{
+ExprList(
+   Expr(
+      foocomp = (
+         IF (
+            call (i Int) < call (j Float)
+         ) 
+         THEN 
+            -(1.5) 
+         ELSE 
+            IF (
+               i > j
+            ) 
+            THEN 
+               1.6 
+            ELSE 
+               0
+      ), 
+   1)
+)
+
+}>
+
+}>

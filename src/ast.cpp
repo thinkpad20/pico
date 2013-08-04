@@ -34,10 +34,12 @@ Expression *Expression::make_unbound_var(const char *vtype, const char *vname) {
 }
 
 Expression *Expression::make_0ary_call(Expression *func) {
-   if (func->is_literal()) // we can keep literals as-is
+   // assignments and literals we can keep as-is
+   if (func->is_literal() || func->t == ASSIGN) {
       return func;
-   else
+   } else {
       return new Expression(func, new ExpressionList()); // this explist will be empty
+   }
 }
 
 Expression *Expression::BLANK_EXPR() {
@@ -90,7 +92,7 @@ bool Expression::is_literal() {
    return t == INT || t == FLOAT || t == CHAR || t == STRING || t == BOOL;
 }
 
-ostream& operator<<(ostream& os, Expression *&expr) {
+ostream& operator<<(ostream& os, Expression *expr) {
    switch(expr->t) {
       case Expression::IF: 
       {
@@ -122,7 +124,7 @@ ostream& operator<<(ostream& os, Expression *&expr) {
             else
                os << "call (" << expr->func << ")";
             if (expr->args->size() > 0) 
-               os << "(" << expr->args << ")";
+               os << " on (" << expr->args << ")";
          }
          return os;
       }
@@ -166,13 +168,11 @@ ostream& operator<<(ostream& os, Expression *&expr) {
 ostream& operator<<(ostream& os, ExpressionList *&exprlist) {
    ExpressionList::iterator it;
    bool first = true;
-   os << "ExprList(";
    int i = 0;
    for (it = exprlist->begin(); it != exprlist->end(); it++) {
       if (first) first = false; else os << ", ";
-      os << "Expr(" << *it << ")";
+      os << *it;
    }
-   os << ")";
    return os;
 }
 

@@ -78,7 +78,10 @@ exprs: expr '.'      { parsed_expressions = $$ = new ExpressionList();
 
 expr
    : term
-   | var_name '=' expr comma_or_newline expr { $$ = new Expression($1, $3, $5); }
+   | var_name '=' expr comma_or_newline expr 
+   { 
+      $$ = new Expression($1, $3, $5); 
+   }
    | IF term THEN term ELSE expr             { $$ = new Expression($2, $4, $6); }
    ;
 
@@ -107,7 +110,7 @@ term
    ;
 
 invocation
-   : primary                      { $$ = Expression::make_0ary_call($1);}
+   : primary                      { $$ = Expression::make_0ary_call($1); }
    | invocation '(' expr_list ')' { $$ = new Expression($1, $3); }
    ;
 

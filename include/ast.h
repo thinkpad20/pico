@@ -92,18 +92,7 @@ struct Expression {
    static Expression *BLANK_EXPR();
    static Expression *ROOT_EXPR();
    bool is_symbol(); bool is_literal();
-   friend std::ostream& operator<<(std::ostream& os, Expression *&expr);
-};
-
-struct Assignment {
-   std::string vname;
-   Expression *rval;
-   Assignment(std::string vname, Expression *rval): vname(vname), rval(rval) {}
-   friend std::ostream &operator<<(std::ostream &os, const Assignment &asn) {
-      os << asn.vname << " -> " << asn.rval;
-      return os;
-   }
-   static std::deque<Assignment> compile(Expression *expr);
+   friend std::ostream& operator<<(std::ostream& os, Expression *expr);
 };
 
 }
