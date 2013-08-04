@@ -149,7 +149,7 @@ static deque<Assignment> _compile(Expression *expr, deque<Assignment> &assignmen
    assignments.push_back(Assignment(*expr->alias, rhs));
 }
 
-deque<Assignment> compile(Expression *expr) {
+deque<Assignment> Assignment::compile(Expression *expr) {
    return _compile(Expression *expr, deque<Assignment>);
 }
 
