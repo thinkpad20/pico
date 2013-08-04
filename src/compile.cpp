@@ -133,8 +133,8 @@ ostream &operator<<(ostream &os, const Assignment &asn) {
    return os;
 }
 
-deque<Assignment> compile(Expression *expr, deque<Assignment> &assignments) {
-   // cout << "call to compile on expression " << expr << endl;
+deque<Assignment> get_assignments(Expression *expr, deque<Assignment> &assignments) {
+   // cout << "call to get_assignments on expression " << expr << endl;
    if (expr->t != Expression::ASSIGN) {
       // cout << "This isn't an assignment expression. Weird?" << endl;
       return assignments;
@@ -142,17 +142,17 @@ deque<Assignment> compile(Expression *expr, deque<Assignment> &assignments) {
    Expression *rhs = expr->rhs;
    // cout << "rhs of this assignment is " << rhs << endl;
    while (rhs->t == Expression::ASSIGN) {
-      compile(rhs, assignments);
+      get_assignments(rhs, assignments);
       rhs = rhs->next;
    }
    assignments.push_back(Assignment(*expr->alias, rhs));
    return assignments;
 }
 
-deque<Assignment> compile(ExpressionList *elist) {
+deque<Assignment> get_assignments(ExpressionList *elist) {
    deque<Assignment> assignments;
    for (int i = 0; i < elist->size(); ++i) {
-      compile((*elist)[i], assignments);
+      get_assignments((*elist)[i], assignments);
    }
    return assignments;
 }

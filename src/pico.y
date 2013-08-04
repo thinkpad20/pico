@@ -70,11 +70,11 @@ extern pico::ExpressionList *pico::parsed_expressions;
 
 %%
 
-pico: exprs { $$ = $1; } ;
+pico: exprs ;
 
-exprs: expr '.'      { parsed_expressions = $$ = new ExpressionList(); 
-                       $$->push_back($1); }
-    | pico expr '.'  { $1->push_back($2); parsed_expressions = $$ = $1; }
+exprs: expr '.'      { parsed_expressions = new ExpressionList(); 
+                       parsed_expressions->push_back($1); }
+    | pico expr '.'  { $1->push_back($2); parsed_expressions = $1; }
 
 expr
    : term
