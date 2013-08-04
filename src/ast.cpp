@@ -1,147 +1,94 @@
 #include "../include/ast.h"
+#include <map>
 
 using namespace std;
 
 namespace pico {
 
-static map<Expression::Type, string> symdic;
+static map<const char *, Expression *> named_functions;
+static Expression *blank_expr = NULL;
+static Expression *root_expr = NULL;
+ExpressionList *parsed_expressions = NULL;
+
+static const char *primitive_symbols[] = {
+   "+", "-", "*", "/", "%", "==", "<", ">", "<=", ">=", "&&", "||", "!", "^"
+};
 
 void Expression::init() {
-   symdic[ADD] = "+";
-   symdic[SUB] = "-";
-   symdic[MULT] = "*";
-   symdic[DIV] = "/";
-   symdic[LT] = "<";
-   symdic[GT] = ">";
-   symdic[EQ] = "==";
-   symdic[NEQ] = "!=";
-   symdic[GEQ] = ">=";
-   symdic[LEQ] = "<=";
-   symdic[EXP] = "^";
-   symdic[LOG_AND] = "&&";
-   symdic[LOG_OR] = "||";
-   symdic[LOG_NOT] = "!";
-   symdic[BIT_AND] = "&";
-   symdic[BIT_OR] = "|";
-   symdic[BIT_XOR] = "^^";
-   symdic[BIT_NOT] = "~";
-   symdic[MOD] = "%";
-   symdic[INT] = "INT";
-   symdic[FLOAT] = "FLOAT";
-   symdic[CHAR] = "CHAR";
-   symdic[STRING] = "STRING";
-   symdic[BOOL] = "BOOL";
-   symdic[VAR] = "VAR";
-   symdic[INVOKE] = "INVOKE";
-   symdic[UNRESOLVED] = "UNRESOLVED";
+   for (int i = 0; i < sizeof(primitive_symbols)/sizeof(const char *); ++i)
+      named_functions[primitive_symbols[i]] = make_var(primitive_symbols[i]);
 }
 
-Expression::~Expression() {
-   //TODO
+ExpressionList *get_expressions() {
+   return parsed_expressions;
 }
 
-void Expression::print_info() {
-   if (symdic.find(t) == symdic.end()) 
-      printf("Unknown type\n");
-   else 
-      printf("type %s", symdic[t].c_str());
-   if (t == VAR) 
-      printf(" (name %s)", vname->c_str());
+Expression *Expression::make_var(const char *name) {
+   Expression *res = new Expression(new string(name));
+   res->t = VAR;
+   return res;
 }
 
-Expression *Expression::make_add(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::ADD);
-}
-Expression *Expression::make_sub(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::SUB);
-}
-Expression *Expression::make_mult(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::MULT);
-}
-Expression *Expression::make_div(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::DIV);
-}
-Expression *Expression::make_mod(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::MOD);
-}
-Expression *Expression::make_exp(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::EXP);
-}
-Expression *Expression::make_eq(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::EQ);
-}
-Expression *Expression::make_lt(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::LT);
-}
-Expression *Expression::make_gt(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::GT);
-}
-Expression *Expression::make_leq(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::LEQ);
-}
-Expression *Expression::make_geq(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::GEQ);
+Expression *Expression::make_unbound_var(const char *vtype, const char *vname) {
+   return new Expression(new string(vname), new string(vtype));
 }
 
-Expression *Expression::make_neq(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::NEQ);
+Expression *Expression::make_0ary_call(Expression *func) {
+   if (func->is_literal()) // we can keep literals as-is
+      return func;
+   else
+      return new Expression(func, new ExpressionList()); // this explist will be empty
 }
 
-Expression *Expression::make_log_and(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::LOG_AND);
-}
-Expression *Expression::make_log_or(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::LOG_OR);
-}
-Expression *Expression::make_log_not(Expression *expr)  {
-   return new Expression(expr, Expression::LOG_NOT);
-}
-Expression *Expression::make_bit_and(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::BIT_AND);
-}
-Expression *Expression::make_bit_or(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::BIT_OR);
-}
-Expression *Expression::make_bit_xor(Expression *expr1, Expression *expr2) {
-   return new Expression(expr1, expr2, Expression::BIT_XOR);
-}
-
-Expression *Expression::make_bit_not(Expression *expr) {
-   return new Expression(expr, Expression::BIT_NOT);
-}
-
-Expression *Expression::make_neg(Expression *expr) {
-   return new Expression(expr, Expression::NEG);
-}
-
-Expression *Expression::make_var(char *name) {
-   Expression *expr = new Expression();
-   expr->t = Expression::VAR;
-   expr->name = new string(name);
-   expr->type = NULL;
-   free(name);
-   return expr;
-}
-
-Expression *Expression::make_var(char *type, char *name) {
-   Expression *expr = make_var(name);
-   expr->type = new string(type);
-   free(type);
-   return expr;
-}
-
-ostream& operator<<(ostream& os, ExpressionList *&exprlist) {
-   ExpressionList::iterator it;
-   bool first = true;
-   os << "ExprList(";
-   for (it = exprlist->begin(); it != exprlist->end(); it++) {
-      if (first) first = false; else os << ", ";
-      os << "Expr(" << *it << ")";
+Expression *Expression::BLANK_EXPR() {
+   if (!blank_expr) {
+      blank_expr = new Expression();
    }
-   os << ")";
-   return os;
+   return blank_expr;
 }
 
+Expression *Expression::ROOT_EXPR() {
+   if (!root_expr) {
+      root_expr = new Expression();
+   }
+   return root_expr;
+}
+
+Expression *Expression::make_binary_sym_call(const char *symbol, Expression *e1, Expression *e2) {
+   if (named_functions.find(symbol) == named_functions.end()) {
+      cout << "Encountered new binary symbol " << symbol << ", adding it to the table" << endl;
+      named_functions[symbol] = make_var(symbol);
+   }
+   ExpressionList *list = new ExpressionList();
+   list->push_back(e1); list->push_back(e2);
+   return new Expression(named_functions[symbol], list);
+}
+
+Expression *Expression::make_unary_sym_call(const char *symbol, Expression *e) {
+   if (named_functions.find(symbol) == named_functions.end()) {
+      cout << "Encountered new unary symbol " << symbol << ", adding it to the table" << endl;
+      named_functions[symbol] = make_var(symbol);
+   }
+   ExpressionList *list = new ExpressionList();
+   list->push_back(e);
+   return new Expression(named_functions[symbol], list);
+}
+
+bool Expression::is_symbol() {
+   if (t != CALL) return false;
+   if (func->t != VAR) return false;
+   if (args->size() > 2) return false;
+   for (int i = 0; i < func->str->size(); ++i) {
+      char c = (*func->str)[i];
+      if (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_') 
+         return false;
+   }
+   return true;
+}
+
+bool Expression::is_literal() {
+   return t == INT || t == FLOAT || t == CHAR || t == STRING || t == BOOL;
+}
 
 ostream& operator<<(ostream& os, Expression *&expr) {
    switch(expr->t) {
@@ -153,65 +100,61 @@ ostream& operator<<(ostream& os, Expression *&expr) {
       }
       case Expression::ASSIGN:
       {
-         os << *expr->vname << " = (" << expr->right_hand << "), " << expr->next;
+         os << *expr->alias << " = (" << expr->rhs << "), " << expr->next;
          return os;
       }
-      case Expression::UNRESOLVED: 
+      case Expression::UNBOUND: 
       {
-         printf("(empty expr)"); fflush(stdout);
+         os << *expr->var_type << " " << *expr->var_name;
          return os;
       }
-      case Expression::INVOKE:
+      case Expression::CALL:
       {
-         os << "(" << expr->func << ") on (" << expr->expr_list << ")";
+         if (expr->is_symbol()) { 
+            if (expr->args->size() == 1) {
+               os << *expr->func->str << "(" << (*expr->args)[0] << ")";
+            } else {
+               os << "(" << (*expr->args)[0] << " " << *expr->func->str << " " << (*expr->args)[1] << ")";
+            }
+         } else {
+            if (expr->func->t == Expression::VAR || expr->func->t == Expression::UNBOUND)
+               os << expr->func;
+            else
+               os << "call (" << expr->func << ")";
+            if (expr->args->size() > 0) 
+               os << "(" << expr->args << ")";
+         }
          return os;
       }
       case Expression::FLOAT:
       {
-         os << expr->fval;
+         os << expr->f;
          return os;
       }
       case Expression::INT:
       {
-         os << expr->ival;
+         os << expr->i;
          return os;
       }
       case Expression::CHAR:
       {
-         os << expr->cval;
+         os << expr->c;
          return os;
       }
       case Expression::BOOL:
       {
-         os << (expr->bval ? "TRUE" : "FALSE");
+         os << (expr->b ? "TRUE" : "FALSE");
          return os;
       }
       case Expression::STRING:
       {
-         os << expr->strval;
+         os << '"' << *expr->str << '"';
          return os;
       }
       case Expression::VAR:
       {
-         if (expr->type) os << *expr->type;
-         os << *expr->name;
+         os << *expr->str;
          return os;
-      }
-      case Expression::ADD: case Expression::SUB: case Expression::MULT: 
-      case Expression::DIV: case Expression::LT: case Expression::GT: 
-      case Expression::GEQ: case Expression::LEQ: case Expression::MOD: 
-      case Expression::EQ: case Expression::NEQ: case Expression::LOG_AND: 
-      case Expression::LOG_OR: case Expression::BIT_AND: 
-      case Expression::BIT_OR: case Expression::BIT_XOR: case Expression::EXP:
-      {
-         os << "(" << expr->expr1 << " " << symdic[expr->t]
-            << " " << expr->expr2 << ")";
-         break;
-      }
-      case Expression::LOG_NOT: case Expression::BIT_NOT:
-      {
-         os << symdic[expr->t] << "(" << expr->unary << ")";
-         break;
       }
       default:
          os << "UNKNOWN EXPR " << expr->t;
@@ -220,26 +163,17 @@ ostream& operator<<(ostream& os, Expression *&expr) {
    return os;
 }
 
-bool Expression::is_binary() const {
-   switch(t) {
-      case ADD: case SUB: case MULT: 
-      case DIV: case LT: case GT: 
-      case GEQ: case LEQ: case MOD: 
-      case EQ: case NEQ: case LOG_AND: 
-      case LOG_OR: case BIT_AND: 
-      case BIT_OR: case BIT_XOR: case EXP:
-      {
-         return true;
-      }
-      default:
-         return false;
+ostream& operator<<(ostream& os, ExpressionList *&exprlist) {
+   ExpressionList::iterator it;
+   bool first = true;
+   os << "ExprList(";
+   int i = 0;
+   for (it = exprlist->begin(); it != exprlist->end(); it++) {
+      if (first) first = false; else os << ", ";
+      os << "Expr(" << *it << ")";
    }
+   os << ")";
+   return os;
 }
-
-bool Expression::is_unary() const {
-   return (t == BIT_NOT || t == LOG_NOT || t == NEG);
-}
-
-void Expression::set_parent(Expression *parent) { this->parent = parent; }
 
 }

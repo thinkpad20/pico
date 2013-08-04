@@ -1,0 +1,2 @@
+foocomp = if Int i < Float j then -1.5 else if i > j then 1.6 else 0.0, 
+1. 

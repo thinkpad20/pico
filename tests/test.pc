@@ -1,4 +1,6 @@
-foo = 1 + 2 + 3, foo.
+<-- foo = 1 + 2 + 3, foo.
+
+bar = (a = 1, b = 2, a + b), bar.
 
 <{
 

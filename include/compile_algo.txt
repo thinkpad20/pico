@@ -1,0 +1,200 @@
+Thinking about an algorithm for compilation...
+
+We essentially have 4 classes of expressions: 
+
+literal:
+1
+"hello"
+False
+
+invocation:
+a,
+f(4),
+g(,6, b, Int k),
+max(10, floor(7.6)),
+
+assignment:
+a = 4
+foo = max(Int i, bar)
+f = (
+   b = 3,
+   c = a/b,
+   c^b + 5
+)
+
+if:
+fuzz = if foo(2, Int i) > Int j then 1 else -1,
+baz = if fuzz(Int p) != -1 then "scoop" 
+      else if tom > dick then "poop" else "loop"
+
+When we have an assignment statement, we might need to make other assignments internally, and we need to make sure that these assignments are recorded first. For example
+
+a = (
+   b = (
+      c = 5 + Int i,
+      d = c^2,
+      d + c
+   ),
+   b(6)
+), 0.
+
+This would look like the following AST:
+
+Assign a to
+   Assign b to
+      Assign c to
+         Call
+            '+'
+            5, arg0
+      Assign d to
+         Call
+            '^'
+            c, 2
+      Call
+         '+'
+         d, c
+   Call
+      'b'
+      6
+0
+
+
+
+We would want the above to be compiled to something like
+a.b.c:
+   push 5
+   push arg 0
+   add
+   return 1
+a.b.d:
+   push arg 0
+   call a.b.c 1
+   push 2
+   exp
+   return 1
+a.b:
+   push arg 0
+   call a.b.d 1
+   push arg 0
+   call a.b.c 1
+   add
+   return 1
+a:
+   push 6
+   call a.b
+   return 1
+
+We can't do something like
+a:
+a.b:
+a.b.c:
+   push 5
+   push arg 0
+   add
+   return 1
+a.b.d:
+   push arg 0
+   .....
+
+because the functions are no longer separate. How do we guarantee this, then?
+
+Well we know that assignment will always come before a return, because a return is always the last statement in a given thread (after, there's nothing more to say!). So when we have nested functions, we start with the outer one, find the first of its RHS functions that don't have an assignment in those, and throw on the stack the name of the function and a pointer to that first non-assigning expression. Then we recurse on its RHS. 
+
+In this example:
+
+Found assignment of variable a
+push a onto the stack
+Search through a's RHS:
+   found assignment of b, skip over and go to next
+   found call function, not an assignment, so point TOS at call function
+Recurse on 
+Search through b's RHS:
+   found asn of c, skip
+   found asn of d, skip
+   found
+
+So here's the idea.
+
+We start with an assignment statement - this can be required or it can be hard-coded in as root, or whatever.
+
+Then we proceed in the following manner:
+
+
+struct asn = { string name, term ret }
+
+vector<asn> assignments
+
+eval(assn_expr):
+   expr rhs = assn_expr->rhs
+   while (rhs is another assignment):
+      eval(rhs)
+      rhs = rhs->next
+   assignments.add({assn_expr.name, rhs})
+
+Let's try this pseudocode on the expression we had before. This time I'll put numbers on the AST pieces so we can refer to where we are in the AST.
+
+
+AST:
+1  Assign a to
+   2  Assign b to
+      3  Assign c to
+         4  Call
+               '+'
+               5, arg0
+      5  Assign d to
+         6  Call
+               '^'
+               c, 2
+      7  Call
+            '+'
+            d, c
+   8  Call
+         'b'
+         6
+0
+
+evaluating 1
+   1.rhs = 2
+   enter 1.while
+      2 is an assignment
+      evaluating 2
+         2.rhs = 3
+         enter 2.while
+            3 is an assignment
+            evaluating 3
+               3.rhs = 4
+               enter 3.while
+                  4 is NOT an assignment
+               exit 3.while
+               assignments.add({c, Call '+', 5, arg 0})
+            done evaluating 3
+            3.next = 5
+            5 is an assignment
+            evaluating 5
+               5.rhs = 6
+               enter 5.while
+                  6 is NOT an assignment
+               exit 5.while
+               assignments.add({d, Call '^', c, 2})
+            done evaluating 5
+            5.next = 7
+            7 is NOT an assignment
+         exit 2.while
+         assignments.add({"b", Call '+', d, c})
+      done evaluating 2
+      rhs = 2.next = 8
+      8 is NOT an assigment
+   exit 1.while
+   assignments.add({"a", Call 'b', 6})
+done evaluating 1
+
+This would fill up the list of assignments as follows:
+
+assignments {
+   "c" -> call('+', 5, arg 0)
+   "d" -> call('^', c, 2)
+   "b" -> call("+", d, c)
+   "a" -> call(b, 6)
+}
+
+This, of course, isn't touching the symbol table, doing type checking, counting the number of arguments needed to call a function, etc. We probably want to store that information as we recurse.

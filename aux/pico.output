@@ -27,151 +27,157 @@ Grammar
     3      | pico expr '.'
 
     4 expr: term
-    5     | var_name '=' term ',' expr
-    6     | IF term THEN term ',' ELSE expr
+    5     | var_name '=' expr comma_or_newline expr
+    6     | IF term THEN term ELSE expr
 
-    7 term: invocation
-    8     | term '<' term
-    9     | term '>' term
-   10     | term LEQ term
-   11     | term GEQ term
-   12     | term EQ term
-   13     | term NEQ term
-   14     | term AND term
-   15     | term OR term
-   16     | term '+' term
-   17     | term '-' term
-   18     | term '*' term
-   19     | term '/' term
-   20     | term '%' term
-   21     | term '^' term
-   22     | NOT term
-   23     | '-' term
+    7 comma_or_newline: ','
+    8                 | '\n'
 
-   24 invocation: primary
-   25           | invocation '(' term_list ')'
+    9 term: invocation
+   10     | term '<' term
+   11     | term '>' term
+   12     | term LEQ term
+   13     | term GEQ term
+   14     | term EQ term
+   15     | term NEQ term
+   16     | term AND term
+   17     | term OR term
+   18     | term '+' term
+   19     | term '-' term
+   20     | term '*' term
+   21     | term '/' term
+   22     | term '%' term
+   23     | term '^' term
+   24     | NOT term
+   25     | '-' term
 
-   26 term_list: opt_term
-   27          | term_list ',' opt_term
+   26 invocation: primary
+   27           | invocation '(' expr_list ')'
 
-   28 opt_term: term
-   29         | /* empty */
+   28 expr_list: opt_term
+   29          | expr_list ',' opt_term
 
-   30 primary: literal
-   31        | var
-   32        | '(' expr ')'
+   30 opt_term: term
+   31         | /* empty */
 
-   33 var: var_name
-   34    | type_name var_name
+   32 primary: literal
+   33        | var
+   34        | '(' expr ')'
 
-   35 type_name: ANY
-   36          | INT
-   37          | FLOAT
-   38          | STRING
-   39          | ARRAY
-   40          | LIST
-   41          | TABLE
-   42          | TYPENAME
+   35 var: var_name
+   36    | type_name var_name
 
-   43 literal: INT_LITERAL
-   44        | FLOAT_LITERAL
-   45        | STRING_LITERAL
-   46        | CHAR_LITERAL
-   47        | TRUE
-   48        | FALSE
+   37 type_name: ANY
+   38          | INT
+   39          | FLOAT
+   40          | STRING
+   41          | ARRAY
+   42          | LIST
+   43          | TABLE
+   44          | TYPENAME
 
-   49 var_name: ID
+   45 literal: INT_LITERAL
+   46        | FLOAT_LITERAL
+   47        | STRING_LITERAL
+   48        | CHAR_LITERAL
+   49        | TRUE
+   50        | FALSE
+
+   51 var_name: ID
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'%' (37) 20
-'(' (40) 25 32
-')' (41) 25 32
-'*' (42) 18
-'+' (43) 16
-',' (44) 5 6 27
-'-' (45) 17 23
+'\n' (10) 8
+'%' (37) 22
+'(' (40) 27 34
+')' (41) 27 34
+'*' (42) 20
+'+' (43) 18
+',' (44) 7 29
+'-' (45) 19 25
 '.' (46) 2 3
-'/' (47) 19
-'<' (60) 8
+'/' (47) 21
+'<' (60) 10
 '=' (61) 5
-'>' (62) 9
-'^' (94) 21
+'>' (62) 11
+'^' (94) 23
 error (256)
 FN (258)
-INT (259) 36
-FLOAT (260) 37
+INT (259) 38
+FLOAT (260) 39
 CHAR (261)
-STRING (262) 38
-ARRAY (263) 39
-TABLE (264) 41
+STRING (262) 40
+ARRAY (263) 41
+TABLE (264) 43
 ALG (265)
 WHEN (266)
 END (267)
 IF (268) 6
 THEN (269) 6
-ANY (270) 35
+ANY (270) 37
 RETURN (271)
 IS (272)
 DO (273)
 IO (274)
 IOFN (275)
-LIST (276) 40
+LIST (276) 42
 SL (277)
 SR (278)
-LEQ (279) 10
-GEQ (280) 11
-EQ (281) 12
-NEQ (282) 13
-OR (283) 15
-AND (284) 14
-NOT (285) 22
+LEQ (279) 12
+GEQ (280) 13
+EQ (281) 14
+NEQ (282) 15
+OR (283) 17
+AND (284) 16
+NOT (285) 24
 ELSE (286) 6
 BOOL (287)
-TRUE (288) 47
-FALSE (289) 48
-ID (290) 49
+TRUE (288) 49
+FALSE (289) 50
+ID (290) 51
 SYMBOL (291)
-TYPENAME (292) 42
-STRING_LITERAL (293) 45
-FLOAT_LITERAL (294) 44
-INT_LITERAL (295) 43
-CHAR_LITERAL (296) 46
+TYPENAME (292) 44
+STRING_LITERAL (293) 47
+FLOAT_LITERAL (294) 46
+INT_LITERAL (295) 45
+CHAR_LITERAL (296) 48
 INTEGER (297)
 UNARY (298)
 
 
 Nonterminals, with rules where they appear
 
-$accept (57)
+$accept (58)
     on left: 0
-pico (58)
+pico (59)
     on left: 1, on right: 0 3
-exprs (59)
+exprs (60)
     on left: 2 3, on right: 1
-expr (60)
-    on left: 4 5 6, on right: 2 3 5 6 32
-term (61)
-    on left: 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23, on right:
-    4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 28
-invocation (62)
-    on left: 24 25, on right: 7 25
-term_list (63)
-    on left: 26 27, on right: 25 27
-opt_term (64)
-    on left: 28 29, on right: 26 27
-primary (65)
-    on left: 30 31 32, on right: 24
-var (66)
-    on left: 33 34, on right: 31
-type_name (67)
-    on left: 35 36 37 38 39 40 41 42, on right: 34
-literal (68)
-    on left: 43 44 45 46 47 48, on right: 30
-var_name (69)
-    on left: 49, on right: 5 33 34
+expr (61)
+    on left: 4 5 6, on right: 2 3 5 6 34
+comma_or_newline (62)
+    on left: 7 8, on right: 5
+term (63)
+    on left: 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25, on right:
+    4 6 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 30
+invocation (64)
+    on left: 26 27, on right: 9 27
+expr_list (65)
+    on left: 28 29, on right: 27 29
+opt_term (66)
+    on left: 30 31, on right: 28 29
+primary (67)
+    on left: 32 33 34, on right: 26
+var (68)
+    on left: 35 36, on right: 33
+type_name (69)
+    on left: 37 38 39 40 41 42 43 44, on right: 36
+literal (70)
+    on left: 45 46 47 48 49 50, on right: 32
+var_name (71)
+    on left: 51, on right: 5 35 36
 
 
 State 0
@@ -181,47 +187,47 @@ State 0
     2 exprs: . expr '.'
     3      | . pico expr '.'
     4 expr: . term
-    5     | . var_name '=' term ',' expr
-    6     | . IF term THEN term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    5     | . var_name '=' expr comma_or_newline expr
+    6     | . IF term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -257,81 +263,81 @@ State 0
 
 State 1
 
-   36 type_name: INT .
-
-    $default  reduce using rule 36 (type_name)
-
-
-State 2
-
-   37 type_name: FLOAT .
-
-    $default  reduce using rule 37 (type_name)
-
-
-State 3
-
-   38 type_name: STRING .
+   38 type_name: INT .
 
     $default  reduce using rule 38 (type_name)
 
 
-State 4
+State 2
 
-   39 type_name: ARRAY .
+   39 type_name: FLOAT .
 
     $default  reduce using rule 39 (type_name)
 
 
-State 5
+State 3
 
-   41 type_name: TABLE .
+   40 type_name: STRING .
+
+    $default  reduce using rule 40 (type_name)
+
+
+State 4
+
+   41 type_name: ARRAY .
 
     $default  reduce using rule 41 (type_name)
 
 
+State 5
+
+   43 type_name: TABLE .
+
+    $default  reduce using rule 43 (type_name)
+
+
 State 6
 
-    6 expr: IF . term THEN term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    6 expr: IF . term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -363,60 +369,60 @@ State 6
 
 State 7
 
-   35 type_name: ANY .
+   37 type_name: ANY .
 
-    $default  reduce using rule 35 (type_name)
+    $default  reduce using rule 37 (type_name)
 
 
 State 8
 
-   40 type_name: LIST .
+   42 type_name: LIST .
 
-    $default  reduce using rule 40 (type_name)
+    $default  reduce using rule 42 (type_name)
 
 
 State 9
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   22     | NOT . term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   24     | NOT . term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -448,102 +454,102 @@ State 9
 
 State 10
 
-   47 literal: TRUE .
+   49 literal: TRUE .
 
-    $default  reduce using rule 47 (literal)
+    $default  reduce using rule 49 (literal)
 
 
 State 11
 
-   48 literal: FALSE .
+   50 literal: FALSE .
 
-    $default  reduce using rule 48 (literal)
+    $default  reduce using rule 50 (literal)
 
 
 State 12
 
-   49 var_name: ID .
+   51 var_name: ID .
 
-    $default  reduce using rule 49 (var_name)
+    $default  reduce using rule 51 (var_name)
 
 
 State 13
 
-   42 type_name: TYPENAME .
+   44 type_name: TYPENAME .
 
-    $default  reduce using rule 42 (type_name)
+    $default  reduce using rule 44 (type_name)
 
 
 State 14
 
-   45 literal: STRING_LITERAL .
+   47 literal: STRING_LITERAL .
 
-    $default  reduce using rule 45 (literal)
+    $default  reduce using rule 47 (literal)
 
 
 State 15
 
-   44 literal: FLOAT_LITERAL .
-
-    $default  reduce using rule 44 (literal)
-
-
-State 16
-
-   43 literal: INT_LITERAL .
-
-    $default  reduce using rule 43 (literal)
-
-
-State 17
-
-   46 literal: CHAR_LITERAL .
+   46 literal: FLOAT_LITERAL .
 
     $default  reduce using rule 46 (literal)
 
 
+State 16
+
+   45 literal: INT_LITERAL .
+
+    $default  reduce using rule 45 (literal)
+
+
+State 17
+
+   48 literal: CHAR_LITERAL .
+
+    $default  reduce using rule 48 (literal)
+
+
 State 18
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   23     | '-' . term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   25     | '-' . term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -576,48 +582,48 @@ State 18
 State 19
 
     4 expr: . term
-    5     | . var_name '=' term ',' expr
-    6     | . IF term THEN term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   32        | '(' . expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    5     | . var_name '=' expr comma_or_newline expr
+    6     | . IF term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   34        | '(' . expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -654,47 +660,47 @@ State 20
     0 $accept: pico . $end
     3 exprs: pico . expr '.'
     4 expr: . term
-    5     | . var_name '=' term ',' expr
-    6     | . IF term THEN term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    5     | . var_name '=' expr comma_or_newline expr
+    6     | . IF term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     $end            shift, and go to state 35
     INT             shift, and go to state 1
@@ -743,21 +749,21 @@ State 22
 
 State 23
 
-    4 expr: term .  ['.', ')']
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+    4 expr: term .  ['.', ',', '\n', ')']
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     LEQ  shift, and go to state 38
     GEQ  shift, and go to state 39
@@ -779,32 +785,32 @@ State 23
 
 State 24
 
-    7 term: invocation .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', ')']
-   25 invocation: invocation . '(' term_list ')'
+    9 term: invocation .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', '\n', ')']
+   27 invocation: invocation . '(' expr_list ')'
 
     '('  shift, and go to state 52
 
-    $default  reduce using rule 7 (term)
+    $default  reduce using rule 9 (term)
 
 
 State 25
 
-   24 invocation: primary .
+   26 invocation: primary .
 
-    $default  reduce using rule 24 (invocation)
+    $default  reduce using rule 26 (invocation)
 
 
 State 26
 
-   31 primary: var .
+   33 primary: var .
 
-    $default  reduce using rule 31 (primary)
+    $default  reduce using rule 33 (primary)
 
 
 State 27
 
-   34 var: type_name . var_name
-   49 var_name: . ID
+   36 var: type_name . var_name
+   51 var_name: . ID
 
     ID  shift, and go to state 12
 
@@ -813,38 +819,38 @@ State 27
 
 State 28
 
-   30 primary: literal .
+   32 primary: literal .
 
-    $default  reduce using rule 30 (primary)
+    $default  reduce using rule 32 (primary)
 
 
 State 29
 
-    5 expr: var_name . '=' term ',' expr
-   33 var: var_name .  [LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', '(', ')']
+    5 expr: var_name . '=' expr comma_or_newline expr
+   35 var: var_name .  [LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', '\n', '(', ')']
 
     '='  shift, and go to state 54
 
-    $default  reduce using rule 33 (var)
+    $default  reduce using rule 35 (var)
 
 
 State 30
 
-    6 expr: IF term . THEN term ',' ELSE expr
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+    6 expr: IF term . THEN term ELSE expr
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     THEN  shift, and go to state 55
     LEQ   shift, and go to state 38
@@ -865,86 +871,86 @@ State 30
 
 State 31
 
-   33 var: var_name .
+   35 var: var_name .
 
-    $default  reduce using rule 33 (var)
+    $default  reduce using rule 35 (var)
 
 
 State 32
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-   22     | NOT term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', ')']
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+   24     | NOT term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', '\n', ')']
 
-    $default  reduce using rule 22 (term)
+    $default  reduce using rule 24 (term)
 
-    Conflict between rule 22 and token LEQ resolved as reduce (LEQ < NOT).
-    Conflict between rule 22 and token GEQ resolved as reduce (GEQ < NOT).
-    Conflict between rule 22 and token EQ resolved as reduce (EQ < NOT).
-    Conflict between rule 22 and token NEQ resolved as reduce (NEQ < NOT).
-    Conflict between rule 22 and token OR resolved as reduce (OR < NOT).
-    Conflict between rule 22 and token AND resolved as reduce (AND < NOT).
-    Conflict between rule 22 and token '<' resolved as reduce ('<' < NOT).
-    Conflict between rule 22 and token '>' resolved as reduce ('>' < NOT).
-    Conflict between rule 22 and token '+' resolved as reduce ('+' < NOT).
-    Conflict between rule 22 and token '-' resolved as reduce ('-' < NOT).
-    Conflict between rule 22 and token '*' resolved as reduce ('*' < NOT).
-    Conflict between rule 22 and token '/' resolved as reduce ('/' < NOT).
-    Conflict between rule 22 and token '%' resolved as reduce ('%' < NOT).
-    Conflict between rule 22 and token '^' resolved as reduce ('^' < NOT).
+    Conflict between rule 24 and token LEQ resolved as reduce (LEQ < NOT).
+    Conflict between rule 24 and token GEQ resolved as reduce (GEQ < NOT).
+    Conflict between rule 24 and token EQ resolved as reduce (EQ < NOT).
+    Conflict between rule 24 and token NEQ resolved as reduce (NEQ < NOT).
+    Conflict between rule 24 and token OR resolved as reduce (OR < NOT).
+    Conflict between rule 24 and token AND resolved as reduce (AND < NOT).
+    Conflict between rule 24 and token '<' resolved as reduce ('<' < NOT).
+    Conflict between rule 24 and token '>' resolved as reduce ('>' < NOT).
+    Conflict between rule 24 and token '+' resolved as reduce ('+' < NOT).
+    Conflict between rule 24 and token '-' resolved as reduce ('-' < NOT).
+    Conflict between rule 24 and token '*' resolved as reduce ('*' < NOT).
+    Conflict between rule 24 and token '/' resolved as reduce ('/' < NOT).
+    Conflict between rule 24 and token '%' resolved as reduce ('%' < NOT).
+    Conflict between rule 24 and token '^' resolved as reduce ('^' < NOT).
 
 
 State 33
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-   23     | '-' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', ')']
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+   25     | '-' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', '\n', ')']
 
-    $default  reduce using rule 23 (term)
+    $default  reduce using rule 25 (term)
 
-    Conflict between rule 23 and token LEQ resolved as reduce (LEQ < UNARY).
-    Conflict between rule 23 and token GEQ resolved as reduce (GEQ < UNARY).
-    Conflict between rule 23 and token EQ resolved as reduce (EQ < UNARY).
-    Conflict between rule 23 and token NEQ resolved as reduce (NEQ < UNARY).
-    Conflict between rule 23 and token OR resolved as reduce (OR < UNARY).
-    Conflict between rule 23 and token AND resolved as reduce (AND < UNARY).
-    Conflict between rule 23 and token '<' resolved as reduce ('<' < UNARY).
-    Conflict between rule 23 and token '>' resolved as reduce ('>' < UNARY).
-    Conflict between rule 23 and token '+' resolved as reduce ('+' < UNARY).
-    Conflict between rule 23 and token '-' resolved as reduce ('-' < UNARY).
-    Conflict between rule 23 and token '*' resolved as reduce ('*' < UNARY).
-    Conflict between rule 23 and token '/' resolved as reduce ('/' < UNARY).
-    Conflict between rule 23 and token '%' resolved as reduce ('%' < UNARY).
-    Conflict between rule 23 and token '^' resolved as reduce ('^' < UNARY).
+    Conflict between rule 25 and token LEQ resolved as reduce (LEQ < UNARY).
+    Conflict between rule 25 and token GEQ resolved as reduce (GEQ < UNARY).
+    Conflict between rule 25 and token EQ resolved as reduce (EQ < UNARY).
+    Conflict between rule 25 and token NEQ resolved as reduce (NEQ < UNARY).
+    Conflict between rule 25 and token OR resolved as reduce (OR < UNARY).
+    Conflict between rule 25 and token AND resolved as reduce (AND < UNARY).
+    Conflict between rule 25 and token '<' resolved as reduce ('<' < UNARY).
+    Conflict between rule 25 and token '>' resolved as reduce ('>' < UNARY).
+    Conflict between rule 25 and token '+' resolved as reduce ('+' < UNARY).
+    Conflict between rule 25 and token '-' resolved as reduce ('-' < UNARY).
+    Conflict between rule 25 and token '*' resolved as reduce ('*' < UNARY).
+    Conflict between rule 25 and token '/' resolved as reduce ('/' < UNARY).
+    Conflict between rule 25 and token '%' resolved as reduce ('%' < UNARY).
+    Conflict between rule 25 and token '^' resolved as reduce ('^' < UNARY).
 
 
 State 34
 
-   32 primary: '(' expr . ')'
+   34 primary: '(' expr . ')'
 
     ')'  shift, and go to state 56
 
@@ -972,46 +978,46 @@ State 37
 
 State 38
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   10     | term LEQ . term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   12     | term LEQ . term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1043,46 +1049,46 @@ State 38
 
 State 39
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   11     | term GEQ . term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   13     | term GEQ . term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1114,46 +1120,46 @@ State 39
 
 State 40
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   12     | term EQ . term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   14     | term EQ . term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1185,46 +1191,46 @@ State 40
 
 State 41
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   13     | term NEQ . term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   15     | term NEQ . term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1256,46 +1262,46 @@ State 41
 
 State 42
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   15     | term OR . term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   17     | term OR . term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1327,46 +1333,46 @@ State 42
 
 State 43
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   14     | term AND . term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   16     | term AND . term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1398,46 +1404,46 @@ State 43
 
 State 44
 
-    7 term: . invocation
-    8     | . term '<' term
-    8     | term '<' . term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   10     | term '<' . term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1469,46 +1475,46 @@ State 44
 
 State 45
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-    9     | term '>' . term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   11     | term '>' . term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1540,46 +1546,46 @@ State 45
 
 State 46
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   16     | term '+' . term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   18     | term '+' . term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1611,46 +1617,46 @@ State 46
 
 State 47
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   17     | term '-' . term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   19     | term '-' . term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1682,46 +1688,46 @@ State 47
 
 State 48
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   18     | term '*' . term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   20     | term '*' . term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1753,46 +1759,46 @@ State 48
 
 State 49
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   19     | term '/' . term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   21     | term '/' . term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1824,46 +1830,46 @@ State 49
 
 State 50
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   20     | term '%' . term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   22     | term '%' . term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1895,46 +1901,46 @@ State 50
 
 State 51
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   21     | term '^' . term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   23     | term '^' . term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -1966,50 +1972,50 @@ State 51
 
 State 52
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   25           | invocation '(' . term_list ')'
-   26 term_list: . opt_term
-   27          | . term_list ',' opt_term
-   28 opt_term: . term
-   29         | .  [',', ')']
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   27           | invocation '(' . expr_list ')'
+   28 expr_list: . opt_term
+   29          | . expr_list ',' opt_term
+   30 opt_term: . term
+   31         | .  [',', ')']
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -2030,11 +2036,11 @@ State 52
     '-'             shift, and go to state 18
     '('             shift, and go to state 19
 
-    $default  reduce using rule 29 (opt_term)
+    $default  reduce using rule 31 (opt_term)
 
     term        go to state 72
     invocation  go to state 24
-    term_list   go to state 73
+    expr_list   go to state 73
     opt_term    go to state 74
     primary     go to state 25
     var         go to state 26
@@ -2045,59 +2051,63 @@ State 52
 
 State 53
 
-   34 var: type_name var_name .
+   36 var: type_name var_name .
 
-    $default  reduce using rule 34 (var)
+    $default  reduce using rule 36 (var)
 
 
 State 54
 
-    5 expr: var_name '=' . term ',' expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    4 expr: . term
+    5     | . var_name '=' expr comma_or_newline expr
+    5     | var_name '=' . expr comma_or_newline expr
+    6     | . IF term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
     STRING          shift, and go to state 3
     ARRAY           shift, and go to state 4
     TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
     ANY             shift, and go to state 7
     LIST            shift, and go to state 8
     NOT             shift, and go to state 9
@@ -2112,57 +2122,58 @@ State 54
     '-'             shift, and go to state 18
     '('             shift, and go to state 19
 
-    term        go to state 75
+    expr        go to state 75
+    term        go to state 23
     invocation  go to state 24
     primary     go to state 25
     var         go to state 26
     type_name   go to state 27
     literal     go to state 28
-    var_name    go to state 31
+    var_name    go to state 29
 
 
 State 55
 
-    6 expr: IF term THEN . term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    6 expr: IF term THEN . term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -2194,9 +2205,9 @@ State 55
 
 State 56
 
-   32 primary: '(' expr ')' .
+   34 primary: '(' expr ')' .
 
-    $default  reduce using rule 32 (primary)
+    $default  reduce using rule 34 (primary)
 
 
 State 57
@@ -2208,111 +2219,21 @@ State 57
 
 State 58
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   10     | term LEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-
-    OR   shift, and go to state 42
-    AND  shift, and go to state 43
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-
-    $default  reduce using rule 10 (term)
-
-    Conflict between rule 10 and token LEQ resolved as reduce (%left LEQ).
-    Conflict between rule 10 and token GEQ resolved as reduce (%left GEQ).
-    Conflict between rule 10 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 10 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 10 and token OR resolved as shift (LEQ < OR).
-    Conflict between rule 10 and token AND resolved as shift (LEQ < AND).
-    Conflict between rule 10 and token '<' resolved as reduce (%left '<').
-    Conflict between rule 10 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 10 and token '+' resolved as shift (LEQ < '+').
-    Conflict between rule 10 and token '-' resolved as shift (LEQ < '-').
-    Conflict between rule 10 and token '*' resolved as shift (LEQ < '*').
-    Conflict between rule 10 and token '/' resolved as shift (LEQ < '/').
-    Conflict between rule 10 and token '%' resolved as shift (LEQ < '%').
-    Conflict between rule 10 and token '^' resolved as shift (LEQ < '^').
-
-
-State 59
-
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   11     | term GEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-
-    OR   shift, and go to state 42
-    AND  shift, and go to state 43
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-
-    $default  reduce using rule 11 (term)
-
-    Conflict between rule 11 and token LEQ resolved as reduce (%left LEQ).
-    Conflict between rule 11 and token GEQ resolved as reduce (%left GEQ).
-    Conflict between rule 11 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 11 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 11 and token OR resolved as shift (GEQ < OR).
-    Conflict between rule 11 and token AND resolved as shift (GEQ < AND).
-    Conflict between rule 11 and token '<' resolved as reduce (%left '<').
-    Conflict between rule 11 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 11 and token '+' resolved as shift (GEQ < '+').
-    Conflict between rule 11 and token '-' resolved as shift (GEQ < '-').
-    Conflict between rule 11 and token '*' resolved as shift (GEQ < '*').
-    Conflict between rule 11 and token '/' resolved as shift (GEQ < '/').
-    Conflict between rule 11 and token '%' resolved as shift (GEQ < '%').
-    Conflict between rule 11 and token '^' resolved as shift (GEQ < '^').
-
-
-State 60
-
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   12     | term EQ term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   12     | term LEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     OR   shift, and go to state 42
     AND  shift, and go to state 43
@@ -2329,35 +2250,35 @@ State 60
     Conflict between rule 12 and token GEQ resolved as reduce (%left GEQ).
     Conflict between rule 12 and token EQ resolved as reduce (%left EQ).
     Conflict between rule 12 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 12 and token OR resolved as shift (EQ < OR).
-    Conflict between rule 12 and token AND resolved as shift (EQ < AND).
+    Conflict between rule 12 and token OR resolved as shift (LEQ < OR).
+    Conflict between rule 12 and token AND resolved as shift (LEQ < AND).
     Conflict between rule 12 and token '<' resolved as reduce (%left '<').
     Conflict between rule 12 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 12 and token '+' resolved as shift (EQ < '+').
-    Conflict between rule 12 and token '-' resolved as shift (EQ < '-').
-    Conflict between rule 12 and token '*' resolved as shift (EQ < '*').
-    Conflict between rule 12 and token '/' resolved as shift (EQ < '/').
-    Conflict between rule 12 and token '%' resolved as shift (EQ < '%').
-    Conflict between rule 12 and token '^' resolved as shift (EQ < '^').
+    Conflict between rule 12 and token '+' resolved as shift (LEQ < '+').
+    Conflict between rule 12 and token '-' resolved as shift (LEQ < '-').
+    Conflict between rule 12 and token '*' resolved as shift (LEQ < '*').
+    Conflict between rule 12 and token '/' resolved as shift (LEQ < '/').
+    Conflict between rule 12 and token '%' resolved as shift (LEQ < '%').
+    Conflict between rule 12 and token '^' resolved as shift (LEQ < '^').
 
 
-State 61
+State 59
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   13     | term NEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   13     | term GEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     OR   shift, and go to state 42
     AND  shift, and go to state 43
@@ -2374,79 +2295,38 @@ State 61
     Conflict between rule 13 and token GEQ resolved as reduce (%left GEQ).
     Conflict between rule 13 and token EQ resolved as reduce (%left EQ).
     Conflict between rule 13 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 13 and token OR resolved as shift (NEQ < OR).
-    Conflict between rule 13 and token AND resolved as shift (NEQ < AND).
+    Conflict between rule 13 and token OR resolved as shift (GEQ < OR).
+    Conflict between rule 13 and token AND resolved as shift (GEQ < AND).
     Conflict between rule 13 and token '<' resolved as reduce (%left '<').
     Conflict between rule 13 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 13 and token '+' resolved as shift (NEQ < '+').
-    Conflict between rule 13 and token '-' resolved as shift (NEQ < '-').
-    Conflict between rule 13 and token '*' resolved as shift (NEQ < '*').
-    Conflict between rule 13 and token '/' resolved as shift (NEQ < '/').
-    Conflict between rule 13 and token '%' resolved as shift (NEQ < '%').
-    Conflict between rule 13 and token '^' resolved as shift (NEQ < '^').
+    Conflict between rule 13 and token '+' resolved as shift (GEQ < '+').
+    Conflict between rule 13 and token '-' resolved as shift (GEQ < '-').
+    Conflict between rule 13 and token '*' resolved as shift (GEQ < '*').
+    Conflict between rule 13 and token '/' resolved as shift (GEQ < '/').
+    Conflict between rule 13 and token '%' resolved as shift (GEQ < '%').
+    Conflict between rule 13 and token '^' resolved as shift (GEQ < '^').
 
 
-State 62
+State 60
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   15     | term OR term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '.', ',', ')']
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   14     | term EQ term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-
-    $default  reduce using rule 15 (term)
-
-    Conflict between rule 15 and token LEQ resolved as reduce (LEQ < OR).
-    Conflict between rule 15 and token GEQ resolved as reduce (GEQ < OR).
-    Conflict between rule 15 and token EQ resolved as reduce (EQ < OR).
-    Conflict between rule 15 and token NEQ resolved as reduce (NEQ < OR).
-    Conflict between rule 15 and token OR resolved as reduce (%left OR).
-    Conflict between rule 15 and token AND resolved as reduce (%left AND).
-    Conflict between rule 15 and token '<' resolved as reduce ('<' < OR).
-    Conflict between rule 15 and token '>' resolved as reduce ('>' < OR).
-    Conflict between rule 15 and token '+' resolved as shift (OR < '+').
-    Conflict between rule 15 and token '-' resolved as shift (OR < '-').
-    Conflict between rule 15 and token '*' resolved as shift (OR < '*').
-    Conflict between rule 15 and token '/' resolved as shift (OR < '/').
-    Conflict between rule 15 and token '%' resolved as shift (OR < '%').
-    Conflict between rule 15 and token '^' resolved as shift (OR < '^').
-
-
-State 63
-
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   14     | term AND term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '.', ',', ')']
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-
+    OR   shift, and go to state 42
+    AND  shift, and go to state 43
     '+'  shift, and go to state 46
     '-'  shift, and go to state 47
     '*'  shift, and go to state 48
@@ -2456,84 +2336,39 @@ State 63
 
     $default  reduce using rule 14 (term)
 
-    Conflict between rule 14 and token LEQ resolved as reduce (LEQ < AND).
-    Conflict between rule 14 and token GEQ resolved as reduce (GEQ < AND).
-    Conflict between rule 14 and token EQ resolved as reduce (EQ < AND).
-    Conflict between rule 14 and token NEQ resolved as reduce (NEQ < AND).
-    Conflict between rule 14 and token OR resolved as reduce (%left OR).
-    Conflict between rule 14 and token AND resolved as reduce (%left AND).
-    Conflict between rule 14 and token '<' resolved as reduce ('<' < AND).
-    Conflict between rule 14 and token '>' resolved as reduce ('>' < AND).
-    Conflict between rule 14 and token '+' resolved as shift (AND < '+').
-    Conflict between rule 14 and token '-' resolved as shift (AND < '-').
-    Conflict between rule 14 and token '*' resolved as shift (AND < '*').
-    Conflict between rule 14 and token '/' resolved as shift (AND < '/').
-    Conflict between rule 14 and token '%' resolved as shift (AND < '%').
-    Conflict between rule 14 and token '^' resolved as shift (AND < '^').
+    Conflict between rule 14 and token LEQ resolved as reduce (%left LEQ).
+    Conflict between rule 14 and token GEQ resolved as reduce (%left GEQ).
+    Conflict between rule 14 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 14 and token NEQ resolved as reduce (%left NEQ).
+    Conflict between rule 14 and token OR resolved as shift (EQ < OR).
+    Conflict between rule 14 and token AND resolved as shift (EQ < AND).
+    Conflict between rule 14 and token '<' resolved as reduce (%left '<').
+    Conflict between rule 14 and token '>' resolved as reduce (%left '>').
+    Conflict between rule 14 and token '+' resolved as shift (EQ < '+').
+    Conflict between rule 14 and token '-' resolved as shift (EQ < '-').
+    Conflict between rule 14 and token '*' resolved as shift (EQ < '*').
+    Conflict between rule 14 and token '/' resolved as shift (EQ < '/').
+    Conflict between rule 14 and token '%' resolved as shift (EQ < '%').
+    Conflict between rule 14 and token '^' resolved as shift (EQ < '^').
 
 
-State 64
+State 61
 
-    8 term: term . '<' term
-    8     | term '<' term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-
-    OR   shift, and go to state 42
-    AND  shift, and go to state 43
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-
-    $default  reduce using rule 8 (term)
-
-    Conflict between rule 8 and token LEQ resolved as reduce (%left LEQ).
-    Conflict between rule 8 and token GEQ resolved as reduce (%left GEQ).
-    Conflict between rule 8 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 8 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 8 and token OR resolved as shift ('<' < OR).
-    Conflict between rule 8 and token AND resolved as shift ('<' < AND).
-    Conflict between rule 8 and token '<' resolved as reduce (%left '<').
-    Conflict between rule 8 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 8 and token '+' resolved as shift ('<' < '+').
-    Conflict between rule 8 and token '-' resolved as shift ('<' < '-').
-    Conflict between rule 8 and token '*' resolved as shift ('<' < '*').
-    Conflict between rule 8 and token '/' resolved as shift ('<' < '/').
-    Conflict between rule 8 and token '%' resolved as shift ('<' < '%').
-    Conflict between rule 8 and token '^' resolved as shift ('<' < '^').
-
-
-State 65
-
-    8 term: term . '<' term
-    9     | term . '>' term
-    9     | term '>' term .  [THEN, LEQ, GEQ, EQ, NEQ, '<', '>', '.', ',', ')']
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   15     | term NEQ term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     OR   shift, and go to state 42
     AND  shift, and go to state 43
@@ -2544,83 +2379,44 @@ State 65
     '%'  shift, and go to state 50
     '^'  shift, and go to state 51
 
-    $default  reduce using rule 9 (term)
+    $default  reduce using rule 15 (term)
 
-    Conflict between rule 9 and token LEQ resolved as reduce (%left LEQ).
-    Conflict between rule 9 and token GEQ resolved as reduce (%left GEQ).
-    Conflict between rule 9 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 9 and token NEQ resolved as reduce (%left NEQ).
-    Conflict between rule 9 and token OR resolved as shift ('>' < OR).
-    Conflict between rule 9 and token AND resolved as shift ('>' < AND).
-    Conflict between rule 9 and token '<' resolved as reduce (%left '<').
-    Conflict between rule 9 and token '>' resolved as reduce (%left '>').
-    Conflict between rule 9 and token '+' resolved as shift ('>' < '+').
-    Conflict between rule 9 and token '-' resolved as shift ('>' < '-').
-    Conflict between rule 9 and token '*' resolved as shift ('>' < '*').
-    Conflict between rule 9 and token '/' resolved as shift ('>' < '/').
-    Conflict between rule 9 and token '%' resolved as shift ('>' < '%').
-    Conflict between rule 9 and token '^' resolved as shift ('>' < '^').
-
-
-State 66
-
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   16     | term '+' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '.', ',', ')']
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-
-    $default  reduce using rule 16 (term)
-
-    Conflict between rule 16 and token LEQ resolved as reduce (LEQ < '+').
-    Conflict between rule 16 and token GEQ resolved as reduce (GEQ < '+').
-    Conflict between rule 16 and token EQ resolved as reduce (EQ < '+').
-    Conflict between rule 16 and token NEQ resolved as reduce (NEQ < '+').
-    Conflict between rule 16 and token OR resolved as reduce (OR < '+').
-    Conflict between rule 16 and token AND resolved as reduce (AND < '+').
-    Conflict between rule 16 and token '<' resolved as reduce ('<' < '+').
-    Conflict between rule 16 and token '>' resolved as reduce ('>' < '+').
-    Conflict between rule 16 and token '+' resolved as reduce (%left '+').
-    Conflict between rule 16 and token '-' resolved as reduce (%left '-').
-    Conflict between rule 16 and token '*' resolved as shift ('+' < '*').
-    Conflict between rule 16 and token '/' resolved as shift ('+' < '/').
-    Conflict between rule 16 and token '%' resolved as shift ('+' < '%').
-    Conflict between rule 16 and token '^' resolved as shift ('+' < '^').
+    Conflict between rule 15 and token LEQ resolved as reduce (%left LEQ).
+    Conflict between rule 15 and token GEQ resolved as reduce (%left GEQ).
+    Conflict between rule 15 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 15 and token NEQ resolved as reduce (%left NEQ).
+    Conflict between rule 15 and token OR resolved as shift (NEQ < OR).
+    Conflict between rule 15 and token AND resolved as shift (NEQ < AND).
+    Conflict between rule 15 and token '<' resolved as reduce (%left '<').
+    Conflict between rule 15 and token '>' resolved as reduce (%left '>').
+    Conflict between rule 15 and token '+' resolved as shift (NEQ < '+').
+    Conflict between rule 15 and token '-' resolved as shift (NEQ < '-').
+    Conflict between rule 15 and token '*' resolved as shift (NEQ < '*').
+    Conflict between rule 15 and token '/' resolved as shift (NEQ < '/').
+    Conflict between rule 15 and token '%' resolved as shift (NEQ < '%').
+    Conflict between rule 15 and token '^' resolved as shift (NEQ < '^').
 
 
-State 67
+State 62
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   17     | term '-' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '.', ',', ')']
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   17     | term OR term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '.', ',', '\n', ')']
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
     '*'  shift, and go to state 48
     '/'  shift, and go to state 49
     '%'  shift, and go to state 50
@@ -2628,189 +2424,404 @@ State 67
 
     $default  reduce using rule 17 (term)
 
-    Conflict between rule 17 and token LEQ resolved as reduce (LEQ < '-').
-    Conflict between rule 17 and token GEQ resolved as reduce (GEQ < '-').
-    Conflict between rule 17 and token EQ resolved as reduce (EQ < '-').
-    Conflict between rule 17 and token NEQ resolved as reduce (NEQ < '-').
-    Conflict between rule 17 and token OR resolved as reduce (OR < '-').
-    Conflict between rule 17 and token AND resolved as reduce (AND < '-').
-    Conflict between rule 17 and token '<' resolved as reduce ('<' < '-').
-    Conflict between rule 17 and token '>' resolved as reduce ('>' < '-').
-    Conflict between rule 17 and token '+' resolved as reduce (%left '+').
-    Conflict between rule 17 and token '-' resolved as reduce (%left '-').
-    Conflict between rule 17 and token '*' resolved as shift ('-' < '*').
-    Conflict between rule 17 and token '/' resolved as shift ('-' < '/').
-    Conflict between rule 17 and token '%' resolved as shift ('-' < '%').
-    Conflict between rule 17 and token '^' resolved as shift ('-' < '^').
+    Conflict between rule 17 and token LEQ resolved as reduce (LEQ < OR).
+    Conflict between rule 17 and token GEQ resolved as reduce (GEQ < OR).
+    Conflict between rule 17 and token EQ resolved as reduce (EQ < OR).
+    Conflict between rule 17 and token NEQ resolved as reduce (NEQ < OR).
+    Conflict between rule 17 and token OR resolved as reduce (%left OR).
+    Conflict between rule 17 and token AND resolved as reduce (%left AND).
+    Conflict between rule 17 and token '<' resolved as reduce ('<' < OR).
+    Conflict between rule 17 and token '>' resolved as reduce ('>' < OR).
+    Conflict between rule 17 and token '+' resolved as shift (OR < '+').
+    Conflict between rule 17 and token '-' resolved as shift (OR < '-').
+    Conflict between rule 17 and token '*' resolved as shift (OR < '*').
+    Conflict between rule 17 and token '/' resolved as shift (OR < '/').
+    Conflict between rule 17 and token '%' resolved as shift (OR < '%').
+    Conflict between rule 17 and token '^' resolved as shift (OR < '^').
 
 
-State 68
+State 63
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   18     | term '*' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '.', ',', ')']
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   16     | term AND term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '.', ',', '\n', ')']
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '%'  shift, and go to state 50
+    '^'  shift, and go to state 51
+
+    $default  reduce using rule 16 (term)
+
+    Conflict between rule 16 and token LEQ resolved as reduce (LEQ < AND).
+    Conflict between rule 16 and token GEQ resolved as reduce (GEQ < AND).
+    Conflict between rule 16 and token EQ resolved as reduce (EQ < AND).
+    Conflict between rule 16 and token NEQ resolved as reduce (NEQ < AND).
+    Conflict between rule 16 and token OR resolved as reduce (%left OR).
+    Conflict between rule 16 and token AND resolved as reduce (%left AND).
+    Conflict between rule 16 and token '<' resolved as reduce ('<' < AND).
+    Conflict between rule 16 and token '>' resolved as reduce ('>' < AND).
+    Conflict between rule 16 and token '+' resolved as shift (AND < '+').
+    Conflict between rule 16 and token '-' resolved as shift (AND < '-').
+    Conflict between rule 16 and token '*' resolved as shift (AND < '*').
+    Conflict between rule 16 and token '/' resolved as shift (AND < '/').
+    Conflict between rule 16 and token '%' resolved as shift (AND < '%').
+    Conflict between rule 16 and token '^' resolved as shift (AND < '^').
+
+
+State 64
+
+   10 term: term . '<' term
+   10     | term '<' term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+
+    OR   shift, and go to state 42
+    AND  shift, and go to state 43
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '%'  shift, and go to state 50
+    '^'  shift, and go to state 51
+
+    $default  reduce using rule 10 (term)
+
+    Conflict between rule 10 and token LEQ resolved as reduce (%left LEQ).
+    Conflict between rule 10 and token GEQ resolved as reduce (%left GEQ).
+    Conflict between rule 10 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 10 and token NEQ resolved as reduce (%left NEQ).
+    Conflict between rule 10 and token OR resolved as shift ('<' < OR).
+    Conflict between rule 10 and token AND resolved as shift ('<' < AND).
+    Conflict between rule 10 and token '<' resolved as reduce (%left '<').
+    Conflict between rule 10 and token '>' resolved as reduce (%left '>').
+    Conflict between rule 10 and token '+' resolved as shift ('<' < '+').
+    Conflict between rule 10 and token '-' resolved as shift ('<' < '-').
+    Conflict between rule 10 and token '*' resolved as shift ('<' < '*').
+    Conflict between rule 10 and token '/' resolved as shift ('<' < '/').
+    Conflict between rule 10 and token '%' resolved as shift ('<' < '%').
+    Conflict between rule 10 and token '^' resolved as shift ('<' < '^').
+
+
+State 65
+
+   10 term: term . '<' term
+   11     | term . '>' term
+   11     | term '>' term .  [THEN, LEQ, GEQ, EQ, NEQ, ELSE, '<', '>', '.', ',', '\n', ')']
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+
+    OR   shift, and go to state 42
+    AND  shift, and go to state 43
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '%'  shift, and go to state 50
+    '^'  shift, and go to state 51
+
+    $default  reduce using rule 11 (term)
+
+    Conflict between rule 11 and token LEQ resolved as reduce (%left LEQ).
+    Conflict between rule 11 and token GEQ resolved as reduce (%left GEQ).
+    Conflict between rule 11 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 11 and token NEQ resolved as reduce (%left NEQ).
+    Conflict between rule 11 and token OR resolved as shift ('>' < OR).
+    Conflict between rule 11 and token AND resolved as shift ('>' < AND).
+    Conflict between rule 11 and token '<' resolved as reduce (%left '<').
+    Conflict between rule 11 and token '>' resolved as reduce (%left '>').
+    Conflict between rule 11 and token '+' resolved as shift ('>' < '+').
+    Conflict between rule 11 and token '-' resolved as shift ('>' < '-').
+    Conflict between rule 11 and token '*' resolved as shift ('>' < '*').
+    Conflict between rule 11 and token '/' resolved as shift ('>' < '/').
+    Conflict between rule 11 and token '%' resolved as shift ('>' < '%').
+    Conflict between rule 11 and token '^' resolved as shift ('>' < '^').
+
+
+State 66
+
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   18     | term '+' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '.', ',', '\n', ')']
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '%'  shift, and go to state 50
     '^'  shift, and go to state 51
 
     $default  reduce using rule 18 (term)
 
-    Conflict between rule 18 and token LEQ resolved as reduce (LEQ < '*').
-    Conflict between rule 18 and token GEQ resolved as reduce (GEQ < '*').
-    Conflict between rule 18 and token EQ resolved as reduce (EQ < '*').
-    Conflict between rule 18 and token NEQ resolved as reduce (NEQ < '*').
-    Conflict between rule 18 and token OR resolved as reduce (OR < '*').
-    Conflict between rule 18 and token AND resolved as reduce (AND < '*').
-    Conflict between rule 18 and token '<' resolved as reduce ('<' < '*').
-    Conflict between rule 18 and token '>' resolved as reduce ('>' < '*').
-    Conflict between rule 18 and token '+' resolved as reduce ('+' < '*').
-    Conflict between rule 18 and token '-' resolved as reduce ('-' < '*').
-    Conflict between rule 18 and token '*' resolved as reduce (%left '*').
-    Conflict between rule 18 and token '/' resolved as reduce (%left '/').
-    Conflict between rule 18 and token '%' resolved as reduce (%left '%').
-    Conflict between rule 18 and token '^' resolved as shift ('*' < '^').
+    Conflict between rule 18 and token LEQ resolved as reduce (LEQ < '+').
+    Conflict between rule 18 and token GEQ resolved as reduce (GEQ < '+').
+    Conflict between rule 18 and token EQ resolved as reduce (EQ < '+').
+    Conflict between rule 18 and token NEQ resolved as reduce (NEQ < '+').
+    Conflict between rule 18 and token OR resolved as reduce (OR < '+').
+    Conflict between rule 18 and token AND resolved as reduce (AND < '+').
+    Conflict between rule 18 and token '<' resolved as reduce ('<' < '+').
+    Conflict between rule 18 and token '>' resolved as reduce ('>' < '+').
+    Conflict between rule 18 and token '+' resolved as reduce (%left '+').
+    Conflict between rule 18 and token '-' resolved as reduce (%left '-').
+    Conflict between rule 18 and token '*' resolved as shift ('+' < '*').
+    Conflict between rule 18 and token '/' resolved as shift ('+' < '/').
+    Conflict between rule 18 and token '%' resolved as shift ('+' < '%').
+    Conflict between rule 18 and token '^' resolved as shift ('+' < '^').
 
 
-State 69
+State 67
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   19     | term '/' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '.', ',', ')']
-   20     | term . '%' term
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   19     | term '-' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '.', ',', '\n', ')']
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '%'  shift, and go to state 50
     '^'  shift, and go to state 51
 
     $default  reduce using rule 19 (term)
 
-    Conflict between rule 19 and token LEQ resolved as reduce (LEQ < '/').
-    Conflict between rule 19 and token GEQ resolved as reduce (GEQ < '/').
-    Conflict between rule 19 and token EQ resolved as reduce (EQ < '/').
-    Conflict between rule 19 and token NEQ resolved as reduce (NEQ < '/').
-    Conflict between rule 19 and token OR resolved as reduce (OR < '/').
-    Conflict between rule 19 and token AND resolved as reduce (AND < '/').
-    Conflict between rule 19 and token '<' resolved as reduce ('<' < '/').
-    Conflict between rule 19 and token '>' resolved as reduce ('>' < '/').
-    Conflict between rule 19 and token '+' resolved as reduce ('+' < '/').
-    Conflict between rule 19 and token '-' resolved as reduce ('-' < '/').
-    Conflict between rule 19 and token '*' resolved as reduce (%left '*').
-    Conflict between rule 19 and token '/' resolved as reduce (%left '/').
-    Conflict between rule 19 and token '%' resolved as reduce (%left '%').
-    Conflict between rule 19 and token '^' resolved as shift ('/' < '^').
+    Conflict between rule 19 and token LEQ resolved as reduce (LEQ < '-').
+    Conflict between rule 19 and token GEQ resolved as reduce (GEQ < '-').
+    Conflict between rule 19 and token EQ resolved as reduce (EQ < '-').
+    Conflict between rule 19 and token NEQ resolved as reduce (NEQ < '-').
+    Conflict between rule 19 and token OR resolved as reduce (OR < '-').
+    Conflict between rule 19 and token AND resolved as reduce (AND < '-').
+    Conflict between rule 19 and token '<' resolved as reduce ('<' < '-').
+    Conflict between rule 19 and token '>' resolved as reduce ('>' < '-').
+    Conflict between rule 19 and token '+' resolved as reduce (%left '+').
+    Conflict between rule 19 and token '-' resolved as reduce (%left '-').
+    Conflict between rule 19 and token '*' resolved as shift ('-' < '*').
+    Conflict between rule 19 and token '/' resolved as shift ('-' < '/').
+    Conflict between rule 19 and token '%' resolved as shift ('-' < '%').
+    Conflict between rule 19 and token '^' resolved as shift ('-' < '^').
 
 
-State 70
+State 68
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   20     | term '%' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '.', ',', ')']
-   21     | term . '^' term
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   20     | term '*' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '.', ',', '\n', ')']
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
     '^'  shift, and go to state 51
 
     $default  reduce using rule 20 (term)
 
-    Conflict between rule 20 and token LEQ resolved as reduce (LEQ < '%').
-    Conflict between rule 20 and token GEQ resolved as reduce (GEQ < '%').
-    Conflict between rule 20 and token EQ resolved as reduce (EQ < '%').
-    Conflict between rule 20 and token NEQ resolved as reduce (NEQ < '%').
-    Conflict between rule 20 and token OR resolved as reduce (OR < '%').
-    Conflict between rule 20 and token AND resolved as reduce (AND < '%').
-    Conflict between rule 20 and token '<' resolved as reduce ('<' < '%').
-    Conflict between rule 20 and token '>' resolved as reduce ('>' < '%').
-    Conflict between rule 20 and token '+' resolved as reduce ('+' < '%').
-    Conflict between rule 20 and token '-' resolved as reduce ('-' < '%').
+    Conflict between rule 20 and token LEQ resolved as reduce (LEQ < '*').
+    Conflict between rule 20 and token GEQ resolved as reduce (GEQ < '*').
+    Conflict between rule 20 and token EQ resolved as reduce (EQ < '*').
+    Conflict between rule 20 and token NEQ resolved as reduce (NEQ < '*').
+    Conflict between rule 20 and token OR resolved as reduce (OR < '*').
+    Conflict between rule 20 and token AND resolved as reduce (AND < '*').
+    Conflict between rule 20 and token '<' resolved as reduce ('<' < '*').
+    Conflict between rule 20 and token '>' resolved as reduce ('>' < '*').
+    Conflict between rule 20 and token '+' resolved as reduce ('+' < '*').
+    Conflict between rule 20 and token '-' resolved as reduce ('-' < '*').
     Conflict between rule 20 and token '*' resolved as reduce (%left '*').
     Conflict between rule 20 and token '/' resolved as reduce (%left '/').
     Conflict between rule 20 and token '%' resolved as reduce (%left '%').
-    Conflict between rule 20 and token '^' resolved as shift ('%' < '^').
+    Conflict between rule 20 and token '^' resolved as shift ('*' < '^').
+
+
+State 69
+
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   21     | term '/' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '.', ',', '\n', ')']
+   22     | term . '%' term
+   23     | term . '^' term
+
+    '^'  shift, and go to state 51
+
+    $default  reduce using rule 21 (term)
+
+    Conflict between rule 21 and token LEQ resolved as reduce (LEQ < '/').
+    Conflict between rule 21 and token GEQ resolved as reduce (GEQ < '/').
+    Conflict between rule 21 and token EQ resolved as reduce (EQ < '/').
+    Conflict between rule 21 and token NEQ resolved as reduce (NEQ < '/').
+    Conflict between rule 21 and token OR resolved as reduce (OR < '/').
+    Conflict between rule 21 and token AND resolved as reduce (AND < '/').
+    Conflict between rule 21 and token '<' resolved as reduce ('<' < '/').
+    Conflict between rule 21 and token '>' resolved as reduce ('>' < '/').
+    Conflict between rule 21 and token '+' resolved as reduce ('+' < '/').
+    Conflict between rule 21 and token '-' resolved as reduce ('-' < '/').
+    Conflict between rule 21 and token '*' resolved as reduce (%left '*').
+    Conflict between rule 21 and token '/' resolved as reduce (%left '/').
+    Conflict between rule 21 and token '%' resolved as reduce (%left '%').
+    Conflict between rule 21 and token '^' resolved as shift ('/' < '^').
+
+
+State 70
+
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   22     | term '%' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '.', ',', '\n', ')']
+   23     | term . '^' term
+
+    '^'  shift, and go to state 51
+
+    $default  reduce using rule 22 (term)
+
+    Conflict between rule 22 and token LEQ resolved as reduce (LEQ < '%').
+    Conflict between rule 22 and token GEQ resolved as reduce (GEQ < '%').
+    Conflict between rule 22 and token EQ resolved as reduce (EQ < '%').
+    Conflict between rule 22 and token NEQ resolved as reduce (NEQ < '%').
+    Conflict between rule 22 and token OR resolved as reduce (OR < '%').
+    Conflict between rule 22 and token AND resolved as reduce (AND < '%').
+    Conflict between rule 22 and token '<' resolved as reduce ('<' < '%').
+    Conflict between rule 22 and token '>' resolved as reduce ('>' < '%').
+    Conflict between rule 22 and token '+' resolved as reduce ('+' < '%').
+    Conflict between rule 22 and token '-' resolved as reduce ('-' < '%').
+    Conflict between rule 22 and token '*' resolved as reduce (%left '*').
+    Conflict between rule 22 and token '/' resolved as reduce (%left '/').
+    Conflict between rule 22 and token '%' resolved as reduce (%left '%').
+    Conflict between rule 22 and token '^' resolved as shift ('%' < '^').
 
 
 State 71
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-   21     | term '^' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', ')']
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+   23     | term '^' term .  [THEN, LEQ, GEQ, EQ, NEQ, OR, AND, ELSE, '<', '>', '+', '-', '*', '/', '%', '^', '.', ',', '\n', ')']
 
-    $default  reduce using rule 21 (term)
+    $default  reduce using rule 23 (term)
 
-    Conflict between rule 21 and token LEQ resolved as reduce (LEQ < '^').
-    Conflict between rule 21 and token GEQ resolved as reduce (GEQ < '^').
-    Conflict between rule 21 and token EQ resolved as reduce (EQ < '^').
-    Conflict between rule 21 and token NEQ resolved as reduce (NEQ < '^').
-    Conflict between rule 21 and token OR resolved as reduce (OR < '^').
-    Conflict between rule 21 and token AND resolved as reduce (AND < '^').
-    Conflict between rule 21 and token '<' resolved as reduce ('<' < '^').
-    Conflict between rule 21 and token '>' resolved as reduce ('>' < '^').
-    Conflict between rule 21 and token '+' resolved as reduce ('+' < '^').
-    Conflict between rule 21 and token '-' resolved as reduce ('-' < '^').
-    Conflict between rule 21 and token '*' resolved as reduce ('*' < '^').
-    Conflict between rule 21 and token '/' resolved as reduce ('/' < '^').
-    Conflict between rule 21 and token '%' resolved as reduce ('%' < '^').
-    Conflict between rule 21 and token '^' resolved as reduce (%left '^').
+    Conflict between rule 23 and token LEQ resolved as reduce (LEQ < '^').
+    Conflict between rule 23 and token GEQ resolved as reduce (GEQ < '^').
+    Conflict between rule 23 and token EQ resolved as reduce (EQ < '^').
+    Conflict between rule 23 and token NEQ resolved as reduce (NEQ < '^').
+    Conflict between rule 23 and token OR resolved as reduce (OR < '^').
+    Conflict between rule 23 and token AND resolved as reduce (AND < '^').
+    Conflict between rule 23 and token '<' resolved as reduce ('<' < '^').
+    Conflict between rule 23 and token '>' resolved as reduce ('>' < '^').
+    Conflict between rule 23 and token '+' resolved as reduce ('+' < '^').
+    Conflict between rule 23 and token '-' resolved as reduce ('-' < '^').
+    Conflict between rule 23 and token '*' resolved as reduce ('*' < '^').
+    Conflict between rule 23 and token '/' resolved as reduce ('/' < '^').
+    Conflict between rule 23 and token '%' resolved as reduce ('%' < '^').
+    Conflict between rule 23 and token '^' resolved as reduce (%left '^').
 
 
 State 72
 
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
-   28 opt_term: term .  [',', ')']
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
+   30 opt_term: term .  [',', ')']
 
     LEQ  shift, and go to state 38
     GEQ  shift, and go to state 39
@@ -2827,13 +2838,13 @@ State 72
     '%'  shift, and go to state 50
     '^'  shift, and go to state 51
 
-    $default  reduce using rule 28 (opt_term)
+    $default  reduce using rule 30 (opt_term)
 
 
 State 73
 
-   25 invocation: invocation '(' term_list . ')'
-   27 term_list: term_list . ',' opt_term
+   27 invocation: invocation '(' expr_list . ')'
+   29 expr_list: expr_list . ',' opt_term
 
     ','  shift, and go to state 77
     ')'  shift, and go to state 78
@@ -2841,125 +2852,102 @@ State 73
 
 State 74
 
-   26 term_list: opt_term .
+   28 expr_list: opt_term .
 
-    $default  reduce using rule 26 (term_list)
+    $default  reduce using rule 28 (expr_list)
 
 
 State 75
 
-    5 expr: var_name '=' term . ',' expr
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+    5 expr: var_name '=' expr . comma_or_newline expr
+    7 comma_or_newline: . ','
+    8                 | . '\n'
 
-    LEQ  shift, and go to state 38
-    GEQ  shift, and go to state 39
-    EQ   shift, and go to state 40
-    NEQ  shift, and go to state 41
-    OR   shift, and go to state 42
-    AND  shift, and go to state 43
-    '<'  shift, and go to state 44
-    '>'  shift, and go to state 45
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-    ','  shift, and go to state 79
+    ','   shift, and go to state 79
+    '\n'  shift, and go to state 80
+
+    comma_or_newline  go to state 81
 
 
 State 76
 
-    6 expr: IF term THEN term . ',' ELSE expr
-    8 term: term . '<' term
-    9     | term . '>' term
-   10     | term . LEQ term
-   11     | term . GEQ term
-   12     | term . EQ term
-   13     | term . NEQ term
-   14     | term . AND term
-   15     | term . OR term
-   16     | term . '+' term
-   17     | term . '-' term
-   18     | term . '*' term
-   19     | term . '/' term
-   20     | term . '%' term
-   21     | term . '^' term
+    6 expr: IF term THEN term . ELSE expr
+   10 term: term . '<' term
+   11     | term . '>' term
+   12     | term . LEQ term
+   13     | term . GEQ term
+   14     | term . EQ term
+   15     | term . NEQ term
+   16     | term . AND term
+   17     | term . OR term
+   18     | term . '+' term
+   19     | term . '-' term
+   20     | term . '*' term
+   21     | term . '/' term
+   22     | term . '%' term
+   23     | term . '^' term
 
-    LEQ  shift, and go to state 38
-    GEQ  shift, and go to state 39
-    EQ   shift, and go to state 40
-    NEQ  shift, and go to state 41
-    OR   shift, and go to state 42
-    AND  shift, and go to state 43
-    '<'  shift, and go to state 44
-    '>'  shift, and go to state 45
-    '+'  shift, and go to state 46
-    '-'  shift, and go to state 47
-    '*'  shift, and go to state 48
-    '/'  shift, and go to state 49
-    '%'  shift, and go to state 50
-    '^'  shift, and go to state 51
-    ','  shift, and go to state 80
+    LEQ   shift, and go to state 38
+    GEQ   shift, and go to state 39
+    EQ    shift, and go to state 40
+    NEQ   shift, and go to state 41
+    OR    shift, and go to state 42
+    AND   shift, and go to state 43
+    ELSE  shift, and go to state 82
+    '<'   shift, and go to state 44
+    '>'   shift, and go to state 45
+    '+'   shift, and go to state 46
+    '-'   shift, and go to state 47
+    '*'   shift, and go to state 48
+    '/'   shift, and go to state 49
+    '%'   shift, and go to state 50
+    '^'   shift, and go to state 51
 
 
 State 77
 
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   27 term_list: term_list ',' . opt_term
-   28 opt_term: . term
-   29         | .  [',', ')']
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   29 expr_list: expr_list ',' . opt_term
+   30 opt_term: . term
+   31         | .  [',', ')']
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -2980,11 +2968,11 @@ State 77
     '-'             shift, and go to state 18
     '('             shift, and go to state 19
 
-    $default  reduce using rule 29 (opt_term)
+    $default  reduce using rule 31 (opt_term)
 
     term        go to state 72
     invocation  go to state 24
-    opt_term    go to state 81
+    opt_term    go to state 83
     primary     go to state 25
     var         go to state 26
     type_name   go to state 27
@@ -2994,153 +2982,70 @@ State 77
 
 State 78
 
-   25 invocation: invocation '(' term_list ')' .
+   27 invocation: invocation '(' expr_list ')' .
 
-    $default  reduce using rule 25 (invocation)
+    $default  reduce using rule 27 (invocation)
 
 
 State 79
 
-    4 expr: . term
-    5     | . var_name '=' term ',' expr
-    5     | var_name '=' term ',' . expr
-    6     | . IF term THEN term ',' ELSE expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    7 comma_or_newline: ',' .
 
-    INT             shift, and go to state 1
-    FLOAT           shift, and go to state 2
-    STRING          shift, and go to state 3
-    ARRAY           shift, and go to state 4
-    TABLE           shift, and go to state 5
-    IF              shift, and go to state 6
-    ANY             shift, and go to state 7
-    LIST            shift, and go to state 8
-    NOT             shift, and go to state 9
-    TRUE            shift, and go to state 10
-    FALSE           shift, and go to state 11
-    ID              shift, and go to state 12
-    TYPENAME        shift, and go to state 13
-    STRING_LITERAL  shift, and go to state 14
-    FLOAT_LITERAL   shift, and go to state 15
-    INT_LITERAL     shift, and go to state 16
-    CHAR_LITERAL    shift, and go to state 17
-    '-'             shift, and go to state 18
-    '('             shift, and go to state 19
-
-    expr        go to state 82
-    term        go to state 23
-    invocation  go to state 24
-    primary     go to state 25
-    var         go to state 26
-    type_name   go to state 27
-    literal     go to state 28
-    var_name    go to state 29
+    $default  reduce using rule 7 (comma_or_newline)
 
 
 State 80
 
-    6 expr: IF term THEN term ',' . ELSE expr
+    8 comma_or_newline: '\n' .
 
-    ELSE  shift, and go to state 83
+    $default  reduce using rule 8 (comma_or_newline)
 
 
 State 81
 
-   27 term_list: term_list ',' opt_term .
-
-    $default  reduce using rule 27 (term_list)
-
-
-State 82
-
-    5 expr: var_name '=' term ',' expr .
-
-    $default  reduce using rule 5 (expr)
-
-
-State 83
-
     4 expr: . term
-    5     | . var_name '=' term ',' expr
-    6     | . IF term THEN term ',' ELSE expr
-    6     | IF term THEN term ',' ELSE . expr
-    7 term: . invocation
-    8     | . term '<' term
-    9     | . term '>' term
-   10     | . term LEQ term
-   11     | . term GEQ term
-   12     | . term EQ term
-   13     | . term NEQ term
-   14     | . term AND term
-   15     | . term OR term
-   16     | . term '+' term
-   17     | . term '-' term
-   18     | . term '*' term
-   19     | . term '/' term
-   20     | . term '%' term
-   21     | . term '^' term
-   22     | . NOT term
-   23     | . '-' term
-   24 invocation: . primary
-   25           | . invocation '(' term_list ')'
-   30 primary: . literal
-   31        | . var
-   32        | . '(' expr ')'
-   33 var: . var_name
-   34    | . type_name var_name
-   35 type_name: . ANY
-   36          | . INT
-   37          | . FLOAT
-   38          | . STRING
-   39          | . ARRAY
-   40          | . LIST
-   41          | . TABLE
-   42          | . TYPENAME
-   43 literal: . INT_LITERAL
-   44        | . FLOAT_LITERAL
-   45        | . STRING_LITERAL
-   46        | . CHAR_LITERAL
-   47        | . TRUE
-   48        | . FALSE
-   49 var_name: . ID
+    5     | . var_name '=' expr comma_or_newline expr
+    5     | var_name '=' expr comma_or_newline . expr
+    6     | . IF term THEN term ELSE expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
 
     INT             shift, and go to state 1
     FLOAT           shift, and go to state 2
@@ -3172,8 +3077,98 @@ State 83
     var_name    go to state 29
 
 
+State 82
+
+    4 expr: . term
+    5     | . var_name '=' expr comma_or_newline expr
+    6     | . IF term THEN term ELSE expr
+    6     | IF term THEN term ELSE . expr
+    9 term: . invocation
+   10     | . term '<' term
+   11     | . term '>' term
+   12     | . term LEQ term
+   13     | . term GEQ term
+   14     | . term EQ term
+   15     | . term NEQ term
+   16     | . term AND term
+   17     | . term OR term
+   18     | . term '+' term
+   19     | . term '-' term
+   20     | . term '*' term
+   21     | . term '/' term
+   22     | . term '%' term
+   23     | . term '^' term
+   24     | . NOT term
+   25     | . '-' term
+   26 invocation: . primary
+   27           | . invocation '(' expr_list ')'
+   32 primary: . literal
+   33        | . var
+   34        | . '(' expr ')'
+   35 var: . var_name
+   36    | . type_name var_name
+   37 type_name: . ANY
+   38          | . INT
+   39          | . FLOAT
+   40          | . STRING
+   41          | . ARRAY
+   42          | . LIST
+   43          | . TABLE
+   44          | . TYPENAME
+   45 literal: . INT_LITERAL
+   46        | . FLOAT_LITERAL
+   47        | . STRING_LITERAL
+   48        | . CHAR_LITERAL
+   49        | . TRUE
+   50        | . FALSE
+   51 var_name: . ID
+
+    INT             shift, and go to state 1
+    FLOAT           shift, and go to state 2
+    STRING          shift, and go to state 3
+    ARRAY           shift, and go to state 4
+    TABLE           shift, and go to state 5
+    IF              shift, and go to state 6
+    ANY             shift, and go to state 7
+    LIST            shift, and go to state 8
+    NOT             shift, and go to state 9
+    TRUE            shift, and go to state 10
+    FALSE           shift, and go to state 11
+    ID              shift, and go to state 12
+    TYPENAME        shift, and go to state 13
+    STRING_LITERAL  shift, and go to state 14
+    FLOAT_LITERAL   shift, and go to state 15
+    INT_LITERAL     shift, and go to state 16
+    CHAR_LITERAL    shift, and go to state 17
+    '-'             shift, and go to state 18
+    '('             shift, and go to state 19
+
+    expr        go to state 85
+    term        go to state 23
+    invocation  go to state 24
+    primary     go to state 25
+    var         go to state 26
+    type_name   go to state 27
+    literal     go to state 28
+    var_name    go to state 29
+
+
+State 83
+
+   29 expr_list: expr_list ',' opt_term .
+
+    $default  reduce using rule 29 (expr_list)
+
+
 State 84
 
-    6 expr: IF term THEN term ',' ELSE expr .
+    5 expr: var_name '=' expr comma_or_newline expr .
+
+    $default  reduce using rule 5 (expr)
+
+
+State 85
+
+    6 expr: IF term THEN term ELSE expr .
 
     $default  reduce using rule 6 (expr)

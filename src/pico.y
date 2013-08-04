@@ -5,6 +5,7 @@
 #define YYDEBUG 1
 int yydebug = 1;
 extern int yylineno;
+extern pico::ExpressionList *pico::parsed_expressions;
 
 %}
 %require "2.4.1"
@@ -56,7 +57,7 @@ extern int yylineno;
 
 %type <strval> type_name var_name
 %type <expr> expr term opt_term literal invocation primary var
-%type <expr_list> pico exprs term_list
+%type <expr_list> pico exprs expr_list
 
 %left '<' '>' LEQ GEQ EQ NEQ
 %left AND OR
@@ -69,76 +70,65 @@ extern int yylineno;
 
 %%
 
-pico: exprs { 
-               $$ = $1; 
-               std::cout << "Parsed: " << $1 << std::endl;
-               //std::cout << "Reducing... ";
-               //try {
-               //   $$->reduce_all(); 
-               //} catch (std::string msg) {
-               //   printf("%s\n", msg.c_str());
-               //}
-               //std::cout << "Done. Reduced form is:" << std::endl;
-               //std::cout << $1 << std::endl;
-               std::cout << "Let's try compiling it!" << std::endl;
-               compile_all($$);
-               std::cout << "going to print the symbol tables..." << std::endl;
-               $1->symtables_print();
-               std::cout << "printed the symbol tables..." << std::endl;
-            } ;
+pico: exprs { $$ = $1; } ;
 
-exprs: expr '.'      { $$ = new ExpressionList(); $$->push_back($1); }
-    | pico expr '.'  { $1->push_back($2); $$ = $1; }
+exprs: expr '.'      { parsed_expressions = $$ = new ExpressionList(); 
+                       $$->push_back($1); }
+    | pico expr '.'  { $1->push_back($2); parsed_expressions = $$ = $1; }
 
 expr
    : term
-   | var_name '=' term ',' expr        { $$ = new Expression($1, $3, $5); }
-   | IF term THEN term ',' ELSE expr   { $$ = new Expression($2, $4, $7); }
+   | var_name '=' expr comma_or_newline expr { $$ = new Expression($1, $3, $5); }
+   | IF term THEN term ELSE expr             { $$ = new Expression($2, $4, $6); }
+   ;
+
+comma_or_newline
+   : ',' | '\n'
    ;
 
 term
    : invocation 
-   | term '<' term  { $$ = Expression::make_lt($1, $3); }
-   | term '>' term  { $$ = Expression::make_gt($1, $3); }
-   | term LEQ term  { $$ = Expression::make_leq($1, $3); }
-   | term GEQ term  { $$ = Expression::make_leq($1, $3); }
-   | term EQ term   { $$ = Expression::make_eq($1, $3); }
-   | term NEQ term  { $$ = Expression::make_neq($1, $3); }
-   | term AND term  { $$ = Expression::make_log_and($1, $3); }
-   | term OR term   { $$ = Expression::make_log_or($1, $3); }
-   | term '+' term  { $$ = Expression::make_add($1, $3); }
-   | term '-' term  { $$ = Expression::make_sub($1, $3); }
-   | term '*' term  { $$ = Expression::make_mult($1, $3); }
-   | term '/' term  { $$ = Expression::make_div($1, $3); }
-   | term '%' term  { $$ = Expression::make_mod($1, $3); }
-   | term '^' term  { $$ = Expression::make_exp($1, $3); }
-   | NOT term             { $$ = Expression::make_log_not($2); }
-   | '-' term %prec UNARY { $$ = Expression::make_neg($2);  }
+   | term '<' term  { $$ = Expression::make_binary_sym_call("<", $1, $3); }
+   | term '>' term  { $$ = Expression::make_binary_sym_call(">", $1, $3); }
+   | term LEQ term  { $$ = Expression::make_binary_sym_call("<=", $1, $3); }
+   | term GEQ term  { $$ = Expression::make_binary_sym_call(">=", $1, $3); }
+   | term EQ term   { $$ = Expression::make_binary_sym_call("==", $1, $3); }
+   | term NEQ term  { $$ = Expression::make_binary_sym_call("!=", $1, $3); }
+   | term AND term  { $$ = Expression::make_binary_sym_call("&&", $1, $3); }
+   | term OR term   { $$ = Expression::make_binary_sym_call("||", $1, $3); }
+   | term '+' term  { $$ = Expression::make_binary_sym_call("+", $1, $3); }
+   | term '-' term  { $$ = Expression::make_binary_sym_call("-", $1, $3); }
+   | term '*' term  { $$ = Expression::make_binary_sym_call("*", $1, $3); }
+   | term '/' term  { $$ = Expression::make_binary_sym_call("/", $1, $3); }
+   | term '%' term  { $$ = Expression::make_binary_sym_call("%", $1, $3); }
+   | term '^' term  { $$ = Expression::make_binary_sym_call("^", $1, $3); }
+   | NOT term             { $$ = Expression::make_unary_sym_call("!", $2); }
+   | '-' term %prec UNARY { $$ = Expression::make_unary_sym_call("-", $2); }
    ;
 
 invocation
-   : primary
-   | invocation '(' term_list ')' { $$ = new Expression($1, $3); }
+   : primary                      { $$ = Expression::make_0ary_call($1);}
+   | invocation '(' expr_list ')' { $$ = new Expression($1, $3); }
    ;
 
-term_list
+expr_list
    : opt_term                 { $$ = new ExpressionList(); $$->push_back($1); }
-   | term_list ',' opt_term   { $1->push_back($3); $$ = $1; }
+   | expr_list ',' opt_term   { $1->push_back($3); $$ = $1; }
    ;
 
 opt_term
    : term
-   | { $$ = GLOBAL_UNRESOLVED(); }
+   | { $$ = Expression::BLANK_EXPR(); }
    ;
 
 primary
    : literal
-   | var
+   | var          
    | '(' expr ')' { $$ = $2; }
    ;
 
 var: var_name           { $$ = Expression::make_var($1); }
-   | type_name var_name { $$ = Expression::make_var($1, $2); } ;
+   | type_name var_name { $$ = Expression::make_unbound_var($1, $2); } ;
 
 type_name
    : ANY       { $$ = strdup("Any"); } 
@@ -164,13 +154,10 @@ var_name: ID;
 
 %%
 
-// We have to implement the error function
 void pico::BisonParser::error(const pico::BisonParser::location_type &loc, const std::string &msg) {
 	std::cerr << "Error: " << msg << ", line " << yylineno << std::endl;
 }
 
-// Now that we have the Parser declared, we can declare the Scanner and implement
-// the yylex function
 #include "../include/picoScanner.h"
 static int yylex(pico::BisonParser::semantic_type * yylval, pico::FlexScanner &scanner) {
 	return scanner.yylex(yylval);

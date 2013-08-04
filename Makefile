@@ -1,5 +1,5 @@
 CPP=clang++
-LIBS=bin/ast.o bin/symbol.o bin/reduce.o bin/compile.o bin/vm.o
+LIBS=bin/ast.o # bin/symbol.o bin/reduce.o bin/compile.o bin/vm.o
 PARSE=bin/lex.o bin/parse.o
 
 all: pico
@@ -7,9 +7,11 @@ all: pico
 run: pico
 	./pico
 
-pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o bin/reduce.o bin/symbol.o \
-		bin/compile.o bin/vm.o
-	g++ -o pico bin/engine.o $(PARSE) $(LIBS)
+pico: bin/lex.o bin/parse.o bin/engine.o bin/ast.o 
+	$(CPP) -o pico bin/engine.o $(PARSE) $(LIBS)
+
+pico-simple: bin/lex.o bin/parse.o bin/engine.o bin/simple-ast.o
+	$(CPP) -o pico bin/engine.o $(PARSE) bin/simple-ast.o
 
 # generate C source from lex and yac files
 src/lex.yy.cc: src/pico.l
@@ -57,8 +59,13 @@ bin/ast.o: src/ast.cpp include/ast.h
 	@mkdir -p bin
 	$(CPP) -c -o bin/ast.o src/ast.cpp
 
+bin/ast-simple.o: src/ast-simple.cpp include/ast-simple.h
+	@mkdir -p bin
+	$(CPP) -c -o bin/ast.o src/ast-simple.cpp
+
 test: pico
-	cat tests/test.pc | ./pico
+	# cat tests/test.pc | ./pico
+	cat tests/testcomp.pc | ./pico
 
 debug_test: pico
 	cat tests/test.pc | ./pico debug

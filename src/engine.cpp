@@ -3,8 +3,11 @@
 
 namespace pico {
    class Parser {
+      private:
+         pico::FlexScanner scanner;
+         pico::BisonParser parser;
       public:
-         Parser() : parser(scanner) {}
+         Parser(): parser(scanner) {}
       
          int parse() {
             return parser.parse();
@@ -12,18 +15,20 @@ namespace pico {
          void set_debug_level(int level) {
             parser.set_debug_level(level);
          }
-      private:
-         pico::FlexScanner scanner;
-         pico::BisonParser parser;
    };
 }
 
+using namespace pico;
+using namespace std;
+
 // Entry Point
 int main(int argc, char * argv[]) {
-	pico::Parser parser;
-   pico::Expression::init();
+	Parser parser;
+   Expression::init();
    if (argc > 1 && !strcmp(argv[1], "debug"))
       parser.set_debug_level(1);
-	return parser.parse();
+	parser.parse();
+   cout << parsed_expressions << endl;
+   return 0;
 }
 

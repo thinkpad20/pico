@@ -1,149 +1,110 @@
-#ifndef __EXPRESSION_H_
-#define __EXPRESSION_H_
+#ifndef __PICO_AST_H_
+#define __PICO_AST_H_
 
 #include "common.h"
-#include <map>
 #include <deque>
+#include <vector>
+#include <map>
 
 namespace pico {
+struct Expression;
 
 struct ExpressionList : public std::deque<Expression *> { 
    friend std::ostream& operator<<(std::ostream&, ExpressionList *&);
    void reduce_all();
-   void symtables_print();
 };
+extern ExpressionList *parsed_expressions;
+
+
+// struct Term {
+//    enum Type { INT, FLOAT, CHAR, BOOL, STRING, VAR, CALL } t;
+//    union { 
+//       std::string *str;
+//       int i; double f; char c; bool b;
+//       struct { std::string *vname; std::vector<int> *args; }; // func call
+//       struct {Term *cond, *if_true, *if_false; }; // if statement
+//    };
+//    static Term *make_int(int i) {
+//       Term *t = new Term(); t->t = INT; t->i = i; return t;
+//    }
+//    static Term *make_float(double f) {
+//       Term *t = new Term(); t->t = FLOAT; t->f = f; return t;
+//    }
+//    static Term *make_char(char c) {
+//       Term *t = new Term(); t->t = CHAR; t->c = c; return t;
+//    }
+//    static Term *make_bool(bool b) {
+//       Term *t = new Term(); t->t = BOOL; t->b = b; return t;
+//    }
+//    static Term *make_string(std::string *s) {
+//       Term *t = new Term(); t->t = STRING; t->str = s; return t;
+//    }
+//    static Term *make_var(std::string *s) {
+//       Term *t = new Term(); t->t = VAR; t->str = s; return t;
+//    }
+//    ~Term() { if (t == STRING || t == VAR) delete str; }
+// };
+
+// struct Function {
+//    Function *parent;
+//    std::map<std::string, Function *> children; // internal functions/variables
+//    Term *return_val;
+// };
 
 struct Expression {
-   enum Type { 
-      ASSIGN, IF, UNRESOLVED, INVOKE, FLOAT, INT, STRING, VAR, CHAR,
-      ADD, SUB, MULT, DIV, LT, BOOL, EXP, GT, LEQ, GEQ, EQ, NEQ, MOD,
-      LOG_AND, LOG_OR, LOG_NOT, BIT_AND, BIT_OR, BIT_XOR, BIT_NOT, NEG, 
-   } t;
+   enum Type { ASSIGN, IF, CALL, INT, FLOAT, BLANK,
+               STRING, CHAR, BOOL, VAR, UNBOUND } t;
    union {
-      int ival;
-      char cval;
-      bool bval;
-      double fval;
-      std::string *strval;
-      struct {Expression *func; ExpressionList *expr_list;};
-      struct {std::string *name, *type; };
-      struct {Expression *expr1, *expr2;};
-      Expression *unary;
-      struct {std::string *vname; Expression *right_hand; Expression *next;};
-      struct {Expression *cond, *if_true; Expression *if_false;};
+      int i;
+      double f;
+      std::string *str; // also doubles as a variable name
+      char c;
+      bool b;
+      struct { std::string *var_name, *var_type; }; // declaring unbound variable
+      struct { std::string *alias; Expression *rhs, *next; }; // assign statement
+      struct { Expression *cond, *if_true, *if_false; }; // if statement
+      struct { Expression *func; ExpressionList *args; }; // calling a function
    };
-   unsigned u; // num unresolved exprs in this expr
-   Expression *parent; // for symbol lookups
-   typedef std::map<std::string, Expression *> SymTable;
-   SymTable *symbol_table, *temps;
-   std::deque<Expression *> *free_vars;
-   Expression(): t(UNRESOLVED), u(1), parent(NULL) {
-      // std::cout << "Creating new expression at address " << this << std::endl;
-   }
-   Expression(double f): t(FLOAT), fval(f), u(0), parent(NULL) {}
-   Expression(int i): t(INT), ival(i), u(0), parent(NULL) {}
-   Expression(char c): t(CHAR), cval(c), u(0), parent(NULL) {}
-   Expression(bool b): t(BOOL), bval(b), u(0), parent(NULL) { }
-   Expression(char *str): t(STRING), u(0), parent(NULL) {
-      strval = new std::string(strndup(str+1, strlen(str) - 2));
-      printf("created string, pointer is %p\n", strval);
-      free(str);
-   }
-   // binary operation
-   Expression(Expression *expr1, Expression *expr2, enum Type type): 
-      t(type), expr1(expr1), expr2(expr2), u(expr1->u + expr2->u)
-      { expr1->parent = expr2->parent = this; }
-   // unary operation
-   Expression(Expression *expr, enum Type type): t(type), unary(expr), u(expr->u) 
-      { unary->parent = this; }
-   // invocation
-   Expression(Expression *func, ExpressionList *expr_list): 
-      t(INVOKE), func(func), expr_list(expr_list), u(func->u - expr_list->size())
-      { func->parent = this; }
-   // if statement
+
+   Expression(): t(BLANK) {}
+   Expression(int i): t(INT), i(i) {}
+   Expression(double f): t(FLOAT), f(f) {}
+   Expression(char c): t(CHAR), c(c) {}
+   Expression(bool b): t(BOOL), b(b) {}
+   Expression(std::string *str): t(STRING), str(str) {}
+   Expression(std::string *var_name, std::string *var_type): 
+      t(UNBOUND), var_name(var_name), var_type(var_type) {}
+   Expression(const char *alias, Expression *rhs, Expression *next):
+      t(ASSIGN), alias(new std::string(alias)), rhs(rhs), next(next) {}
+   Expression(Expression *func, ExpressionList *args): 
+      t(CALL), func(func), args(args) {}
    Expression(Expression *cond, Expression *if_true, Expression *if_false): 
-      t(IF), cond(cond), if_true(if_true), if_false(if_false)
-      { cond->set_parent(this); if_true->set_parent(this); if_false->set_parent(this); }
-   // assignment statement
-   Expression(char *vname, Expression *expr, Expression *next):
-      t(ASSIGN), vname(new std::string(vname)), right_hand(expr), next(next)
-      {  expr->set_parent(this); next->set_parent(expr); }
-   ~Expression();
+      t(IF), cond(cond), if_true(if_true), if_false(if_false) {}
+   static Expression *make_var(const char *vname);
+   static Expression *make_unbound_var(const char *vtype, const char *vname);
 
-   friend std::ostream& operator<<(std::ostream& os, Expression *&expr);
-   void print_info();
+   //wrapper functions for calls with 0, 1 and 2 args
+   static Expression *make_0ary_call(Expression *func);
+   static Expression *make_unary_sym_call(const char *symbol, Expression *e);
+   static Expression *make_binary_sym_call(const char *symbol, Expression *e1, Expression *e2);
 
-   bool is_eq(Expression *other);
-
-   // static Expression *reduce(Expression *expr);
-   Expression *reduce();
-   static void reduce_update(Expression *&expr);
-
-   unsigned unresolved();
-
-   bool as_bool(void);
-   bool is_binary() const; // useful check to see if it's a binary type
-   bool is_unary() const;
-
-   void set_parent(Expression *parent);
-   //symbol table stuff
-   Expression *sym_lookup(std::string *name);
-   void sym_store(std::string *name, Expression *term);
-   void sym_update(std::string *str, Expression *term);
-   bool sym_contains(std::string *name) const;
-   void add_free_var(std::string *str);
-   void symtable_print(unsigned level = 0); // bottom-up symbol table print
-   void symtable_print_forward(unsigned level = 0); //top-down symbol table print
-   void symtable_print_single(); //top-down symbol table print
-
-   // arithmetic operations
-   static Expression *add(Expression *expr1, Expression *expr2);
-   static Expression *sub(Expression *expr1, Expression *expr2);
-   static Expression *mult(Expression *expr1, Expression *expr2);
-   static Expression *div(Expression *expr1, Expression *expr2);
-   static Expression *mod(Expression *expr1, Expression *expr2);
-   static Expression *exp(Expression *expr1, Expression *expr2);
-   static Expression *neg(Expression *t);
-   static Expression *land(Expression *expr1, Expression *expr2);
-   static Expression *lor(Expression *expr1, Expression *expr2);
-   static Expression *lnot(Expression *t);
-   static Expression *eq(Expression *expr1, Expression *expr2);
-   static Expression *neq(Expression *expr1, Expression *expr2);
-   static Expression *lt(Expression *expr1, Expression *expr2);
-   static Expression *gt(Expression *expr1, Expression *expr2);
-   static Expression *leq(Expression *expr1, Expression *expr2);
-   static Expression *geq(Expression *expr1, Expression *expr2);
-   static Expression *band(Expression *expr1, Expression *expr2);
-   static Expression *bor(Expression *expr1, Expression *expr2);
-   static Expression *bnot(Expression *expr1, Expression *expr2);
-   static Expression *bxor(Expression *expr1, Expression *expr2);
-
-   static Expression *make_add(Expression *expr1, Expression *expr2);
-   static Expression *make_sub(Expression *expr1, Expression *expr2);
-   static Expression *make_mult(Expression *expr1, Expression *expr2);
-   static Expression *make_div(Expression *expr1, Expression *expr2);
-   static Expression *make_mod(Expression *expr1, Expression *expr2);
-   static Expression *make_exp(Expression *expr1, Expression *expr2);
-   static Expression *make_eq(Expression *expr1, Expression *expr2);
-   static Expression *make_lt(Expression *expr1, Expression *expr2);
-   static Expression *make_gt(Expression *expr1, Expression *expr2);
-   static Expression *make_leq(Expression *expr1, Expression *expr2);
-   static Expression *make_neq(Expression *expr1, Expression *expr2);
-   static Expression *make_geq(Expression *expr1, Expression *expr2);
-   static Expression *make_log_and(Expression *expr1, Expression *expr2);
-   static Expression *make_log_or(Expression *expr1, Expression *expr2);
-   static Expression *make_log_not(Expression *expr);
-   static Expression *make_bit_and(Expression *expr1, Expression *expr2);
-   static Expression *make_bit_or(Expression *expr1, Expression *expr2);
-   static Expression *make_bit_xor(Expression *expr1, Expression *expr2);
-   static Expression *make_bit_not(Expression *expr);
-   static Expression *make_neg(Expression *expr);
-   static Expression *make_var(char *name);
-   static Expression *make_var(char *type, char *name);
    static void init();
+   static Expression *BLANK_EXPR();
+   static Expression *ROOT_EXPR();
+   bool is_symbol(); bool is_literal();
+   friend std::ostream& operator<<(std::ostream& os, Expression *&expr);
 };
 
-Expression *GLOBAL_UNRESOLVED();
+struct Assignment {
+   std::string vname;
+   Expression *rval;
+   Assignment(std::string vname, Expression *rval): vname(vname), rval(rval) {}
+   friend std::ostream &operator<<(std::ostream &os, const Assignment &asn) {
+      os << asn.vname << " -> " << asn.rval;
+      return os;
+   }
+   static std::deque<Assignment> compile(Expression *expr);
+};
 
 }
 

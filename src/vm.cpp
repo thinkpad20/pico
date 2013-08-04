@@ -338,7 +338,7 @@ ostream &operator<<(ostream &os, Instruction *&inst) {
          case Instruction::NOT:
          { os << "not"; break; }
          case Instruction::RETURN:
-         { os << "return" << inst->u; break; }
+         { os << "return " << inst->u; break; }
          case Instruction::CALL_LN:
          { os << "call " << inst->line << " " << inst->num_args; break; }
          case Instruction::CALL:
@@ -745,7 +745,7 @@ void InstructionList::execute(Instruction *inst) {
 }
 
 void InstructionList::append(Instruction *i) {
-   cout << "Appending: " << i << endl;
+   // cout << "Appending: " << i << endl;
    initial_list.push_back(i);
 }
 
