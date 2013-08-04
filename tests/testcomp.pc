@@ -4,7 +4,7 @@ a = (
       d = c^2,
       d + c
    ),
-   (Int j + Int k + Float z)(6, a, c)
+   b(6)
 ), 
 0.
 

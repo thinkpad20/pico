@@ -15,42 +15,6 @@ struct ExpressionList : public std::deque<Expression *> {
 };
 extern ExpressionList *parsed_expressions;
 
-
-// struct Term {
-//    enum Type { INT, FLOAT, CHAR, BOOL, STRING, VAR, CALL } t;
-//    union { 
-//       std::string *str;
-//       int i; double f; char c; bool b;
-//       struct { std::string *vname; std::vector<int> *args; }; // func call
-//       struct {Term *cond, *if_true, *if_false; }; // if statement
-//    };
-//    static Term *make_int(int i) {
-//       Term *t = new Term(); t->t = INT; t->i = i; return t;
-//    }
-//    static Term *make_float(double f) {
-//       Term *t = new Term(); t->t = FLOAT; t->f = f; return t;
-//    }
-//    static Term *make_char(char c) {
-//       Term *t = new Term(); t->t = CHAR; t->c = c; return t;
-//    }
-//    static Term *make_bool(bool b) {
-//       Term *t = new Term(); t->t = BOOL; t->b = b; return t;
-//    }
-//    static Term *make_string(std::string *s) {
-//       Term *t = new Term(); t->t = STRING; t->str = s; return t;
-//    }
-//    static Term *make_var(std::string *s) {
-//       Term *t = new Term(); t->t = VAR; t->str = s; return t;
-//    }
-//    ~Term() { if (t == STRING || t == VAR) delete str; }
-// };
-
-// struct Function {
-//    Function *parent;
-//    std::map<std::string, Function *> children; // internal functions/variables
-//    Term *return_val;
-// };
-
 struct Expression {
    enum Type { ASSIGN, IF, CALL, INT, FLOAT, BLANK,
                STRING, CHAR, BOOL, VAR, UNBOUND } t;
@@ -91,7 +55,8 @@ struct Expression {
    static void init();
    static Expression *BLANK_EXPR();
    static Expression *ROOT_EXPR();
-   bool is_symbol(); bool is_literal();
+   bool is_symbol(); bool is_literal(); 
+   bool is_binary(); bool is_unary(); bool is_0ary();
    friend std::ostream& operator<<(std::ostream& os, Expression *expr);
 };
 

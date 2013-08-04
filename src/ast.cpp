@@ -35,7 +35,7 @@ Expression *Expression::make_unbound_var(const char *vtype, const char *vname) {
 
 Expression *Expression::make_0ary_call(Expression *func) {
    // assignments and literals we can keep as-is
-   if (func->is_literal() || func->t == ASSIGN) {
+   if (func->is_literal() || func->t == ASSIGN || func->t == UNBOUND) {
       return func;
    } else {
       return new Expression(func, new ExpressionList()); // this explist will be empty
@@ -92,6 +92,16 @@ bool Expression::is_literal() {
    return t == INT || t == FLOAT || t == CHAR || t == STRING || t == BOOL;
 }
 
+bool Expression::is_binary() {
+   return t == CALL && args->size() == 2;
+}
+bool Expression::is_unary() {
+   return t == CALL && args->size() == 1;
+}
+bool Expression::is_0ary() {
+   return t == CALL && args->size() == 0;
+}
+
 ostream& operator<<(ostream& os, Expression *expr) {
    switch(expr->t) {
       case Expression::IF: 
@@ -113,7 +123,7 @@ ostream& operator<<(ostream& os, Expression *expr) {
       case Expression::CALL:
       {
          if (expr->is_symbol()) { 
-            if (expr->args->size() == 1) {
+            if (expr->is_unary()) {
                os << *expr->func->str << "(" << (*expr->args)[0] << ")";
             } else {
                os << "(" << (*expr->args)[0] << " " << *expr->func->str << " " << (*expr->args)[1] << ")";
@@ -123,7 +133,7 @@ ostream& operator<<(ostream& os, Expression *expr) {
                os << expr->func;
             else
                os << "call (" << expr->func << ")";
-            if (expr->args->size() > 0) 
+            if (!expr->is_0ary()) 
                os << " on (" << expr->args << ")";
          }
          return os;

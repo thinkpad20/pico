@@ -13,8 +13,10 @@ struct Assignment {
    friend std::ostream &operator<<(std::ostream &os, const Assignment &asn);
 };
 
-std::deque<Assignment> compile(Expression *, std::deque<Assignment> &);
-std::deque<Assignment> compile(ExpressionList *);
+std::deque<Assignment> get_assignments(Expression *, std::deque<Assignment> &);
+std::deque<Assignment> get_assignments(ExpressionList *);
+void compile_init(std::string root_name = "root");
+InstructionList compile(Expression *expr);
 
 }
 

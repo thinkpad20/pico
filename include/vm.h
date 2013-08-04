@@ -65,6 +65,7 @@ struct Instruction {
    static Instruction *_label(std::string *label);
    static Instruction *_call(std::string *label, unsigned num_args);
    static Instruction *_call(unsigned line, unsigned num_args);
+   static Instruction *_call(); // when what we're going to call is on the TOS
    static Instruction *_return(unsigned nrets);
    static Instruction *_add();
    static Instruction *_sub();
@@ -94,6 +95,7 @@ struct InstructionList {
    unsigned pc;
    int instcount;
    bool fixed_list;
+   InstructionList() {}
    InstructionList(unsigned num_regs);
    void run(std::string start);
    void execute(Instruction *inst);
