@@ -8,7 +8,7 @@ data IntExp = Const Int
 instance Show IntExp where
   show (Const n) = show n
   show (BinaryCall s l r) = "(" ++ show l ++ s ++ show r ++ ")"
-  show (UnaryCall s e) = s ++ "(" ++ show e ++ ")"
+  show (UnaryCall s e) = s ++ show e
 
 run :: Show a => Parser a -> String -> IO ()
 run p input =

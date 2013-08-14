@@ -1,6 +1,7 @@
 import Text.ParserCombinators.Parsec
 import Control.Applicative hiding (spaces, (<|>), Int, many)
 import Data.List
+import Debug.Trace (traceShow)
 
 data Expression = 
   Int Int
@@ -12,7 +13,7 @@ data Expression =
   | Unbound String String
   | UnaryCall String Expression
   | BinaryCall String Expression Expression
-  | FunctionCall Expression [Expression]
+  | Call Expression [Expression]
   | Lambda Expression
   | Assign String Expression Expression
   | Conditional Expression Expression Expression
@@ -27,7 +28,7 @@ instance Show Expression where
   show (Unbound varName typeName) = varName ++ ":" ++ typeName
   show (UnaryCall s e) = s ++ show e
   show (BinaryCall s l r) = "(" ++ show l ++ " " ++ s ++ " " ++ show r ++ ")"
-  show (FunctionCall e es) = show e ++ "(" ++ (intercalate ", " (map show es)) ++ ")"
+  show (Call e es) = show e ++ "(" ++ (intercalate ", " (map show es)) ++ ")"
   show (Lambda e) = "{" ++ show e ++ "}"
   show (Assign v e n) = v ++ " = " ++ show e ++ ", " ++ show n
   show (Conditional c t f) = "if " ++ show c ++ " then " ++ show t ++ " else " ++ show f
@@ -44,8 +45,7 @@ expression :: Parser Expression
 expression = 
   try assignment
   <|> try conditional
-  <|> logOr
-  
+  <|> symbolic
 
 assignment :: Parser Expression
 assignment =
@@ -68,30 +68,26 @@ conditional =
      return $ Conditional condition ifTrue ifFalse
 
 -- from lowest to highest precedence; higher prec will be parsed first
-logOr = binary ["||"] logAnd
-logAnd = binary ["&&"] comparative
-comparative = binary ["<=", ">=", "==", "!=", "<", ">"] additive
-additive = binary ["+", "-"] multiplicative
-multiplicative = binary ["*", "/"] exponential
-exponential = binary ["^"] unary
+symbolic = binary [symbol] logOr
+logOr = binary [string "||"] logAnd
+logAnd = binary [string "&&"] comparative
+comparative = binary (map (try.string) ["<=", ">=", "<", ">", "==", "!="]) additive
+additive = binary (map string ["+", "-"]) multiplicative
+multiplicative = binary (map string ["*", "/", "%"]) exponential
+exponential = binary [string "^"] unary
 
-binary :: [String] -> Parser Expression -> Parser Expression
+binary :: [Parser String] -> Parser Expression -> Parser Expression
 -- takes a list of operators (syms) and the next higher-precedence rule,
 -- parses a binary expression using one of the operators in the list.
-binary (sym:syms) next = 
-  try getOp <|> next
+binary ps next = chainl1 next getOp
   where getOp = do spaces
-                   left <- next
+                   s <- foldl1 (<|>) ps -- OR all of the parser rules in the list
                    spaces
-                   op <- (foldl (<|>) ((try.string) sym) (map (try.string) syms))
-                   spaces
-                   right <- binary (sym:syms) next
-                   spaces
-                   return (BinaryCall op left right)
+                   return $ BinaryCall s
 
 unary :: Parser Expression
 unary =
-  try go <|> call
+  go <|> call
   where go = do spaces
                 op <- string "-" <|> string "!"
                 spaces
@@ -100,21 +96,25 @@ unary =
                 return (UnaryCall op right)
 
 call :: Parser Expression
-call =
-  try go <|> term
-  where go = do spaces
-                func <- term
-                spaces
-                char '('
-                exprs <- sepBy expression (spaces >> char ',' >> spaces)
-                char ')'
-                spaces
-                return $ FunctionCall func exprs
+call = 
+  do spaces
+     t <- term
+     spaces
+     as <- args
+     spaces 
+     return $ foldl Call t as
+     where 
+      args :: Parser [[Expression]]
+      args = many exprLists
+      exprLists :: Parser [Expression]
+      exprLists = do schar '('
+                     es <- sepBy expression $ schar ','
+                     schar ')'
+                     return es
 
 term :: Parser Expression
 term =
-  try floatConstant 
-  <|> intConstant
+  number
   <|> stringConstant
   <|> charConstant
   <|> boolConstant
@@ -123,82 +123,71 @@ term =
   <|> lambda
   <|> parens
 
-floatConstant :: Parser Expression
-floatConstant = 
-  do
-    first <- many1 digit
-    dot <- char '.'
-    rest <- many1 digit
-    return . Float . read $ first ++ (dot : rest)
-
-intConstant :: Parser Expression
-intConstant = (Int . read) <$> (many1 digit)
+number :: Parser Expression
+-- parses either an int or a float
+number = 
+  do first <- many1 digit
+     rest <- optionMaybe $ do dot <- char '.'
+                              ns <- many1 digit
+                              return (dot:ns)
+     return $ case rest of
+                Just ns -> Float . read $ first ++ ns
+                Nothing -> (Int . read) first
 
 charConstant :: Parser Expression
 charConstant = 
-  do
-    char '\''
-    cs <- many1 (noneOf "\'")
-    char '\''
-    return $ 
-      case cs of
-        '\\' : c : _ -> 
-          case c of
-            'n' ->  Char '\n'
-            '\\' -> Char '\\'
-            'r' ->  Char '\r'
-            't' ->  Char '\t'
-            'b' ->  Char '\b'
-            'a' ->  Char '\a'
-            '0' ->  Char '\0'
-            otherwise -> Char c
-        c : _ -> Char c -- if it's not a '\' then just return the first character
+  do char '\''
+     cs <- many1 (noneOf "\'")
+     char '\''
+     return $ 
+       case cs of
+         '\\' : c : _ -> 
+           case c of
+             'n' ->  Char '\n'
+             '\\' -> Char '\\'
+             'r' ->  Char '\r'
+             't' ->  Char '\t'
+             'b' ->  Char '\b'
+             'a' ->  Char '\a'
+             '0' ->  Char '\0'
+             otherwise -> Char c
+         c : _ -> Char c -- if it's not a '\' then just return the first character
 
 boolConstant :: Parser Expression
 boolConstant = do  
-  s <- (string "True" <|> string "False")
+  s <- string "True" <|> string "False"
   case s of
     "True"  -> return $ Bool True
     "False" -> return $ Bool False
 
 stringConstant :: Parser Expression
-stringConstant = char '"' >> many (noneOf "\"") >>= \s -> char '"' >> return (String s)
+stringConstant = do {char '"'; s <- many (noneOf "\""); char '"'; return $ String s }
 
 var :: Parser Expression
 var = Var <$> identifier
 
 unbound :: Parser Expression
 unbound = 
-  do
-    spaces
-    varName <- identifier
-    spaces >> char ':' >> spaces
-    typeName <- identifier
-    spaces
-    return $ Unbound varName typeName
+  do { spaces; varName <- identifier; schar ':'; typeName <- identifier; spaces;
+     return $ Unbound varName typeName }
 
 identifier :: Parser String
-identifier = many1 (oneOf (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "_"))
+identifier = many1 $ oneOf $ ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "_"
 
-symbol :: Parser Expression
+symbol :: Parser String
 symbol =
-  do
-    first <- oneOf "!$%&|*+-/:<?>@^~#"
-    rest <- many $ oneOf "!$%&|*+-/-><?>@^~#"
-    return . Var $ first : rest
+  do first <- oneOf "!$%&|*+-/:<?>@^~#"
+     rest <- many $ oneOf "!$%&|*+=-/-><?>@^~#"
+     return $ first : rest
 
 lambda :: Parser Expression
-lambda =
-  do
-    spaces >> char '{' >> spaces
-    expr <- expression
-    spaces >> char '}' >> spaces
-    return $ Lambda expr
+lambda = do { schar '{'; expr <- expression; schar '}'; return $ Lambda expr }
 
 parens :: Parser Expression
-parens =
-  do
-    spaces >> char '(' >> spaces
-    expr <- expression
-    spaces >> char ')' >> spaces
-    return expr
+parens = do { schar '('; expr <- expression; schar ')'; return expr }
+
+schar :: Char -> Parser Char
+schar c = do spaces 
+             ch <- char c
+             spaces
+             return ch
