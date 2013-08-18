@@ -4,8 +4,10 @@ import Text.ParserCombinators.Parsec
 import Control.Applicative hiding (spaces, (<|>), many)
 import PicoAST
 
-run :: String -> Either ParseError Expression
-run input = runSingle expression input
+run :: String -> Expression
+run input = case runSingle expression input of
+              Right expr -> expr
+              Left err -> error $ show err
 
 runSingle :: Parser Expression -> String -> Either ParseError Expression
 runSingle p input = parse (p <* eof) "pico" input

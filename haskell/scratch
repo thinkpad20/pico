@@ -1,0 +1,119 @@
+reduce :: Expression -> SymbolTable -> Expression
+-- reduce will take an AST and reduce it to the simplest possible
+-- AST which provides the same result. For example, (1 + 2) * 3 -> 9.
+-- Literal values are easy:
+reduce p@(PInt i) _       = p
+reduce p@(PFloat f) _     = p
+reduce p@(PChar c) _      = p
+reduce p@(PString s) _    = p
+reduce p@(PBool b) _      = p
+reduce p@(Unbound v t) _  = p -- we'll need to do some storage on these...
+
+-- Bound variables will require a lookup
+reduce (Var name) env = 
+  case symLookup env name of
+    Just expr -> expr
+    Nothing -> error $ "Symbol " ++ name ++ " is not defined in this scope"
+
+-- Reducing assignments means reducing the right side, and adding this to the 
+-- symbol table, and then continuing on the next expression
+reduce (Assign name rhs next) env = Assign name newRhs newNext where
+  newRhs = reduce rhs env
+  newNext = reduce next $ symStore env name newRhs
+  symStore (top:rest) n e = ((n, e):top):rest
+
+-- Reducing a lambda means reducing its contents, inside a new context
+reduce (Lambda expr) env = Lambda $ reduce expr ([]:env)
+
+-- Reducing an if expression means reducing each of its internal expressions
+reduce (Conditional c t f) env = 
+  Conditional (reduce c env) (reduce t env) (reduce f env)
+
+-- Reducing a function call, for now we just return it as-is...
+reduce (Call e es) _ = Call e es
+
+-- Binary and unary expressions are a bit more involved:
+reduce (Binary op e1 e2) env = 
+  case pOper (reduce e1 env) (reduce e2 env) env of
+    Just expr -> expr
+    Nothing -> error $ "Type mismatch on binary operation " ++ op
+    where pOper = case op of
+                      "+" -> pAdd
+                      "-" -> pSub
+                      "*" -> pMult
+                      "/" -> pDiv 
+                      "%" -> pMod 
+                      "<" -> pLt
+                      ">" -> pGt
+                      "<=" -> pLeq
+                      ">=" -> pGeq
+                      "==" -> pEq
+                      "!=" -> pNeq
+                      "&&" -> pAnd
+                      "||" -> pOr
+                      "^" -> pExp
+                      otherwise -> pBinSymbol op
+
+reduce (Unary op e) env = 
+  case pOper (reduce e env) env of
+    Just expr -> expr
+    Nothing -> error $ "Type mismatch on unary operation " ++ op
+  where pOper = case op of
+                    "-" -> pNeg
+                    "!" -> pNot
+                    otherwise -> pUnSymbol op
+
+
+pAdd :: Expression -> Expression -> Expression
+pAdd e1 e2 sym = Just $ e1 + e2
+
+pSub :: Expression -> Expression -> Expression
+pSub = undefined
+
+pMult :: Expression -> Expression -> Expression
+pMult = undefined
+
+pDiv :: Expression -> Expression -> Expression
+pDiv = undefined
+
+pMod :: Expression -> Expression -> Expression
+pMod = undefined
+
+pLt :: Expression -> Expression -> Expression
+pLt = undefined
+
+pGt :: Expression -> Expression -> Expression
+pGt = undefined
+
+pLeq :: Expression -> Expression -> Expression
+pLeq = undefined
+
+pGeq :: Expression -> Expression -> Expression
+pGeq = undefined
+
+pEq :: Expression -> Expression -> Expression
+pEq = undefined
+
+pNeq :: Expression -> Expression -> Expression
+pNeq = undefined
+
+pAnd :: Expression -> Expression -> Expression
+pAnd = undefined
+
+pOr :: Expression -> Expression -> Expression
+pOr = undefined
+
+pExp :: Expression -> Expression -> Expression
+pExp = undefined
+
+pBinSymbol :: String -> Expression -> Expression -> Expression
+pBinSymbol = undefined
+
+pNeg :: Expression -> Expression
+pNeg = undefined
+
+pNot :: Expression -> Expression
+pNot = undefined
+
+pUnSymbol :: String -> Expression -> Expression
+pUnSymbol = undefined
