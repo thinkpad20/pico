@@ -101,9 +101,9 @@ number =
      rest <- optionMaybe $ do dot <- char '.'
                               ns <- many1 digit
                               return (dot:ns)
-     return $ case rest of
-                Just ns -> PFloat . read $ first ++ ns
-                Nothing -> (PInt . read) first
+     return $ (PNum . read) (case rest of
+                              Just ns -> first ++ ns
+                              Nothing -> first)
 
 charConstant :: Parser Expression
 charConstant = 
@@ -141,8 +141,7 @@ var :: Parser Expression
 var = Var <$> identifier
 
 strToType :: String -> PType
-strToType "int" = IntT
-strToType "float" = FloatT
+strToType "num" = NumT
 strToType "char" = CharT
 strToType "string" = StringT
 strToType "bool" = BoolT
