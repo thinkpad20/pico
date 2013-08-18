@@ -9,7 +9,7 @@ data Expression =
   | PChar Char
   | PBool Bool
   | Var String
-  | Unbound String String
+  | Unbound String PType
   | Unary String Expression
   | Binary String Expression Expression
   | Call Expression [Maybe Expression]
@@ -18,6 +18,16 @@ data Expression =
   | Conditional Expression Expression Expression
   deriving Eq
 
+data PType = 
+  IntT 
+  | FloatT 
+  | CharT 
+  | BoolT 
+  | StringT 
+  | CustomT String
+  | FunctionT [PType] PType
+  deriving (Ord, Show, Eq)
+
 instance Show Expression where
   show (PInt i) = show i
   show (PFloat f) = show f
@@ -25,7 +35,7 @@ instance Show Expression where
   show (PChar c) = show c
   show (PBool b) = show b
   show (Var v) = v
-  show (Unbound varName typeName) = varName ++ ":" ++ typeName
+  show (Unbound varName typeName) = varName ++ ":" ++ show typeName
   show (Unary s e) = s ++ show e
   show (Binary s l r) = "(" ++ show l ++ " " ++ s ++ " " ++ show r ++ ")"
   show (Call e es) = show e ++ "(" ++ (intercalate ", " (map showME es)) ++ ")"

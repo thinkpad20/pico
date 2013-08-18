@@ -138,10 +138,34 @@ stringConstant = do {char '"'; s <- many (noneOf "\""); char '"'; return $ PStri
 var :: Parser Expression
 var = Var <$> identifier
 
+strToType :: String -> PType
+strToType "int" = IntT
+strToType "float" = FloatT
+strToType "char" = CharT
+strToType "string" = StringT
+strToType "bool" = BoolT
+strToType s = CustomT s
+
+getTypes :: Parser PType
+getTypes =
+  (do schar '('
+      types <- sepBy identifier (schar ',')
+      schar ')'
+      return $ case types of
+                  [t] -> strToType t
+                  otherwise -> FunctionT tList typ where
+                    tList = map strToType $ init types 
+                    typ = strToType $ last types)
+  <|> strToType <$> identifier
+
 unbound :: Parser Expression
 unbound = 
-  do { spaces; varName <- identifier; schar ':'; typeName <- identifier; spaces;
-     return $ Unbound varName typeName }
+  do spaces
+     varName <- identifier
+     schar ':'
+     typ <- getTypes
+     spaces
+     return $ Unbound varName typ
 
 identifier :: Parser String
 identifier = many1 $ oneOf $ ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "_"
