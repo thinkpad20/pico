@@ -117,3 +117,165 @@ pNot = undefined
 
 pUnSymbol :: String -> Expression -> Expression
 pUnSymbol = undefined
+
+{-
+
+OK so we need to think: what are the parameters of each of these:
+
+foo = { n:num ^2 } // foo has one param, i:num
+bar = foo + 2 // bar has one param, foo.i:num
+baz = foo * bar // baz has two params, foo.i:num, bar.i:num
+
+so we need to
+- keep track of a namespace
+  -- lambda expressions don't add a namespace
+  -- "functions as return types" do
+  -- this means we need to keep track of state... because otherwise
+     we don't know how to resolve symbols... argh
+
+code:
+
+-}
+
+type ExpMap = Map.Map String Expression
+type Param = [(String, PType)]
+
+findParams :: Expression -> [Param]
+findParams expr = paramList
+  where
+    (paramList, mp) = findP Map.empty "" expr
+    findP :: ExpMap -> [String] -> Expression -> ([Param], ExpMap)
+    findP mp ns (Unbound v t) = 
+      case Map.lookup v mp of
+        Just _  -> ([], mp) -- don't add if already there
+        Nothing -> ([(ns ++ [v], t)], Map.insert v ArgV mp)
+    findP mp ns (Assign name rhs next) = 
+      let 
+        (paramsL, mpL) = findP (Map.insert name rhs mpL) ns rhs 
+        (paramsN, mpN) = findP mpL ns next
+      in
+      (paramsL ++ paramsN, mpN)
+    findP mp ns (Conditional c t f) = 
+      let
+        (prmsC, mpC) = findP mp ns c
+        (prmsT, mpT) = findP mpC ns t
+        (prmsF, mpF) = findP mpT ns f
+      in
+      (prmsC ++ prmsT ++ prmsF, mpF)
+    findP mp ns (Binary _ l r) = 
+      let 
+        (prmsL, mpL) = findP mp ns l
+        (prmsR, mpR) = findP mpL ns r
+      in
+      (prmsL ++ prmsR, mpR)
+    findP ns (Unary _ e) = findP mp ns e
+    findP ns (Call f es) = 
+      let 
+        (prmsF, mpF) = findP mp ns f
+        findP' m (Just e) = findP m ns e
+        findP' m Nothing = ([], m)
+        findPExprs m [Just e] = findP m ns e
+        findPExprs m [Nothing] = ([], m)
+        findPExprs m [] = ([], m)
+        findPExprs m (e:es) = (p:ps, m')
+          where (p, m'') = findPExprs
+        (prmsEs, mpEs) = 
+      in
+        ++ (foldl1 (++) $ map (fP' ns) es) where
+      fP' ns (Just e) = findP ns e
+      fP' ns _ = []
+    findP ns (Var name) =
+      case Map.lookup env name of
+        Just (FunV env' expr) -> findP (ns ++ "." ++ name) expr
+        Just _ -> []
+        Nothing -> error $ "Symbol " ++ name ++ " is unresolved"
+    findP ns (Lambda e) = findP ns e
+    -- the rest are primitive (Num, String, Char, Bool)
+    findP _ _ _ = []
+
+case f of
+    Var name ->
+      case fLookup env name types of
+        Just (FunV env' expr) -> eval (Map.union env' env) expr
+        Just _ -> error "Non-sensical result found in n-ary getType evaluation"
+        Nothing -> error ("Symbol " ++ name ++ " is not defined for types " ++ (show types))
+    Lambda e -> eval env e
+    otherwise -> error "Call can only be made on lambda or reference to one"
+  where types = map (eval' env) es
+        eval' env (Just expr) = eval env expr
+        eval' env Nothing = error "Can't deal with partial application yet"
+
+FunV env' expr | getType expr == NumT -> 
+            -- want to return a FunV which is the LHS added to this FunV
+            FunV (updateEnv )
+
+
+          (ArgV nameL tL, ArgV nameR tR) -> newFun (Unbound nameR tR) (Unbound nameR tR)
+          (ArgV nameL tL, ) -> newFun (Unbound nameR tR) (Unbound nameR tR)
+        case (valL, valR) of 
+          (NumV nL, NumV nR) 
+            | not (sym `elem` ["&&", "||"]) -> (cons (op nL nR), envR, argsR) -- apply the operator
+          (NumV nL, ArgV name NumT) -> newFun (PNum nL) (Unbound name NumT)
+          (ArgV name NumT, NumV nR) -> newFun (Unbound name NumT) (PNum nR)
+          (NumV nL, ArgV _ t) -> error $ sTypeErr NumT "right" t
+          (ArgV _ t, NumV nR) -> error $ sTypeErr NumT "left" t
+          (NumV nL, FunV env' ex) -> newFun (PNum nL) ex
+          (FunV env' ex, NumV nR) -> newFun ex (PNum nR) 
+          (NumV nL, r') -> error $ "poop piles r " ++ show r'
+          (l', NumV nR) -> error $ "poop piles l " ++ show l'
+          otherwise -> error "double poop piles"
+          where sTypeErr t1 side t2 = sym ++ " only accepts " ++ show t1 ++ ", " 
+                                          ++ side ++ " side was a " ++ show t2
+                newFun lft rgt = (FunV envR (Binary sym lft rgt), envR, argsR)
+
+getType :: Expression -> PType
+getType = getType' Map.empty
+
+getType' :: Env -> Expression -> PType
+getType' _ (PNum n)    = NumT
+getType' _ (PChar c)     = CharT
+getType' _ (PString s)   = StringT
+getType' _ (PBool b)     = BoolT
+getType' _ (Unbound v t) = t
+
+getType' env (Var v) =
+  case fLookup env v of
+    Just (FunV env' expr) -> getType' (Map.union env' env) expr
+    Nothing -> error $ "Can't get type of " ++ v ++ ", not defined in scope"
+
+getType' env (Binary sym l r) = 
+  let tL = getType' env l
+      tR = getType' env r
+      f = fLookup env sym in
+  if (sym `elem` [ "+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!="])
+    then if tL == NumT && tR == NumT then NumT
+      else error $ "Type mismatch on " ++ sym
+  else if (sym `elem` ["&&", "||"])
+    then if tL == BoolT && tR == BoolT then BoolT
+      else error $ "Type mismatch on " ++ sym
+  else case f of 
+        Just (FunV env' expr) -> getType' (Map.union env' env) expr
+        Just _ -> error "Non-sensical result found in binary getType evaluation"
+        Nothing -> error ("Symbol " ++ sym ++ " is not defined for types " 
+                            ++ (show tL) ++ ", " ++ (show tR))
+
+getType' env (Unary sym e) = undefined
+
+getType' env (Lambda e) = getType' env e
+getType' env (Assign _ _ next) = getType' env next
+getType' env (Conditional _ t f) =
+  let tType = getType' env t
+      fType = getType' env f in
+  if tType == fType
+    then tType
+    else error $ "Both branches of a conditional statement must return same type"
+getType' env (Call f es) =
+  case f of
+    Var name ->
+      case fLookup env name of
+        Just (FunV env' expr) -> getType' (Map.union env' env) expr
+        Just _ -> error "Non-sensical result found in n-ary getType evaluation"
+        Nothing -> error ("Symbol " ++ name ++ " is not defined for types given")
+    Lambda e -> getType' env e
+    otherwise -> error "Call can only be made on lambda or reference to one"
+

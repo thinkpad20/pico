@@ -15,7 +15,7 @@ data Expression =
   | Lambda Expression
   | Assign String Expression Expression
   | Conditional Expression Expression Expression
-  deriving Eq
+  deriving (Eq, Ord)
 
 data PType = 
   NumT  
@@ -41,30 +41,3 @@ instance Show Expression where
   show (Lambda e) = "{" ++ show e ++ "}"
   show (Assign v e n) = v ++ " = " ++ show e ++ ", " ++ show n
   show (Conditional c t f) = "if " ++ show c ++ " then " ++ show t ++ " else " ++ show f
-
---instance Num Expression where
---   PInt a + PInt b = PInt $ a + b
---   PInt a + PFloat b = PFloat $ fromIntegral a + b
---   PFloat a + PInt b = PFloat $ a + fromIntegral b
---   PFloat a + PFloat b = PFloat $ a + b
---   _ + _ = undefined
---   PInt a - PInt b = PInt $ a - b
---   PInt a - PFloat b = PFloat $ fromIntegral a - b
---   PFloat a - PInt b = PFloat $ a - fromIntegral b
---   PFloat a - PFloat b = PFloat $ a - b
---   _ - _ = undefined
---   PInt a * PInt b = PInt $ a * b
---   PInt a * PFloat b = PFloat $ fromIntegral a * b
---   PFloat a * PInt b = PFloat $ a * fromIntegral b
---   PFloat a * PFloat b = PFloat $ a * b
---   _ * _ = undefined
---   negate (PInt a) = PInt (-a)
---   negate (PFloat a) = PFloat (-a)
---   negate _ = undefined
---   abs (PInt a) = PInt $ abs a
---   abs (PFloat a) = PFloat $ abs a
---   abs _ = undefined
---   signum (PInt a) = PInt $ signum a
---   signum (PFloat a) = PFloat $ signum a
---   signum _ = undefined
---   fromInteger i = (PInt $ fromInteger i)

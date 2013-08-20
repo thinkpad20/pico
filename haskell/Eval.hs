@@ -2,6 +2,7 @@ module PicoEval where
 
 import PicoAST
 import qualified Data.Map as Map
+import Data.Ratio
 
 -- FunctionRecord stores the name, parameter types and return type
 -- of all of the functions we're aware of (MAYBE NOT NECESSARY)
@@ -16,91 +17,40 @@ data Value =
   | BoolV Bool
   | FunV Env Expression
   | ArgV String PType
-  deriving Show
+  deriving (Show, Eq, Ord)
+
+instance Num Value where
+  NumV a + NumV b = NumV $ a + b
+  l + r = error $ "Can't add " ++ show l ++ ", " ++ show r
+  NumV a - NumV b = NumV $ a - b
+  l - r = error $ "Can't subtract " ++ show l ++ ", " ++ show r
+  NumV a * NumV b = NumV $ a * b
+  l * r = error $ "Can't multiply " ++ show l ++ ", " ++ show r
+  negate (NumV a) = NumV $ negate a
+  negate x = error $ "Can't negate " ++ show x
+  abs (NumV a) = NumV $ abs a
+  abs x = error $ "Can't abs " ++ show x
+  signum (NumV a) = NumV $ signum a
+  signum x = error $ "Can't signum " ++ show x
+  fromInteger = NumV . fromInteger
+
+instance Fractional Value where
+  NumV a / NumV b = NumV $ a/b
+  l / r = error $ "Can't divide " ++ show l ++ ", " ++ show r
+  --fromRational :: Rational
+  fromRational r = NumV $ (fromInteger . numerator $ r) / (fromInteger . denominator $ r)
+
+(&&&) :: Value -> Value -> Value
+BoolV a &&& BoolV b = BoolV $ a && b
+l &&& r = error $ "Can't AND " ++ show l ++ ", " ++ show r
+
+(|||) :: Value -> Value -> Value
+BoolV a ||| BoolV b = BoolV $ a || b
+l ||| r = error $ "Can't AND " ++ show l ++ ", " ++ show r
 
 fLookup :: Env -> String -> Maybe Value
 fLookup env name = Map.lookup name env
 
--- initial map of functions -- all dummies right now, only to return types
---baseOpers :: Env
---baseOpers = Map.fromList $ 
---              [ (FunV op)
---                  | op <- ops, t1 <- [IntT, FloatT], t2 <- [IntT, FloatT]]
---                ++ 
---              [ (FunV "%"  [IntT, IntT], unb IntT),
---                (FunV "-"  [IntT], unb IntT),
---                (FunV "-"  [FloatT], unb FloatT),
---                (FunV "&&" [BoolT, BoolT], unb BoolT),
---                (FunV "||" [BoolT, BoolT], unb BoolT),
---                (FunV "!"  [BoolT], unb BoolT) ]
---            where ops = 
---                    [ "+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!=" ]
---                  intFloat t1 t2 = 
---                    if (t1 == IntT) && (t2 == IntT) then IntT else FloatT
---                  unb = ( FunV (Map.empty) ) . (Unbound "")
-
-baseOpers = Map.empty
-
-getType :: Expression -> PType
-getType = getType' baseOpers
-
-getType' :: Env -> Expression -> PType
-getType' _ (PNum n)    = NumT
-getType' _ (PChar c)     = CharT
-getType' _ (PString s)   = StringT
-getType' _ (PBool b)     = BoolT
-getType' _ (Unbound v t) = t
-
-getType' env (Var v) =
-  case fLookup env v of
-    Just (FunV env' expr) -> getType' (Map.union env' env) expr
-    Nothing -> error $ "Can't get type of " ++ v ++ ", not defined in scope"
-
-getType' env (Binary sym l r) = 
-  let tL = getType' env l
-      tR = getType' env r
-      f = fLookup env sym in
-  if (sym `elem` [ "+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!="])
-    then if tL == NumT && tR == NumT then NumT
-      else error $ "Type mismatch on " ++ sym
-  else if (sym `elem` ["&&", "||"])
-    then if tL == BoolT && tR == BoolT then BoolT
-      else error $ "Type mismatch on " ++ sym
-  else case f of 
-        Just (FunV env' expr) -> getType' (Map.union env' env) expr
-        Just _ -> error "Non-sensical result found in binary getType evaluation"
-        Nothing -> error ("Symbol " ++ sym ++ " is not defined for types " 
-                            ++ (show tL) ++ ", " ++ (show tR))
-
-getType' env (Unary sym e) = undefined
-
-getType' env (Lambda e) = getType' env e
-getType' env (Assign _ _ next) = getType' env next
-getType' env (Conditional _ t f) =
-  let tType = getType' env t
-      fType = getType' env f in
-  if tType == fType
-    then tType
-    else error $ "Both branches of a conditional statement must return same type"
-getType' env (Call f es) =
-  case f of
-    Var name ->
-      case fLookup env name of
-        Just (FunV env' expr) -> getType' (Map.union env' env) expr
-        Just _ -> error "Non-sensical result found in n-ary getType evaluation"
-        Nothing -> error ("Symbol " ++ name ++ " is not defined for types given")
-    Lambda e -> getType' env e
-    otherwise -> error "Call can only be made on lambda or reference to one"
-
-
-{-
-Ah, we have our function that goes and finds the arguments and their types.
-We can run that function whenever we hit a new lambda, and grab all of the 
-unbound variables. This is good!
--}
-
--- updates the environment. Later we'll probably want to do 
--- checks for namespace collisions, etc
 updateEnv :: Env -> Env -> Env
 updateEnv e1 e2 = Map.union e2 e1
 
@@ -108,83 +58,98 @@ addVar :: String -> Value -> Env -> Env
 addVar s v env = Map.insert s v env
 
 evalStart :: Expression -> Value
-evalStart e =
-  let (val, _, _) = eval baseOpers [] e in
-  val
+evalStart e = val
+  where (val, _, _, _) = eval Map.empty [] e
 
-eval :: Env -> Args -> Expression -> (Value, Env, Args)
-eval env args (PNum n)      = (NumV n, env, args)
-eval env args (PChar c)     = (CharV c, env, args)
-eval env args (PString s)   = (StringV s, env, args)
-eval env args (PBool b)     = (BoolV b, env, args)
-eval env [] (Unbound nm t)  = (ArgV nm t, addVar nm (ArgV nm t) env, [])
-eval env (arg:args) (Unbound nm t) = (arg, addVar nm arg env, args)
+toExpr (NumV n) = PNum n
+toExpr (CharV c) = PChar c
+toExpr (StringV s) = PString s
+toExpr (BoolV b) = PBool b
+toExpr (ArgV v t) = Unbound v t
+toExpr v = error $ "Can't convert " ++ show v ++ " into an Expression"
 
-eval env args (Var v) =
-  case fLookup env v of
+eval :: Env -> Args -> Expression -> (Value, Env, Args, PType)
+eval env args (PNum n)        = (NumV n, env, args, NumT)
+eval env args (PChar c)       = (CharV c, env, args, CharT)
+eval env args (PString s)     = (StringV s, env, args, StringT)
+eval env args (PBool b)       = (BoolV b, env, args, BoolT)
+eval env []   (Unbound nm t)  = (ArgV nm t, addVar nm (ArgV nm t) env, [], t)
+eval env (a:as) (Unbound nm t) = (a, addVar nm a env, as, t) -- later we'll typecheck
+
+eval env args (Var name) =
+  case fLookup env name of
     Just (FunV env' expr) -> eval (updateEnv env' env) args expr
-    Nothing -> error $ "Variable " ++ v ++ " not defined in scope"
+    Nothing -> error $ "Variable " ++ name ++ " not defined in scope"
 
-eval env args (Binary sym l r) = 
-  let
-    (valL, envL, argsL) = eval env args l -- get result of left side and new environment
-    (valR, envR, argsR) = eval envL argsL r -- pipe left's environment in for right side
-  in
+eval env args (Binary sym l r) =
   case sym of
-    "+" -> 
-      case valL of 
-        NumV nL ->
-          case valR of 
-            NumV nR -> (NumV (nL + nR), envR, argsR)
-            ArgV name NumT -> 
-              (FunV envR (Binary "+" (PNum nL) (Unbound name NumT)), envR, argsR)
-            ArgV _ t -> error $ "+ only accepts NumT, right side was a " ++ show t
-            otherwise -> error "poop piles"
-        otherwise -> error "double poop piles"
+    "+" -> evalNumOp (+)
+    "-" -> evalNumOp (-)
+    "*" -> evalNumOp (*)
+    "/" -> evalNumOp (/)
+    ">" -> evalCompOp (>)
+    "<" -> evalCompOp (<)
+    "<=" -> evalCompOp (<=)
+    ">=" -> evalCompOp (>=)
+    "==" -> evalCompOp (==)
+    "!=" -> evalCompOp (/=)
+    "&&" -> evalLogOp (&&&)
+    "||" -> evalLogOp (|||)
     otherwise -> error $ "we can't handle " ++ sym ++ " yet"
+    where 
+      (valL, envL, argsL, tL) = eval env args l -- get result of left side and new env/args
+      (valR, envR, argsR, tR) = eval envL argsL r -- pipe left's env/args in for right side
+      evalNumOp op = 
+        case (tL, tR) of
+          (NumT, NumT) -> 
+            case (valL, valR) of
+              (NumV _, NumV _) -> (op valL valR, envR, argsR, NumT)
+              (NumV n, ArgV v t) -> newBin envR (toExpr valL) (toExpr valR)
+              (ArgV v t, NumV n) -> newBin envR (toExpr valL) (toExpr valR)
+              (ArgV _ _, ArgV _ _) -> newBin envR (toExpr valL) (toExpr valR)
+              (NumV n, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
+              (FunV env' expr', NumV n) -> newBin (updateEnv envR env') expr' (toExpr valR)
+              (ArgV _ _, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
+              (FunV env' expr', ArgV _ _) -> newBin (updateEnv envR env') expr' (toExpr valR)
+              (FunV env1 expr1, FunV env2 expr2) ->
+                let newEnv1 = (updateEnv envR env1) in
+                newBin (updateEnv newEnv1 env2) expr1 expr2
+              otherwise -> error "blibberblobs"
+              where newBin env' e1 e2 = (FunV env' $ Binary sym e1 e2, env', argsR, NumT)
+          otherwise -> typErr tL tR
+      evalCompOp op =
+        case (tL, tR) of
+          (NumT, NumT) -> (BoolV $ op valL valR, envR, argsR, BoolT)
+          (CharT, CharT) -> (BoolV $ op valL valR, envR, argsR, BoolT)
+          otherwise -> typErr tL tR
+      evalLogOp op = -- doesn't short-circuit, yet
+        case (tL, tR) of
+          (BoolT, BoolT) -> (op valL valR, envR, argsR, BoolT)
+          otherwise -> typErr tL tR
+      typErr tL tR = error $ sym ++ " can't be applied to " ++ show (tR, tR)
 
 eval env args (Unary sym e) = undefined
--- When we're evaluating a lambda, we need to typecheck args against its args
-eval env args (Lambda e) = undefined
+
+eval env args (Lambda e) = undefined --(FunV env e, env, args, )
 
 eval env args (Assign name expr next) = 
-  let (rhs, envR, argsR) = eval env args expr in
+  let (rhs, envR, argsR, tR) = eval env args expr in
   eval (Map.insert name rhs envR) argsR next
 
 eval env args (Conditional c t f) =
-  let (cond, envC, argsC) = eval env args c in
-  case cond of
-    BoolV True -> eval envC argsC t
-    BoolV False -> eval envC argsC f
-    FunV env' expr | getType expr == BoolT ->
-      (FunV (Map.union env' envC) (Conditional expr t f), envC, argsC)
-    otherwise -> error "Condition in if statement doesn't resolve to a bool"
+  let 
+    (cV, envC, argsC, tC) = eval env args c 
+    (tV, envT, argsT, tT) = eval envC argsC t 
+    (fV, envF, argsF, tF) = eval envT argsT f 
+  in
+  if tC /= BoolT then error "Type of a condition must be Bool"
+    else if tT /= tF then error "Types of branches in if statement don't match"
+      else
+        case cV of
+        BoolV True -> eval envC argsC t
+        BoolV False -> eval envC argsC f
+        FunV env' expr | tC == BoolT ->
+          (FunV (Map.union env' envC) (Conditional expr t f), envC, argsC, tF)
+        otherwise -> error "if statement condition doesn't resolve to a bool"
 
 eval env args (Call f es) = undefined
-
-findParams :: Expression -> [(String, PType)]
-findParams (Unbound v t) = [(v, t)]
-findParams (Assign _ r n) = findParams r ++ findParams n
-findParams (Conditional c t f) = findParams c ++ findParams t ++ findParams f
-findParams (Binary _ l r) = findParams l ++ findParams r
-findParams (Unary _ e) = findParams e
-findParams (Call f es) = findParams f ++ (foldl1 (++) $ map findParams' es) where
-  findParams' (Just e) = findParams e
-  findParams' _ = []
-findParams _ = []
-
---case f of
-  --  Var name ->
-  --    case fLookup env name types of
-  --      Just (FunV env' expr) -> eval (Map.union env' env) expr
-  --      Just _ -> error "Non-sensical result found in n-ary getType evaluation"
-  --      Nothing -> error ("Symbol " ++ name ++ " is not defined for types " ++ (show types))
-  --  Lambda e -> eval env e
-  --  otherwise -> error "Call can only be made on lambda or reference to one"
-  --where types = map (eval' env) es
-  --      eval' env (Just expr) = eval env expr
-  --      eval' env Nothing = error "Can't deal with partial application yet"
-
---FunV env' expr | getType expr == NumT -> 
-          --  -- want to return a FunV which is the LHS added to this FunV
-          --  FunV (updateEnv )
