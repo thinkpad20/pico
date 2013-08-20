@@ -7,7 +7,7 @@ import Data.Ratio
 -- FunctionRecord stores the name, parameter types and return type
 -- of all of the functions we're aware of (MAYBE NOT NECESSARY)
 --data FunctionRecord = FunV String [PType] deriving (Ord, Eq, Show)
-type Env = Map.Map String Value -- variable names -> definitions
+type Env = Map.Map String Value -- variable names -> definitions ! Later this will be a stack
 type Args = [Value]
 -- a Value is the result of an evaluation, either a literal value or a function (for now)
 data Value = 
@@ -104,16 +104,15 @@ eval env args (Binary sym l r) =
           (NumT, NumT) -> 
             case (valL, valR) of
               (NumV _, NumV _) -> (op valL valR, envR, argsR, NumT)
-              (NumV n, ArgV v t) -> newBin envR (toExpr valL) (toExpr valR)
-              (ArgV v t, NumV n) -> newBin envR (toExpr valL) (toExpr valR)
+              (NumV _, ArgV _ _) -> newBin envR (toExpr valL) (toExpr valR)
+              (ArgV _ _, NumV _) -> newBin envR (toExpr valL) (toExpr valR)
               (ArgV _ _, ArgV _ _) -> newBin envR (toExpr valL) (toExpr valR)
-              (NumV n, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
-              (FunV env' expr', NumV n) -> newBin (updateEnv envR env') expr' (toExpr valR)
+              (NumV _, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
+              (FunV env' expr', NumV _) -> newBin (updateEnv envR env') expr' (toExpr valR)
               (ArgV _ _, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
               (FunV env' expr', ArgV _ _) -> newBin (updateEnv envR env') expr' (toExpr valR)
               (FunV env1 expr1, FunV env2 expr2) ->
-                let newEnv1 = (updateEnv envR env1) in
-                newBin (updateEnv newEnv1 env2) expr1 expr2
+                newBin (updateEnv (updateEnv envR env1) env2) expr1 expr2
               otherwise -> error "blibberblobs"
               where newBin env' e1 e2 = (FunV env' $ Binary sym e1 e2, env', argsR, NumT)
           otherwise -> typErr tL tR
@@ -126,7 +125,7 @@ eval env args (Binary sym l r) =
         case (tL, tR) of
           (BoolT, BoolT) -> (op valL valR, envR, argsR, BoolT)
           otherwise -> typErr tL tR
-      typErr tL tR = error $ sym ++ " can't be applied to " ++ show (tR, tR)
+      typErr tL tR = error $ sym ++ " can't be applied to " ++ show (tL, tR)
 
 eval env args (Unary sym e) = undefined
 
