@@ -160,11 +160,11 @@ lux = qux(f.a = 12, f.b = 3, b.a = 4, b.b = 8) <-- = (12 * 3)^(1/2) = 6
 I'm currently debating whether to make Pico a dynamic language. They have their benefits. There are many advantages to typing, however, and one in this case is simply that it better indicates which variables are unbound:
 
 ```
-fact = if Int n < 2 then Int acc else fact(n-1, acc*n) <-- function of two variables
+fact = if n:num < 2 then acc:num else fact(n-1, acc*n) <-- function of two variables
 fact1 = fact(,1) <-- partial application leaves fact1 a function of 1 variable
 fact2 = fact(acc=1) <-- different syntax, same result
-fact3 = fact(Int n, 1) <-- note that this n is distinct from fact's n, so fact3 still has one unbound variable
-fact4 = fact(n = Int n, acc = 1) <-- once again Int specifier means n is a new, unbound variable
+fact3 = fact(n:num, 1) <-- note that this n is distinct from fact's n, so fact3 still has one unbound variable
+fact4 = fact(n = n:num, acc = 1) <-- once again specifier:num means n is a new, unbound variable
 n = 10
 fact5 = fact(n,1) <-- now n is bound, so fact4 is the constant expression 3628800
 fact6 = fact3(n) <-- constant expression 3628800
@@ -173,20 +173,20 @@ fact6 = fact3(n) <-- constant expression 3628800
 This would also allow the writer to indicate off the bat which unbound variables there were:
 
 ```
-comp = (Int i, j, if i < j then -1 else (if i > j then 0 else 1))
+comp = (i:num, j, if i < j then -1 else (if i > j then 0 else 1))
 ```
 
 Let's look at a little more significant code, writing binary search over a vector.
 
 ```
-bsearchr = (Int start, finish, target, Vector(Int) v, <-- 4 unbound variables
+bsearchr = (start:num, finish, target, Vector(Int) v, <-- 4 unbound variables
             mid = (start + finish)/2, <-- not unbound
             if target == v[mid] then True, else
             if start == finish then False, else
             if target > v[mid] then bsearchr(mid, finish, target, v), else
             if target < v[mid] then bsearchr(start, mid, target, v))
 
-bsearch = bsearchr(0, len(Vector(Int) v), Int target, v) <-- here we've inlined the variable declarations
+bsearch = bsearchr(0, len(Vector(Int) v), target:num, v) <-- here we've inlined the variable declarations
 
 <-- Now we can use bsearch for some stuff.
 contains5 = bsearch(,5)
@@ -207,7 +207,7 @@ usableVector({1,2,3,4,5}) <-- contains 5, so resolves to true.
 usableVector({1,2,3,4}) <-- is a function equivalent to vcontains
 
 <-- another example of this
-f = (if Int i != i then Int j, else 1) <-- given any argument, f will always resolve to 1
+f = (if i:num != i then j:num, else 1) <-- given any argument, f will always resolve to 1
 f(123) <-- 1
 ```
 
@@ -216,8 +216,8 @@ f(123) <-- 1
 As a functional language, Pico will have algebraic types. Consider a List which is either `Empty` or `Cons(elem, List)`, and a `when` statement which acts as a pattern matcher. Note that this vector usage might not be how we actually do it.
 
 ```
-len = (when List l is Empty then Int acc, when l is Cons(_, next) then len(next, acc+1))
-fillVector = (List(Int) l, Vector v, Int posn
+len = (when List l is Empty then acc:num, when l is Cons(_, next) then len(next, acc+1))
+fillVector = (List(Int) l, Vector v, posn:num
                when l is Empty then v,
                when l is Cons(elem, next) then listToVector(next, add(v, posn, elem), posn - 1)),
 listToVector = (ln = len(List(Int) l, 0),
@@ -252,21 +252,20 @@ term -> literal
       | unary_op term
       | term ( '(' term (',' term)* ')' )*
 
-literal -> (typename)? var 
-         | int_literal 
-         | float_literal
+literal -> identifier type?
+         | number
          | string_literal
          | char_literal
+
+type -> ':' (identifier | '(' identifier (',' identifier)* ')' )
 
 op -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '&' | '|'
       | ">=" | "<=" | "==" | "!=" | "&&" | "||"
 
 unary_op -> '-' | '!' | '~'
 
-var ->            [a-z_][a-zA-Z_]*
-typename ->       [A-Z][a-zA-Z_]* | "Int" | "Float" | "String" | "Char" | "List"
-int_literal ->    [0-9]+
-float_literal ->  ([0-9]*\.[0-9]+)
-string_literal->  \"(\\.|[^\\"])*\"
-char_literal ->   \'(\\.|[^\\'])*\'
+identifier -> [a-zA-Z][a-zA-Z_]*
+number     -> [0-9]*(\.[0-9]+)?
+string     -> \"(\\.|[^\\"])*\"
+char       -> \'(\\.|[^\\'])*\'
 ```
