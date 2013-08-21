@@ -217,17 +217,17 @@ As a functional language, Pico will have algebraic types. Consider a List which 
 
 ```
 len = (when List l is Empty then acc:num, when l is Cons(_, next) then len(next, acc+1))
-fillVector = (List(Int) l, Vector v, posn:num
+fillVector = (l:list[num], v:vector[num], posn:num
                when l is Empty then v,
                when l is Cons(elem, next) then listToVector(next, add(v, posn, elem), posn - 1)),
-listToVector = (ln = len(List(Int) l, 0),
-                v = Vector(Int)(ln),
+listToVector = (ln = len(l:list[int], 0),
+                v = vector[num](ln),
                 fillVector(l, v, ln - 1)).
 
 <{
    Note: one curious question is what would happen if we defined it as such:
    listToVector = (ln = len(, 0),
-                   v = Vector(Int)(ln),
+                   v = vector[num](ln),
                    fillVector(l, v, ln - 1))
    The call to len supplies one argument, so ln is a function which takes a List as an argument. Then passing in a list to listToVector, the list would be passed to the first unbound variable, which is l in the len function. Then the l on the third line of listToVector would be undefined, which would either mean listToVector requires two (identical or same-length) lists as arguments, or if we require a type declaration in front of every unbound variable, then we have an error.
 }>                
