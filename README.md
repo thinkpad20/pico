@@ -242,8 +242,8 @@ pico -> expression '.'
       | pico expression '.'
 
 expression -> term
-            | var '=' term ',' expression
-            | "if" term "then" term ',' "else" expression
+            | var '=' expression ',' expression
+            | "if" expression "then" expression ',' "else" expression
 
 term -> literal
       | '(' expression ')'
