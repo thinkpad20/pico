@@ -4,3 +4,7 @@ pico-debug
 picoexperimental
 pico
 bin/*
+haskell/Main
+haskell/*.hi
+haskell/*.o
+haskell/scratch

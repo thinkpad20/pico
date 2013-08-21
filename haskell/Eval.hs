@@ -7,7 +7,7 @@ import Data.Ratio
 -- FunctionRecord stores the name, parameter types and return type
 -- of all of the functions we're aware of (MAYBE NOT NECESSARY)
 --data FunctionRecord = FunV String [PType] deriving (Ord, Eq, Show)
-type Env = Map.Map String Value -- variable names -> definitions ! Later this will be a stack
+type Env = [Map.Map String Value] -- variable names -> definitions ! Later this will be a stack
 type Args = [Value]
 -- a Value is the result of an evaluation, either a literal value or a function (for now)
 data Value = 
@@ -48,18 +48,9 @@ l &&& r = error $ "Can't AND " ++ show l ++ ", " ++ show r
 BoolV a ||| BoolV b = BoolV $ a || b
 l ||| r = error $ "Can't AND " ++ show l ++ ", " ++ show r
 
-fLookup :: Env -> String -> Maybe Value
-fLookup env name = Map.lookup name env
-
-updateEnv :: Env -> Env -> Env
-updateEnv e1 e2 = Map.union e2 e1
-
-addVar :: String -> Value -> Env -> Env
-addVar s v env = Map.insert s v env
-
-evalStart :: Expression -> Value
-evalStart e = val
-  where (val, _, _, _) = eval Map.empty [] e
+(***) :: Value -> Value -> Value
+NumV a *** NumV b = NumV $ a ** b
+l *** r = error $ "Can't exponentiate " ++ show (l, r)
 
 toExpr (NumV n) = PNum n
 toExpr (CharV c) = PChar c
@@ -67,6 +58,33 @@ toExpr (StringV s) = PString s
 toExpr (BoolV b) = PBool b
 toExpr (ArgV v t) = Unbound v t
 toExpr v = error $ "Can't convert " ++ show v ++ " into an Expression"
+
+fLookup :: Env -> String -> Maybe Value
+fLookup [] _ = Nothing
+fLookup (env:envs) name = 
+  case Map.lookup name env of
+    Just v -> Just v
+    Nothing -> fLookup envs name
+
+updateEnv :: Env -> Env -> Env
+updateEnv (e1:es) (e2:_) = (Map.union e2 e1) : es
+
+tos :: Env -> Map.Map String Value
+tos (env:_) = env
+
+addVar :: String -> Value -> Env -> Env
+addVar s v (env:envs) = (Map.insert s v env):envs
+
+--evalStart :: Expression -> Value
+evalStart e = eval [Map.empty] [] e
+  --where (val, _, _, _) = 
+
+pushEnv :: Env -> Env
+pushEnv env = (Map.empty):env
+
+popEnv :: Env -> Env
+popEnv (env:envs) = envs
+popEnv [] = error "Can't pop from an empty stack"
 
 eval :: Env -> Args -> Expression -> (Value, Env, Args, PType)
 eval env args (PNum n)        = (NumV n, env, args, NumT)
@@ -87,6 +105,7 @@ eval env args (Binary sym l r) =
     "-" -> evalNumOp (-)
     "*" -> evalNumOp (*)
     "/" -> evalNumOp (/)
+    "^" -> evalNumOp (***)
     ">" -> evalCompOp (>)
     "<" -> evalCompOp (<)
     "<=" -> evalCompOp (<=)
@@ -113,7 +132,6 @@ eval env args (Binary sym l r) =
               (FunV env' expr', ArgV _ _) -> newBin (updateEnv envR env') expr' (toExpr valR)
               (FunV env1 expr1, FunV env2 expr2) ->
                 newBin (updateEnv (updateEnv envR env1) env2) expr1 expr2
-              otherwise -> error "blibberblobs"
               where newBin env' e1 e2 = (FunV env' $ Binary sym e1 e2, env', argsR, NumT)
           otherwise -> typErr tL tR
       evalCompOp op =
@@ -127,13 +145,13 @@ eval env args (Binary sym l r) =
           otherwise -> typErr tL tR
       typErr tL tR = error $ sym ++ " can't be applied to " ++ show (tL, tR)
 
-eval env args (Unary sym e) = undefined
+eval env args (Unary sym e) = error "Can't evaluate unary yet"
 
-eval env args (Lambda e) = undefined --(FunV env e, env, args, )
+eval env args (Lambda e) = eval env args e
 
 eval env args (Assign name expr next) = 
   let (rhs, envR, argsR, tR) = eval env args expr in
-  eval (Map.insert name rhs envR) argsR next
+  eval (addVar name rhs envR) argsR next
 
 eval env args (Conditional c t f) =
   let 
@@ -148,7 +166,7 @@ eval env args (Conditional c t f) =
         BoolV True -> eval envC argsC t
         BoolV False -> eval envC argsC f
         FunV env' expr | tC == BoolT ->
-          (FunV (Map.union env' envC) (Conditional expr t f), envC, argsC, tF)
+          (FunV (updateEnv env' envC) (Conditional expr t f), envC, argsC, tF)
         otherwise -> error "if statement condition doesn't resolve to a bool"
 
-eval env args (Call f es) = undefined
+eval env args (Call f es) = error "Can't evaluate call yet"

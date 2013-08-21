@@ -139,19 +139,22 @@ charConstant =
   do char '\''
      cs <- many1 (noneOf "\'")
      char '\''
-     return $ 
-       case cs of
-         '\\' : c : _ -> 
-           case c of
-             'n' ->  Char '\n'
-             '\\' -> Char '\\'
-             'r' ->  Char '\r'
-             't' ->  Char '\t'
-             'b' ->  Char '\b'
-             'a' ->  Char '\a'
-             '0' ->  Char '\0'
-             otherwise -> Char c
-         c : _ -> Char c -- if it's not a '\' then just return the first character
+     return $ Char (escapeChar cs)
+
+escapeChar :: String -> Char
+escapeChar cs = 
+  case cs of
+    '\\' : c : _ -> 
+      case c of
+        'n' -> '\n'
+        '\\' -> '\\'
+        'r' -> '\r'
+        't' -> '\t'
+        'b' -> '\b'
+        'a' -> '\a'
+        '0' -> '\0'
+        otherwise -> c
+    c : _ -> c -- if it's not a '\' then just return the first character
 
 boolConstant :: Parser Expression
 boolConstant = do  
@@ -187,7 +190,4 @@ parens :: Parser Expression
 parens = do { schar '('; expr <- expression; schar ')'; return expr }
 
 schar :: Char -> Parser Char
-schar c = do spaces 
-             ch <- char c
-             spaces
-             return ch
+schar c = do { spaces; ch <- char c; spaces; return ch }

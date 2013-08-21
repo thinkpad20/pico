@@ -19,6 +19,7 @@ string full_name(string name);
 
 struct Context {
    map<string, string> symbol_table;
+   vector<string> args;
    string name;
    Context(string name): name(name) {}
    bool contains(string name) { 
@@ -66,6 +67,14 @@ string full_name(string name) {
    return res;
 }
 
+namestr store_arg(string arg_name) {
+   size_t num = context_stack.back().args.size();
+   char name[100]; sprintf(name, "arg %lu", num);
+   string namestr = string(name);
+   context_stack.back().set(arg_name, namestr);
+   return namestr;
+}
+
 ostream &operator<<(ostream &os, const Assignment &asn) {
    os << asn.vname << " -> " << asn.rval;
    return os;
@@ -93,11 +102,25 @@ static void compile_if(Expression *expr, InstructionList &ilist) {
 }
 
 static void compile_unbound(Expression *expr, InstructionList &ilist) {
+   cout << "trying to compile unbound " << expr << endl;
    cout << "compile_unbound hasn't been written yet" << endl;
+
 }
 
 static void compile_literal(Expression *expr, InstructionList &ilist) {
-   cout << "compile_literal hasn't been written yet" << endl;
+   if (expr->t == Expression::INT) {
+      ilist.append(Instruction::_push(expr->i));
+   } else if (expr->t == Expression::FLOAT) {
+      ilist.append(Instruction::_push(expr->f));
+   } else if (expr->t == Expression::CHAR) {
+      ilist.append(Instruction::_push(expr->c));
+   } else if (expr->t == Expression::STRING) {
+      ilist.append(Instruction::_push(expr->str));
+   } else if (expr->t == Expression::BOOL) {
+      ilist.append(Instruction::_push(expr->b, Primitive::BOOL));
+   } else {
+      throw string("Trying to compile a literal but idk what this is");
+   }
 }
 
 static void compile_call(Expression *expr, InstructionList &ilist) {
@@ -110,7 +133,7 @@ static void compile_call(Expression *expr, InstructionList &ilist) {
       else if (bin_primitives.find(*expr->func->str) != bin_primitives.end())
          ilist.append(bin_primitives[*expr->func->str]());
       else {
-         cout << "trying to call " << expr << endl;
+         cout << "trying to compile " << expr << endl;
          throw string("We can't deal with custom symbols yet");
       }
    } else {
@@ -118,8 +141,11 @@ static void compile_call(Expression *expr, InstructionList &ilist) {
       if (expr->func->t == Expression::VAR) {
          string fullname = full_name(*expr->func->str);
          ilist.append(Instruction::_call(new string(fullname), nargs));
+      } else if (expr->func->func->t == Expression::VAR) {
+         string fullname = full_name(*expr->func->func->str);
+         ilist.append(Instruction::_call(new string(fullname), nargs));
       } else {
-         cout << "trying to call " << expr << endl;
+         cout << "trying to compile " << expr << " func = " << expr->func->func << ", func->t = " << expr->func->t << endl;
          throw string("We can't deal with anonymous functions yet");
       }
    }
@@ -140,15 +166,8 @@ static void compile_assign(Expression *expr, InstructionList &ilist) {
    cout << "compiling " << rhs << " and assigning to " << full_name() << endl;
    ilist.append(Instruction::_label(new string(full_name())));
 
-   if (rhs->is_literal()) {
-      // cout << "LITERAL: " << rhs << endl;
-   } else if (rhs->t == Expression::CALL) {
-      compile_call(rhs, ilist);
-   } else if (rhs->t == Expression::UNBOUND) {
-      // cout << "UNBOUND: " << rhs << endl;
-   } else {
-      throw string("rhs is not literal, call or unbound... what's going on?");
-   }
+   compile(rhs);
+   ilist.append(Instruction::_return(1));
    pop_symbol_table();
 }
 
