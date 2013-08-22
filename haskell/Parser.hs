@@ -22,9 +22,9 @@ assignment :: Parser Expression
 assignment =
   do spaces
      varName <- identifier
-     spaces >> char '=' >> spaces
+     schar '='
      rightHand <- expression
-     spaces >> char ',' >> spaces
+     schar ','
      next <- expression
      return $ Assign varName rightHand next
 
@@ -169,7 +169,9 @@ unbound =
      return $ Unbound varName typ
 
 identifier :: Parser String
-identifier = many1 $ oneOf $ ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "_"
+identifier = 
+  many1 (oneOf (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "_"))
+  <|> many1 (char '%')
 
 symbol :: Parser String
 symbol =
