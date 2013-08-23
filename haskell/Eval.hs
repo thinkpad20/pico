@@ -18,19 +18,6 @@ data Value =
   | NullV
   deriving (Show, Eq, Ord)
 
---instance Show Value where
---  show (NumV n) = show n
---  show (CharV c) = show c
---  show (ArgV v t) = v ++ ":" ++ show t
---  show (StringV s) = show s
---  show NullV = "_"
---  show (FunV mp ex) = "λ(" ++ (foldr (++) "env: " $ showEnv mp) ++ "|" ++ show ex ++ ")\n" where
---    showEnv (mp:mps) =
---      let keys = Map.keys mp in
---      map (\k -> k ++ ":" ++ show' (Map.lookup k mp) ++ ",") keys
---    showEnv _ = [""]
---    show' (Just e) = show e
-
 -- args are evaluated prior to being applied, so they're type Value
 type Args = [Value]
 

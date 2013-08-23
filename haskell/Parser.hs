@@ -101,7 +101,7 @@ number =
      rest <- optionMaybe $ do dot <- char '.'
                               ns <- many1 digit
                               return (dot:ns)
-     return $ (PNum . read) (case rest of
+     return $ (Number . read) (case rest of
                               Just ns -> first ++ ns
                               Nothing -> first)
 
@@ -131,8 +131,8 @@ boolConstant :: Parser Expression
 boolConstant = do  
   s <- string "True" <|> string "False"
   case s of
-    "True"  -> return $ PBool True
-    "False" -> return $ PBool False
+    "True"  -> return $ Bool True
+    "False" -> return $ Bool False
 
 stringConstant :: Parser Expression
 stringConstant = do {char '"'; s <- many (noneOf "\""); char '"'; return $ PString s }
