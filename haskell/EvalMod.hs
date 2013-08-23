@@ -35,12 +35,6 @@ sAdd :: String -> Val -> [SymTable] -> [SymTable]
 sAdd s r [] = [SymTable $ Map.singleton s r]
 sAdd s r ((SymTable tbl):tbls) = (SymTable $ Map.insert s r tbl):tbls
 
---sUnion :: [SymTable] -> [SymTable] -> [SymTable]
---sUnion [] [] = []
---sUnion [] (s:ss) -> (s:ss)
---sUnion (s:ss) [] -> (s:ss)
---sUnion (s1:ss1) (s2:ss2) = (Map.union s1 s2):ss2
-
 {------------- Utility functions -------------}
 lAnd :: Expression -> Expression -> Expression
 lAnd (Bool b1) (Bool b2) = Bool $ b1 && b2
