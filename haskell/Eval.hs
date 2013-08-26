@@ -1,225 +1,181 @@
 module PicoEval where
 
 import PicoAST
+import PicoParser (run)
 import qualified Data.Map as Map
-import Data.Ratio
+import Data.List (intercalate)
 import Debug.Trace
 
-type Env = [Map.Map String Value] -- stack of (variable names -> definitions)
+newtype Val = Val (Expression, [SymTable])
+newtype SymTable = SymTable { getTable :: Map.Map String Val }
+type Context = ([SymTable], [Maybe Val])
 
--- a Value is the result of an evaluation, either a literal value or a function (for now)
-data Value = 
-  NumV Double
-  | CharV Char
-  | StringV String
-  | BoolV Bool
-  | FunV Env Expression
-  | ArgV String PType
-  | NullV
-  deriving (Show, Eq, Ord)
+instance Show SymTable where
+  show (SymTable mp) = "<table>" ++ ((intercalate ",") . (map showPairs) $ Map.toList mp) ++ "</table>" where
+    showPairs (name, val) = name ++ "=>" ++ show val
 
--- args are evaluated prior to being applied, so they're type Value
-type Args = [Value]
+instance Show Val where
+  show (Val (e, syms)) = case syms of
+    [] -> "(" ++ show e ++ ", empty symtable)"
+    otherwise -> "(λ{" ++ show e ++ ", " ++ show syms ++ "})"
 
-instance Num Value where
-  NumV a + NumV b = NumV $ a + b
-  l + r = error $ "Can't add " ++ show l ++ ", " ++ show r
-  NumV a - NumV b = NumV $ a - b
-  l - r = error $ "Can't subtract " ++ show l ++ ", " ++ show r
-  NumV a * NumV b = NumV $ a * b
-  l * r = error $ "Can't multiply " ++ show l ++ ", " ++ show r
-  negate (NumV a) = NumV $ negate a
-  negate x = error $ "Can't negate " ++ show x
-  abs (NumV a) = NumV $ abs a
-  abs x = error $ "Can't abs " ++ show x
-  signum (NumV a) = NumV $ signum a
-  signum x = error $ "Can't signum " ++ show x
-  fromInteger = NumV . fromInteger
+{---------- Symbol table operations ----------}
 
-instance Fractional Value where
-  NumV a / NumV b = NumV $ a/b
-  l / r = error $ "Can't divide " ++ show l ++ ", " ++ show r
-  fromRational r = NumV $ (fromInteger . numerator $ r) / (fromInteger . denominator $ r)
+sLookup :: String -> [SymTable] -> Maybe Val
+sLookup _ [] = Nothing
+sLookup name ((SymTable tbl):tbls) = case Map.lookup name tbl of
+  Just v@(Val (ex, syms)) -> Just $ Val (ex, sAdd name v syms)
+  Nothing -> sLookup name tbls
 
-(&&&) :: Value -> Value -> Value
-BoolV a &&& BoolV b = BoolV $ a && b
-l &&& r = error $ "Can't AND " ++ show l ++ ", " ++ show r
+sLookupSingle :: String -> [SymTable] -> Maybe Val
+sLookupSingle _ [] = Nothing
+sLookupSingle name tbls = Map.lookup name ((getTable . head) tbls)
 
-(|||) :: Value -> Value -> Value
-BoolV a ||| BoolV b = BoolV $ a || b
-l ||| r = error $ "Can't AND " ++ show l ++ ", " ++ show r
+sAdd :: String -> Val -> [SymTable] -> [SymTable]
+sAdd s r [] = trace ("adding " ++ s ++ "=>" ++ show r ++ " to a new symtable") [SymTable $ Map.singleton s r]
+sAdd s r ((SymTable tbl):tbls) = trace ("adding " ++ s ++ " to an existing symtable") $ (SymTable $ Map.insert s r tbl):tbls
 
-(***) :: Value -> Value -> Value
-NumV a *** NumV b = NumV $ a ** b
-l *** r = error $ "Can't exponentiate " ++ show (l, r)
+getSyms :: Context -> [SymTable]
+getSyms (ss, _) = ss
 
-toExpr (NumV n) = PNum n
-toExpr (CharV c) = PChar c
-toExpr (StringV s) = PString s
-toExpr (BoolV b) = PBool b
-toExpr (ArgV v t) = Unbound v t
-toExpr v = error $ "Can't convert " ++ show v ++ " into an Expression"
+{------------- Utility functions -------------}
+lAnd :: Expression -> Expression -> Expression
+lAnd (Bool b1) (Bool b2) = Bool $ b1 && b2
+lAnd e1 e2 = error $ "&& only works on booleans; we got " ++ show (e1, e2)
 
-fLookup :: Env -> String -> Maybe Value
-fLookup [] _ = Nothing
-fLookup (env:envs) name = 
-  case Map.lookup name env of
-    Just v -> Just v
-    Nothing -> fLookup envs name
+lOr :: Expression -> Expression -> Expression
+lOr (Bool b1) (Bool b2) = Bool $ b1 || b2
+lOr e1 e2 = error $ "|| only works on booleans; we got " ++ show (e1, e2)
 
-updateEnv :: Env -> Env -> Env
-updateEnv (e1:es) (e2:_) = (Map.union e2 e1) : es
+(===) :: Expression -> Expression -> Expression
+(Bool b1) === (Bool b2) = Bool $ b1 == b2
+(Number n1) === (Number n2) = Bool $ n1 == n2
+(PChar c1) === (PChar c2) = Bool $ c1 == c2
+(PString s1) === (PString s2) = Bool $ s1 == s2
 
-tos :: Env -> Map.Map String Value
-tos (env:_) = env
+{---------------- Evaluator ------------------}
+eval' input = eval (run input) ([], [])
+evalWith args input = eval (run input) ([], (map dummyVal args)) where
+  dummyVal ex = Just $ Val (ex, [])
 
-addVar :: String -> Value -> Env -> Env
-addVar s v (env:envs) = trace ("Mapping var " ++ s ++ " to " ++ show v) $ 
-  if s == "n" then
-    case v of (FunV _ _) -> error "hey, what gives"
-              _ -> (Map.insert s v env):envs
-    else (Map.insert s v env):envs
+eval :: Expression -> Context -> (Val, Context)
+{--------------- Primitives --------------}
+eval e@(Number  _) ctx = (Val (e, []), ctx)
+eval e@(PChar   _) ctx = (Val (e, []), ctx)
+eval e@(PString _) ctx = (Val (e, []), ctx)
+eval e@(Bool    _) ctx = (Val (e, []), ctx)
 
-evalStart :: Expression -> (Value, Env, Args, PType)
-evalStart e = eval [Map.empty] [] e
+{--------------- Variables ---------------}
+eval (Var name) (syms0, args0) = trace ("looking up " ++ name ++ ", resolves to " ++ show (sLookup name syms0)) $ case sLookup name syms0 of
+  Just (Val (e, syms1)) -> 
+    let (val, (syms2, args1)) = eval e (syms1, args0) in
+    (val, (syms0, args1))
+  Nothing -> error $ "Symbol " ++ name ++ " is not defined in this scope"
+eval u@(Unbound name _) (syms, args) = 
+  case sLookupSingle name syms of 
+    Nothing ->
+      case args of
+        [] -> (Val (u, []), (sAdd name (Val (u, [])) syms, []))
+        (Nothing:as) -> (Val (u, []), (sAdd name (Val (u, [])) syms, []))
+        ((Just a):as) -> trace ("consuming one argument to fill " ++ name ++": (" ++ show a ++ "). new args is " ++ show as) (a, (sAdd name a syms, as))
+    Just _ -> error $ "Variable " ++ name ++ " has already been used in this scope"
 
-pushEnv :: Env -> Env
-pushEnv env = (Map.empty):env
+{--------------- Assignment --------------}
+eval (Assign name rhs next) (syms, args) = trace ("evaluating the assignment of " ++ name ++ " to " ++ show rhs ++ " under context " ++ show (syms,args)) $ 
+  case sLookupSingle name syms of
+    Nothing ->
+      let
+        -- map name to (unevaluated) RHS and current symbol table
+        symsWithName = trace ("1" ++ name ++ ") storing " ++ name ++ " to " ++ show (Val (rhs, syms))) sAdd name (Val (rhs, syms)) syms
+        -- evaluate right-hand side with this mapping
+        (rhsVal, (newSyms, newArgs)) = trace ("2" ++ name ++ ") evaluating " ++ show rhs ++ " with " ++ show (symsWithName, args)) eval rhs (symsWithName, args)
+        -- update symbol table with evaluated RHS
+        --newSyms = trace ("3" ++ name ++ ") updating symbol table with " ++ name ++ " stored to " ++ show rhsVal) sAdd name rhsVal symsWithName
+      in
+      -- pass this updated context into the evaluation of the next expression
+      trace ("4" ++ name ++ ") evaluating " ++ show next ++ " with " ++ show (newSyms, newArgs)) eval next (newSyms, newArgs)
+    Just _ -> error $ name ++ " cannot be redeclared in the same scope"
 
-popEnv :: Env -> Env
-popEnv (env:envs) = envs
-popEnv [] = error "Can't pop from an empty stack"
+{------------ Binary functions -----------}
+eval (Binary op l r) ctx = case op of
+  "+" -> evalNumOp (+)
+  "-" -> evalNumOp (-)
+  "*" -> evalNumOp (*)
+  "/" -> evalNumOp (/)
+  "^" -> evalNumOp (**)
+  ">" -> evalCompOp (>)
+  "<" -> evalCompOp (<)
+  "<=" -> evalCompOp (<=)
+  ">=" -> evalCompOp (>=)
+  "==" -> evalCompOp (==)
+  "!=" -> evalCompOp (/=)
+  "&&" -> evalLogOp (&&)
+  "||" -> evalLogOp (||)
+  otherwise -> error $ "we can't handle " ++ op ++ " yet"
+  where 
+    (valL, ctxL) = trace ("LEFT: context before evaluating " ++ show l ++ " was " ++ show ctx) eval l ctx
+    (valR, ctxR) = trace ("RIGHT: context before evaluating " ++ show r ++ " was " ++ show ctxL) eval r ctxL
+    {- in all of these, if we can resolve it we do; otherwise we return -}
+    evalNumOp o = case (valL, valR) of
+      (Val (Number a, _), Val (Number b, _)) -> trace ("passing on context: " ++ show ctxR) (Val(Number $ o a b, []), ctxR)
+      otherwise -> (Val (Binary op l r, []), ctxR)
+    evalCompOp o = case (valL, valR) of
+      (Val (a@(Number _), _), Val (b@(Number _), _)) -> (Val(Bool $ o a b, []), ctxR)
+      (Val (a@(Bool _), _), Val (b@(Bool _), _)) -> (Val(Bool $ o a b, []), ctxR)
+      (Val (Number _, _), Val (Bool _, _)) -> error $ "Type mismatch: " ++ show (l,r)
+      (Val (Bool _, _), Val (Number _, _)) -> error $ "Type mismatch: " ++ show (l,r)
+      otherwise -> (Val (Binary op l r, []), ctxR)
+    evalLogOp o = case (valL, valR) of
+      (Val (Bool a, _), Val (Bool b, _)) -> (Val(Bool $ o a b, []), ctxR)
+      otherwise -> (Val (Binary op l r, []), ctxR)
 
-eval :: Env -> Args -> Expression -> (Value, Env, Args, PType)
-eval env args (PNum n)        = (NumV n, env, args, NumT)
-eval env args (PChar c)       = (CharV c, env, args, CharT)
-eval env args (PString s)     = (StringV s, env, args, StringT)
-eval env args (PBool b)       = (BoolV b, env, args, BoolT)
--- When we see an unbound variable, if there are no arguments, leave it as unbound (ArgV)
-eval env []   (Unbound nm t)  = (ArgV nm t, addVar nm (ArgV nm t) env, [], t)
--- if there are arguments, but it's a Null arg, treat it as if there weren't any argument.
-eval env (NullV:as) (Unbound nm t)  = (ArgV nm t, addVar nm (ArgV nm t) env, as, t)
--- otherwise, consume the argument and store the mapping. Later we'll typecheck
-eval env (a:as) (Unbound nm t) = (a, addVar nm a env, as, t)
+{------------ Unary functions -----------}
+eval (Unary op e) ctx = case op of
+  "-" -> evalNumOp negate
+  otherwise -> error $ "we can't handle " ++ op ++ " yet"
+  where
+    (v, ctx') = eval e ctx
+    evalNumOp oper = case v of
+      Val (Number a, _) -> (Val (Number $ negate a, []), ctx')
+      otherwise -> (Val (Unary op e, []), ctx')
 
-eval env args (Var name) =
-  trace ("looking up " ++ name ++ ": " ++ show (fLookup env name)) $
-    case fLookup env name of
-      Just (FunV env' expr) -> trace (name ++ " is a fun") $ eval (updateEnv env' env) args expr
-      Just (NumV n) -> (NumV n, env, args, NumT)
-      Just (BoolV b) -> (BoolV b, env, args, BoolT)
-      Just (CharV c) -> (CharV c, env, args, CharT)
-      Just (StringV s) -> (StringV s, env, args, StringT)
-      Just (ArgV n t) -> (ArgV n t, env, args, t)
-      Just x -> error $ "wtf is this thing: " ++ show x
-      Nothing -> error $ "Variable " ++ name ++ " not defined in scope"
+{---------- Lambda expressions ----------}
+eval (Lambda e) (syms, args) = trace ("evaluating lmbda, context is " ++ show (syms, args) ++ ", expression is " ++ show e) (res, ctx) where
+  ctx = (syms, args')
+  (v@(Val (e', c)), (_, args')) = trace ("result of evaluation is " ++ show (eval e (syms, args))) $ eval e (syms, args)
+  res = case e' of
+    Number n -> v
+    PString s -> v
+    PChar c -> v
+    Bool b -> v
+    other@(_) -> trace ("returning new lambda: " ++ show (Val ((Lambda other), syms))) Val ((Lambda other), syms)
 
-eval env args (Binary sym l r) =
-  case sym of
-    "+" -> evalNumOp (+)
-    "-" -> evalNumOp (-)
-    "*" -> evalNumOp (*)
-    "/" -> evalNumOp (/)
-    "^" -> evalNumOp (***)
-    ">" -> evalCompOp (>)
-    "<" -> evalCompOp (<)
-    "<=" -> evalCompOp (<=)
-    ">=" -> evalCompOp (>=)
-    "==" -> evalCompOp (==)
-    "!=" -> evalCompOp (/=)
-    "&&" -> evalLogOp (&&&)
-    "||" -> evalLogOp (|||)
-    otherwise -> error $ "we can't handle " ++ sym ++ " yet"
-    where 
-      (valL, envL, argsL, tL) = eval env args l -- get result of left side and new env/args
-      (valR, envR, argsR, tR) = eval envL argsL r -- pipe left's env/args in for right side
-      evalNumOp op = 
-        case (tL, tR) of
-          (NumT, NumT) -> numTBinEval (op valL valR) NumT
-          otherwise -> typErr tL tR
-      evalCompOp op =
-        case (tL, tR) of
-          (NumT, NumT) -> numTBinEval (BoolV $ op valL valR) BoolT
-          (CharT, CharT) -> (BoolV $ op valL valR, envR, argsR, BoolT)
-          otherwise -> typErr tL tR
-      evalLogOp op = -- doesn't short-circuit, yet
-        case (tL, tR) of
-          (BoolT, BoolT) -> (op valL valR, envR, argsR, BoolT)
-          otherwise -> typErr tL tR
-      typErr tL tR = error $ sym ++ " can't be applied to " ++ show (tL, tR)
-      numTBinEval ev typ = trace ("evaling binop, valL, valR = " ++ show (valL, valR)) $
-        case (valL, valR) of
-          (NumV _, NumV _) -> (ev, envR, argsR, typ)
-          (NumV _, ArgV _ _) -> newBin envR (toExpr valL) (toExpr valR)
-          (ArgV _ _, NumV _) -> newBin envR (toExpr valL) (toExpr valR)
-          (ArgV _ _, ArgV _ _) -> newBin envR (toExpr valL) (toExpr valR)
-          (NumV _, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
-          (FunV env' expr', NumV _) -> newBin (updateEnv envR env') expr' (toExpr valR)
-          (ArgV _ _, FunV env' expr') -> newBin (updateEnv envR env') (toExpr valL) expr'
-          (FunV env' expr', ArgV _ _) -> newBin (updateEnv envR env') expr' (toExpr valR)
-          (FunV env1 expr1, FunV env2 expr2) ->
-            newBin (updateEnv (updateEnv envR env1) env2) expr1 expr2
-          where newBin env' e1 e2 = (FunV env' $ Binary sym e1 e2, env', argsR, typ)
+{---------- Call with arguments ---------}
+eval (Call f es) ctx = eval f ctx' where
+  -- map an evaluation over all of the expressions in the list, carrying the context through
+  -- each time. These expressions are the arguments to the functions we're calling.
+  (args', (syms, args)) = eval' es ctx
+  -- append these arguments to the top of our argument list, and evaluate the function with them.
+  ctx' = trace ("constructing this context: " ++ show (syms, args' ++ args) ++ "result is: " ++ show (eval f (syms, args' ++ args))) (syms, args' ++ args)
+  eval' [] context = ([], context)
+  eval' ([Just x]) context = 
+    let (v, context') = eval x context in
+    ([Just v], context')
+  eval' ([Nothing]) context = ([Nothing], context)
+  eval' (e:es) context = 
+    let (vs, context') = eval' es context in
+    case e of
+      Just x -> 
+        let (v, context'') = eval x context' in 
+        ((Just v):vs, context'')
+      Nothing ->
+        (Nothing:vs, context')
 
-eval env args (Unary sym e) =
-  let (val, env', args', t) = eval env args e in
-  case sym of 
-    "-" ->
-      case t of 
-        NumT -> 
-          case val of
-            NumV _ -> (negate val, env', args', NumT)
-            ArgV _ _ -> newUn env' (toExpr val)
-            FunV env'' expr -> newUn (updateEnv env' env'') expr
-            where newUn envi ex = (FunV envi $ Unary sym ex, envi, args', NumT)
-        otherwise -> error $ "Error: " ++ sym ++ " can't be applied to " ++ show t
-    "!" -> 
-      case t of
-        BoolT ->
-          case val of
-            BoolV b -> (BoolV $ not b, env', args', BoolT)
-            ArgV _ _ -> newUn env' (toExpr val)
-            FunV env'' expr -> newUn (updateEnv env' env'') expr
-            where newUn envi ex = (FunV envi $ Unary sym ex, envi, args', BoolT)
-        otherwise -> error $ "Error: " ++ sym ++ " can't be applied to " ++ show t
-    otherwise -> error "bloops"
-
-eval env args (Lambda e) =
-  let (val, env', args', t) = trace ("evaling lmda, args are " ++ show args) $ eval (pushEnv env) args e in
-  (FunV env e, env, args, t)
-
-eval env args (Assign name expr next) = 
-  let (rhs, envR, argsR, tR) = trace ("evaling rhs, args are " ++ show args) $ eval env args expr in
-  trace ("result of eval is " ++ show rhs) $
-    eval (addVar name rhs envR) argsR next
-
-eval env args (Conditional c t f) =
-  let 
-    (cV, envC, argsC, tC) = trace ("evaling condition ") $ eval env args c 
-    (tV, envT, argsT, tT) = trace ("cond eval'd to " ++ show cV) $ eval envC argsC t 
-    (fV, envF, argsF, tF) = trace ("cond eval'd to " ++ show cV) $ eval envT argsT f 
-  in
-  trace ("evaluating a conditional, args are " ++ show args) $
-    if tC /= BoolT then error "Type of a condition must be Bool"
-      else if tT /= tF then error "Types of branches in if statement don't match"
-        else
-          case cV of
-          BoolV True -> eval envC argsC t
-          BoolV False -> eval envC argsC f
-          FunV env' expr | tC == BoolT ->
-            (FunV (updateEnv env' envC) (Conditional expr t f), envC, argsC, tF)
-          otherwise -> error "if statement condition doesn't resolve to a bool"
-
-eval env args (Call f es) = trace ("choosing whether to call " ++ show f ++ " with args "++ show es) $
-  let
-    evArgs = (map (toFunV env) es)
-    toFunV env (Just e) = FunV env e
-    toFunV env Nothing = NullV
-    shouldEval = not $ hasArgV evArgs
-    hasArgV [] = trace "no argv found" False
-    hasArgV ((ArgV _ _):_) = True
-    hasArgV (_ : as) = hasArgV as
-  in
-  if shouldEval then
-    trace ("calling " ++ show f ++ " with args " ++ show evArgs) $ eval env (evArgs ++ args) f
-    else trace ("decided not to eval") (FunV env (Call f es), env, args, NumT)
+eval (Conditional c t f) ctx =
+  let (condV, ctxAfterCond) = eval c ctx in
+  case condV of
+    Val (Bool True, _) -> eval t ctxAfterCond
+    Val (Bool False, _) -> eval f ctxAfterCond
+    -- if not literally true or false, return with updated condition
+    -- (Later we'll want to add type checking to this...)
+    Val (e@(_), _) -> (Val (Conditional e t f, getSyms ctx), ctx)
