@@ -19,6 +19,9 @@ instance Show Val where
     [] -> "(" ++ show e ++ ", empty symtable)"
     otherwise -> "(λ{" ++ show e ++ ", " ++ show syms ++ "})"
 
+{------------ switchable trace' ---------------}
+trace' s a = if False then trace s a else a
+
 {---------- Symbol table operations ----------}
 
 sLookup :: String -> [SymTable] -> Maybe Val
@@ -32,8 +35,8 @@ sLookupSingle _ [] = Nothing
 sLookupSingle name tbls = Map.lookup name ((getTable . head) tbls)
 
 sAdd :: String -> Val -> [SymTable] -> [SymTable]
-sAdd s r [] = trace ("adding " ++ s ++ "=>" ++ show r ++ " to a new symtable") [SymTable $ Map.singleton s r]
-sAdd s r ((SymTable tbl):tbls) = trace ("adding " ++ s ++ " to an existing symtable") $ (SymTable $ Map.insert s r tbl):tbls
+sAdd s r [] = trace' ("adding " ++ s ++ "=>" ++ show r ++ " to a new symtable") [SymTable $ Map.singleton s r]
+sAdd s r ((SymTable tbl):tbls) = trace' ("adding " ++ s ++ " to an existing symtable") $ (SymTable $ Map.insert s r tbl):tbls
 
 getSyms :: Context -> [SymTable]
 getSyms (ss, _) = ss
@@ -66,7 +69,7 @@ eval e@(PString _) ctx = (Val (e, []), ctx)
 eval e@(Bool    _) ctx = (Val (e, []), ctx)
 
 {--------------- Variables ---------------}
-eval (Var name) (syms0, args0) = trace ("looking up " ++ name ++ ", resolves to " ++ show (sLookup name syms0)) $ case sLookup name syms0 of
+eval (Var name) (syms0, args0) = trace' ("looking up " ++ name ++ ", resolves to " ++ show (sLookup name syms0)) $ case sLookup name syms0 of
   Just (Val (e, syms1)) -> 
     let (val, (syms2, args1)) = eval e (syms1, args0) in
     (val, (syms0, args1))
@@ -77,23 +80,23 @@ eval u@(Unbound name _) (syms, args) =
       case args of
         [] -> (Val (u, []), (sAdd name (Val (u, [])) syms, []))
         (Nothing:as) -> (Val (u, []), (sAdd name (Val (u, [])) syms, []))
-        ((Just a):as) -> trace ("consuming one argument to fill " ++ name ++": (" ++ show a ++ "). new args is " ++ show as) (a, (sAdd name a syms, as))
+        ((Just a):as) -> trace' ("consuming one argument to fill " ++ name ++": (" ++ show a ++ "). new args is " ++ show as) (a, (sAdd name a syms, as))
     Just _ -> error $ "Variable " ++ name ++ " has already been used in this scope"
 
 {--------------- Assignment --------------}
-eval (Assign name rhs next) (syms, args) = trace ("evaluating the assignment of " ++ name ++ " to " ++ show rhs ++ " under context " ++ show (syms,args)) $ 
+eval (Assign name rhs next) (syms, args) = trace' ("evaluating the assignment of " ++ name ++ " to " ++ show rhs ++ " under context " ++ show (syms,args)) $ 
   case sLookupSingle name syms of
     Nothing ->
       let
         -- map name to (unevaluated) RHS and current symbol table
-        symsWithName = trace ("1" ++ name ++ ") storing " ++ name ++ " to " ++ show (Val (rhs, syms))) sAdd name (Val (rhs, syms)) syms
+        symsWithName = trace' ("1" ++ name ++ ") storing " ++ name ++ " to " ++ show (Val (rhs, syms))) sAdd name (Val (rhs, syms)) syms
         -- evaluate right-hand side with this mapping
-        (rhsVal, (newSyms, newArgs)) = trace ("2" ++ name ++ ") evaluating " ++ show rhs ++ " with " ++ show (symsWithName, args)) eval rhs (symsWithName, args)
+        (rhsVal, (newSyms, newArgs)) = trace' ("2" ++ name ++ ") evaluating " ++ show rhs ++ " with " ++ show (symsWithName, args)) eval rhs (symsWithName, args)
         -- update symbol table with evaluated RHS
-        --newSyms = trace ("3" ++ name ++ ") updating symbol table with " ++ name ++ " stored to " ++ show rhsVal) sAdd name rhsVal symsWithName
+        --newSyms = trace' ("3" ++ name ++ ") updating symbol table with " ++ name ++ " stored to " ++ show rhsVal) sAdd name rhsVal symsWithName
       in
       -- pass this updated context into the evaluation of the next expression
-      trace ("4" ++ name ++ ") evaluating " ++ show next ++ " with " ++ show (newSyms, newArgs)) eval next (newSyms, newArgs)
+      trace' ("4" ++ name ++ ") evaluating " ++ show next ++ " with " ++ show (newSyms, newArgs)) eval next (newSyms, newArgs)
     Just _ -> error $ name ++ " cannot be redeclared in the same scope"
 
 {------------ Binary functions -----------}
@@ -113,11 +116,11 @@ eval (Binary op l r) ctx = case op of
   "||" -> evalLogOp (||)
   otherwise -> error $ "we can't handle " ++ op ++ " yet"
   where 
-    (valL, ctxL) = trace ("LEFT: context before evaluating " ++ show l ++ " was " ++ show ctx) eval l ctx
-    (valR, ctxR) = trace ("RIGHT: context before evaluating " ++ show r ++ " was " ++ show ctxL) eval r ctxL
+    (valL, ctxL) = trace' ("LEFT: context before evaluating " ++ show l ++ " was " ++ show ctx) eval l ctx
+    (valR, ctxR) = trace' ("RIGHT: context before evaluating " ++ show r ++ " was " ++ show ctxL) eval r ctxL
     {- in all of these, if we can resolve it we do; otherwise we return -}
     evalNumOp o = case (valL, valR) of
-      (Val (Number a, _), Val (Number b, _)) -> trace ("passing on context: " ++ show ctxR) (Val(Number $ o a b, []), ctxR)
+      (Val (Number a, _), Val (Number b, _)) -> trace' ("passing on context: " ++ show ctxR) (Val(Number $ o a b, []), ctxR)
       otherwise -> (Val (Binary op l r, []), ctxR)
     evalCompOp o = case (valL, valR) of
       (Val (a@(Number _), _), Val (b@(Number _), _)) -> (Val(Bool $ o a b, []), ctxR)
@@ -140,15 +143,15 @@ eval (Unary op e) ctx = case op of
       otherwise -> (Val (Unary op e, []), ctx')
 
 {---------- Lambda expressions ----------}
-eval (Lambda e) (syms, args) = trace ("evaluating lmbda, context is " ++ show (syms, args) ++ ", expression is " ++ show e) (res, ctx) where
+eval (Lambda e) (syms, args) = trace' ("evaluating lmbda, context is " ++ show (syms, args) ++ ", expression is " ++ show e) (res, ctx) where
   ctx = (syms, args')
-  (v@(Val (e', c)), (_, args')) = trace ("result of evaluation is " ++ show (eval e (syms, args))) $ eval e (syms, args)
+  (v@(Val (e', c)), (_, args')) = trace' ("result of evaluation is " ++ show (eval e (syms, args))) $ eval e (syms, args)
   res = case e' of
     Number n -> v
     PString s -> v
     PChar c -> v
     Bool b -> v
-    other@(_) -> trace ("returning new lambda: " ++ show (Val ((Lambda other), syms))) Val ((Lambda other), syms)
+    other@(_) -> trace' ("returning new lambda: " ++ show (Val ((Lambda other), syms))) Val ((Lambda other), syms)
 
 {---------- Call with arguments ---------}
 eval (Call f es) ctx = eval f ctx' where
@@ -156,7 +159,7 @@ eval (Call f es) ctx = eval f ctx' where
   -- each time. These expressions are the arguments to the functions we're calling.
   (args', (syms, args)) = eval' es ctx
   -- append these arguments to the top of our argument list, and evaluate the function with them.
-  ctx' = trace ("constructing this context: " ++ show (syms, args' ++ args) ++ "result is: " ++ show (eval f (syms, args' ++ args))) (syms, args' ++ args)
+  ctx' = trace' ("constructing this context: " ++ show (syms, args' ++ args) ++ "result is: " ++ show (eval f (syms, args' ++ args))) (syms, args' ++ args)
   eval' [] context = ([], context)
   eval' ([Just x]) context = 
     let (v, context') = eval x context in
