@@ -212,6 +212,17 @@ bsearchr[start, finish, target:num, v:vector[num]] = {
 bsearch = bsearchr(0, len(v:vector[num]), target:num, v)
 <-- note that bsearch only takes 2 variables (the vector and the target)
 
+<-- alternative definition of bsearch:
+bsearch[v:vector[num], target:num] = {
+    {
+      mid = elem(v, (start:num + finish:num)/2),
+      if target == mid then True, else
+        if start == finish then False, else
+          if target > mid then $(mid, finish), else
+            $(start, mid))
+  }(0, len(v))
+}
+
 <-- Now we can use bsearch for some stuff.
 contains5 = bsearch(,5) <-- specifying the target
 contains5({1,2,3,4,5,6,7,8,9,10}) <-- true
