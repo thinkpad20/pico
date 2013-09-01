@@ -1,8 +1,10 @@
-## Pico - a tiny functional language
+# Pico - a tiny functional language
+
+## Language Description
 
 ### Functions are Just Underspecified Expressions
 
-The main idea behind Pico is that the only difference between a function and a constant expression is that a function leaves some arguments unspecified. What do I mean by that? Well consider the expression:
+One of the main ideas in Pico is that the only difference between a function and a constant expression is that a function leaves some arguments unspecified. What do I mean by that? Well consider the expression:
 
 ```
 1 < 2
@@ -27,10 +29,12 @@ We are essentially saying that the statement `i <= 1 ? i : i * fact(i-1)` itself
 We therefore don't need to separate functions and expressions, because from a programmatic point of view, all that matters is whether there are any unresolved symbols in an expression, and then it becomes a function.
 
 ```
-fact = if i <= 1 then 1 else i * fact(i-1)
+fact = { if i:num < 2 then 1 else i:num * fact(i-1) }
 ```
 
-Even though we didn't say it, because there is an unresolved symbol in fact (namely `i`), we know that fact is a function which takes one variable; i.e. it's a function which requires one variable to become a constant expression. We can also see that the way to make this function into an expression is to satisfy its unresolved symbol:
+First things first: The curly braces introduce a new lexical scope, so that even if there is some `i` defined in an earlier context, this `i` will override it (otherwise, we'd have an error). The `:num` indicates `i` is a number.
+
+Now even though we didn't explicitly say it, because there is an unresolved symbol in fact (namely `i`), we know that `fact` is a function which takes one variable; i.e. it's a function which requires one variable to become a constant expression. We can also see that the way to make this function into an expression is to satisfy its unresolved symbol:
 
 ```
 a = fact(10)
@@ -42,14 +46,14 @@ a = 3628800 <-- equivalent
 What if we only provide some of an expression's arguments? Consider:
 
 ```
-foo = a - b * c
+foo = { a:num - b:num * c:num }
 foo' = foo(2)
 ```
 
-So then foo is a function with three unresolved symbols. What then, is `foo'`? Functional programmers will know this as currying: `a` is no longer unresolved, so `foo` has two unresolved symbols, so `foo'` is a function on two variables. Then the statement `bar = foo'(3,4)` resolves to `2 - 3 * 4 = -10`. But what about `b` and `c`? If we set `b` equal to 2 instead of `a`, then we still have two unresolved symbols. But now calling this function on `(3,4)` would resolve to `3 - 2 * 4 = -5`. We can see that on a function with initially `n` symbols unresolved, we can potentially construct `2^n - 1` child functions from it (not `2^n` since providing all `n` arguments results in a constant expression). This is an extended idea of currying. Pico provides a syntax for this:
+We can see that `foo` is a function with three unresolved symbols. What then, is `foo'`? Functional programmers will know this as currying: `a` is no longer unresolved, so `foo` has two unresolved symbols; therefore `foo'` is a function on two variables. Then the statement `bar = foo'(3,4)` resolves to `2 - 3 * 4 = -10`. But what about `b` and `c`? If we set `b` equal to 2 instead of `a`, then we still have two unresolved symbols. But now calling this function on `(3,4)` would resolve to `3 - 2 * 4 = -5`. We can see that on a function with initially `n` symbols unresolved, we can potentially construct `2^n - 1` child functions from it (not `2^n` since providing all `n` arguments results in a constant expression). This is an extended idea of currying. Pico provides a syntax for this:
 
 ```
-foo = a * b - c
+foo = {a:num * b:num - c:num}
 foo1 = foo(2) <-- foo with a=2
 foo1(3,4) <-- 2
 
@@ -63,10 +67,10 @@ foo4 = foo(1,,2) <-- foo with a=1, c=2
 foo4(5) <-- 3
 ```
 
-Or we could use a dictionary-style syntax:
+To make things clearer, we could use a dictionary-style syntax:
 
 ```
-bar = (a * b + c^2)^d
+bar = {(a:num * b:num + c:num ^ 2) ^ d:num }
 bar1 = bar(a=5, c=4)
 bar1(6, 2) <-- 2116
 bar(a=5, c=4)(b=6, d=2) <-- 2116
@@ -75,59 +79,70 @@ bar(a=5, c=4)(b=6, d=2) <-- 2116
 Of course, inside of an expression there might be other expressions, or assignments. Then we could have something like this tail-recursive factorial function:
 
 ```
-fact = (fact' = if n' < 2 then acc else fact'(n'-1, acc*n'), fact'(n, 1))
+fact = {
+  fact' = {
+    if n':num < 2 then acc:num else fact'(n'-1, acc*n')
+  }, 
+  fact'(n:num, 1)
+}
 fact(10) <-- 3628800
 ``` 
 
-Here `fact'` is internal to `fact` (and would not be visible to other functions). `fact` has one unresolved symbol, `n`, while `fact'` seems to have two, `n'` and `acc`. But actually `fact'` is constant for any input of `n`, so we can consider its symbols to be resolved. But if `n'` is not provided, then the story changes. So we could write the same thing as
+Here `fact'` is internal to `fact` (and would not be visible to other functions, because of the curly braces). `fact` has one unresolved symbol, `n`, while `fact'` seems to have two, `n'` and `acc`. But actually `fact'` is constant for any input of `n`, so we can consider its symbols to be resolved. But if `n'` is not provided, then the story changes. So we could write the same thing as
 
 ```
-fact = (fact' = if n' < 2 then acc else fact'(n'-1, acc*n'), fact'(,1))
+fact = {fact' = {if n:num < 2 then acc:num else fact'(n-1, acc*n)}, fact'(,1)}
 fact(10) <-- 3628800
 ``` 
 
-This works the same way, because `fact(,1)` provides one symbol to `fact'` (calling it with `acc` = 1), leaving one symbol (`n'`) unresolved. Then `fact` is still a function of one variable. It might be easier to think of the `10` passed into `fact` being effectively handed to `fact'`. We could also write:
+This works the same way, because `fact(,1)` provides one symbol to `fact'` (calling it with `acc` = 1), leaving one symbol (`n`) unresolved. Then `fact` is still a function of one variable. It might be easier to think of the `10` passed into `fact` being effectively handed to `fact'`.
+
+### Anonymous recursion
+
+The function `fact'` is only relevant inside of `fact`, and is only used once, so we really shouldn't need to name it. However, since it recurses, we need to be able to call it from inside itself, suggesting it needs a name. Pico solves this by introducing anonymous recursion. We can use the symbol `$` to indicate "call this function again with these arguments". This meanse make the above definition of `fact` even more concise:
 
 ```
-fact = (if n < 2 then acc else %(n-1, acc*n))(,1)
+fact = {{if n:num < 2 then acc:num else $(n-1, acc*n)}(,1)}
 ```
 
-The `%` indicates that the calling expression should be invoked again with the arguments indicated, letting us recurse on anonymous functions.
+Note that the double curly braces are required; otherwise the `$` would call `fact` itself with two arguments, which would be an error.
+
+### More Partial Application Examples
 
 Let's look at some more complicated examples of partial application, with a first look at function composition.
 
 ```
-foo = (bar = i, bar)
+foo = {bar = i:num, bar}
 foo' = foo(1) <-- what happens here?
 ```
 
-This one is obvious: `foo'` equals 1. How about this?
+This one is obvious: `foo'` passes 1 into foo, which assigns bar to 1 and returns bar, so `foo'` equals 1. How about this?
 
 ```
-foo = (bar = baz(i), bar)
+foo = {bar = baz(i:num), bar}
 foo' = foo(1) <-- what happens here?
 ```
 
-What is `foo'`? Well, `foo` returns `bar`, which is itself a function with `i` unresolved, so `foo' = bar(1) = baz(1)`. We can think alternatively `foo` having no unresolved symbols, so it passes `i` down the chain. Let's make it a little more complex:
+Here, `foo' = bar(1) = baz(1)`. Let's make it a little more complex:
 
 ```
-foo = (
-   bar = (
-      buzz = baz(i), herp = derp(j), 
-      buzz + herp), 
-   bar)
+foo = {
+   bar = {
+      buzz = baz(i:num), herp = derp(j:num), 
+      buzz + herp}, 
+   bar}
 foo' = foo(1) <-- how about this?
 ```
 
-The easy way to look at it is to find the first unresolved variable and replace it with `1`, and see what we have. `foo` has no unresolved variables, and neither does `bar`, but `buzz` does: `i`. Resolving `i` resolves `buzz`, leaving `bar` as `baz(1) + derp(j)`. Since `foo` resolves simply to `bar`, `foo' = bar = baz(1) + derp(j)`.
+The easy way to look at it is to find the first unresolved variable and replace it with `1`, and see what we have. `foo` has no unresolved variables (returning the function `bar`), but `bar` has two: `i` and `j`. Resolving `i` resolves `buzz`, leaving `bar` as `baz(1) + derp(j:num)`. Since `foo` resolves simply to `bar`, `foo' = bar(1) = {baz(1) + derp(j:num)}`, and `foo'` is a function of one variable.
 
 ### New Functions through Function Combination
 
 In the example above, `bar` resolved to `buzz + herp`, but `buzz` and `herp` were each unresolved expressions themselves, so `bar` is a function created by combining two functions. Just as we can provide arguments to create new functions, we can add expressions to a function or combine it with other functions and create new functions.
 
 ```
-foo = a + b <-- foo is a function of two variables
-bar = c - d <-- bar is a function of two variables
+foo = {a:num + b:num} <-- foo is a function of two variables
+bar = {c:num - d:num} <-- bar is a function of two variables
 baz = foo * bar <-- baz is a function of four variables
 baz(3,4) <-- equivalent to foo(3,4) * bar
 baz(3,4,5,6) <-- equivalent to foo(3,4) * bar(5,6) = (3 + 4) * (5 - 6) = -1
@@ -136,8 +151,8 @@ baz(3,4,5,6) <-- equivalent to foo(3,4) * bar(5,6) = (3 + 4) * (5 - 6) = -1
 Note that because functions have separate namespaces, combining two functions can result in namespace collisions. In these cases, if we want to use dictionary syntax to call the function, we have to indicate which function's variables we're supplying. This is similar to SQL.
 
 ```
-foo = a * b
-bar = a / b <-- bar can't see foo's a and b, so they are unrelated variables
+foo = {a:num * b:num}
+bar = {a:num / b:num} <-- bar can't see foo's a and b, so they are unrelated variables
 qux = foo^bar <-- this is NOT the same as (a * b) ^ (a * b). It's the same as (foo.a * foo.b) ^ (bar.a * bar.b).
 lux = qux(foo.a = 4, bar.b = 5) <-- lux gives two args to qux, so lux is a function of 2 variables
 bux = lux(,10) <-- second unbound variable is now bar.a, foo.b still unbound
@@ -149,60 +164,69 @@ dux = bux(3)   <-- no unbound variables, now we can resolve:
 Going further off of SQL inspiration, we could create aliases for some of these functions:
 
 ```
-foo = a * b
-bar = a / b
+foo = {a:num * b:num}
+bar = {a:num / b:num}
 qux = (foo f)^(bar b)
 lux = qux(f.a = 12, f.b = 3, b.a = 4, b.b = 8) <-- = (12 * 3)^(1/2) = 6
 ```
 
 ### Typed vs. Dynamic and Unbound Variable Specification
 
-I'm currently debating whether to make Pico a dynamic language. They have their benefits. There are many advantages to typing, however, and one in this case is simply that it better indicates which variables are unbound:
+Pico is a strongly typed language. Dynamic languages have their benefits, but there are many advantages to typing. One advantage in the case of Pico is simply that it better indicates which variables are unbound:
 
 ```
-fact = if n:num < 2 then acc:num else fact(n-1, acc*n) <-- function of two variables
+fact = {if n:num < 2 then acc:num else fact(n-1, acc*n)} <-- function of two variables
 fact1 = fact(,1) <-- partial application leaves fact1 a function of 1 variable
 fact2 = fact(acc=1) <-- different syntax, same result
-fact3 = fact(n:num, 1) <-- note that this n is distinct from fact's n, so fact3 still has one unbound variable
-fact4 = fact(n = n:num, acc = 1) <-- once again specifier:num means n is a new, unbound variable
+fact3 = {fact(n:num, 1)} <-- note that this n is distinct from fact's n, so fact3 still has one unbound variable, and we need {} to indicate lexical scope
+fact4 = {fact(n = n:num, acc = 1)} <-- once again specifier:num means n is a new, unbound variable
 n = 10
-fact5 = fact(n,1) <-- now n is bound, so fact4 is the constant expression 3628800
+fact5 = fact(n,1) <-- n is defined, and this isn't a new lexical scope, so fact4 is the constant expression 3628800
 fact6 = fact3(n) <-- constant expression 3628800
 ```
 
-This would also allow the writer to indicate off the bat which unbound variables there were:
+We might extend the language to allow the writer (optionally) to indicate which unbound variables there are:
 
 ```
-comp = (i:num, j, if i < j then -1 else (if i > j then 0 else 1))
+comp[i:num, j:num] = (if i < j then -1 else if i > j then 0 else 1)
 ```
+
+The [] syntax would indicate the start of a new lexical scope, omitting the need for {} on the right side.
+
+## Data Structures
+
+How we handle data structures in Pico is still largely up in the air. However, let's imagine that we have polymorphic types, and a Vector type.
 
 Let's look at a little more significant code, writing binary search over a vector.
 
 ```
-bsearchr = (start:num, finish, target, Vector(Int) v, <-- 4 unbound variables
-            mid = (start + finish)/2, <-- not unbound
-            if target == v[mid] then True, else
-            if start == finish then False, else
-            if target > v[mid] then bsearchr(mid, finish, target, v), else
-            if target < v[mid] then bsearchr(start, mid, target, v))
+bsearchr[start, finish, target:num, v:vector[num]] = {
+   mid = elem(v, (start + finish)/2),
+   if target == mid then True, else
+      if start == finish then False, else
+         if target > mid then $(mid, finish, target, v), else
+            $(start, mid, target, v))
+}
 
-bsearch = bsearchr(0, len(Vector(Int) v), target:num, v) <-- here we've inlined the variable declarations
+<-- here we'll inline the variable declarations
+bsearch = bsearchr(0, len(v:vector[num]), target:num, v)
+<-- note that bsearch only takes 2 variables (the vector and the target)
 
 <-- Now we can use bsearch for some stuff.
-contains5 = bsearch(,5)
-v = {1,2,3,4,5,6,7,8,9,10}
-vcontains = bsearch(v)
-vcontains(6) <-- true
-vcontains(11) <-- false
+contains5 = bsearch(,5) <-- specifying the target
+contains5({1,2,3,4,5,6,7,8,9,10}) <-- true
+
+inTen = bsearch({1,2,3,4,5,6,7,8,9,10}) <-- specifying the vector
+inTen(6) <-- true
+inTen(11) <-- false
 
 <-- note that the below is a meaningless function; it's just there 
 <-- to illustrate combining two functions with an OR.
-usableVector = (contains5 || vcontains)
+usableVector = contains5 || vcontains <-- note, takes two variables
 usableVector({1,2,3,4}, 5) <-- true
 usableVector({1,2,3}, 12) <-- false
 
-<-- one interesting thing is that we could make the OR operator short-circuit, so 
-<-- that the following resolves to True even though it has unbound variables.
+<-- one interesting thing is that we could make the OR operator short-circuit, so that the following resolves to True even though it has unbound variables.
 usableVector({1,2,3,4,5}) <-- contains 5, so resolves to true.
 usableVector({1,2,3,4}) <-- is a function equivalent to vcontains
 
@@ -211,29 +235,19 @@ f = (if i:num != i then j:num, else 1) <-- given any argument, f will always res
 f(123) <-- 1
 ```
 
-### Future: Algebraic Types
+## Current Status 
 
-As a functional language, Pico will have algebraic types. Consider a List which is either `Empty` or `Cons(elem, List)`, and a `when` statement which acts as a pattern matcher. Note that this vector usage might not be how we actually do it.
+A parser for Pico has been written using the Parsec library in Haskell. There is also an evaluator written in Haskell which is able to correctly evaluate arithmetic expressions, variable assignment, and some degree of functions (for example, it can correctly compute factorials and fibonacci numbers). It can also correctly handle partial function application in the Haskell style (i.e. providing arguments from left to right), but not yet in the arbitrary style (where a new function can be created by specifyin any subset of a function's variables). It supports treating functions as values (i.e. adding two functions to create a new function).
 
-```
-len = (when List l is Empty then acc:num, when l is Cons(_, next) then len(next, acc+1))
-fillVector = (l:list[num], v:vector[num], posn:num
-               when l is Empty then v,
-               when l is Cons(elem, next) then listToVector(next, add(v, posn, elem), posn - 1)),
-listToVector = (ln = len(l:list[int], 0),
-                v = vector[num](ln),
-                fillVector(l, v, ln - 1)).
+As of right now, only inline variable definitions are supported, and there are no data types besides primitives and functions.
 
-<{
-   Note: one curious question is what would happen if we defined it as such:
-   listToVector = (ln = len(, 0),
-                   v = vector[num](ln),
-                   fillVector(l, v, ln - 1))
-   The call to len supplies one argument, so ln is a function which takes a List as an argument. Then passing in a list to listToVector, the list would be passed to the first unbound variable, which is l in the len function. Then the l on the third line of listToVector would be undefined, which would either mean listToVector requires two (identical or same-length) lists as arguments, or if we require a type declaration in front of every unbound variable, then we have an error.
-}>                
-```
+## Future Directions
 
-### Pico Grammar
+Work will continue on Pico. The first priority is the correct evaluation of partial function application; next, I plan to add tuples and a list data type; after that, user-definable algebraic data types; finally, IO. IO in pico will not be handled purely; there will be a modifier on functions which use IO so that they can only be called by other IO functions. Further into the future, we may introduce concurrency primitives to Pico, most likely implementing a message-passing system.
+
+My ultimate hope is that Pico become a simple, yet robust, functional, typed scripting language. There are several scripting languages which are functional; however, none of them enforce functional purity, immutable variables, or static typing, all of which Pico does (outside of IO). Combining the simplicity of a scripting language with the bug-reducing features above, I believe, will result in a very powerful language.
+
+## Pico Grammar
 
 Pico is designed to be a very small language with minimal syntax. Currently the entire grammar is here (this will be expanded slightly to include algebraic types, pattern matching and possibly interfaces)
 

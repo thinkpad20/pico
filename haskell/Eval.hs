@@ -22,7 +22,7 @@ instance Show Val where
 {------------ switchable trace' ---------------}
 trace' s a = if False then trace s a else a
 
-{---------- Symbol table operations ----------}
+{---------- Symbol table operations -----------}
 
 sLookup :: String -> [SymTable] -> Maybe Val
 sLookup _ [] = Nothing
