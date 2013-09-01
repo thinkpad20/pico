@@ -237,15 +237,11 @@ f(123) <-- 1
 
 ## Current Status 
 
-A parser for Pico has been written using the Parsec library in Haskell. There is also an evaluator written in Haskell which is able to correctly evaluate arithmetic expressions, variable assignment, and some degree of functions (for example, it can correctly compute factorials and fibonacci numbers). It can also correctly handle partial function application in the Haskell style (i.e. providing arguments from left to right), but not yet in the arbitrary style (where a new function can be created by specifyin any subset of a function's variables). It supports treating functions as values (i.e. adding two functions to create a new function).
+The first parser for Pico was written using Lex and Yacc, with an AST representation in C++. I later switched to Haskell, but for those interested, the C++ code can be viewed in the `cpp` directory -- although it might not reflect the latest syntax or evaluation schemes in Pico.
+
+The current codebase for Pico can be found in the `haskell` directory. The parser is written using the `Parsec` library. There is also an evaluator written in Haskell which is able to correctly evaluate arithmetic expressions, variable assignment, and some degree of functions (for example, it can correctly compute factorials and fibonacci numbers). It can also correctly handle partial function application in the Haskell style (i.e. providing arguments from left to right), but not yet in the arbitrary style (where a new function can be created by specifying any subset of a function's variables). It supports treating functions as values (i.e. adding two functions to create a new function).
 
 As of right now, only inline variable definitions are supported, and there are no data types besides primitives and functions.
-
-## Future Directions
-
-Work will continue on Pico. The first priority is the correct evaluation of partial function application; next, I plan to add tuples and a list data type; after that, user-definable algebraic data types; finally, IO. IO in pico will not be handled purely; there will be a modifier on functions which use IO so that they can only be called by other IO functions. Further into the future, we may introduce concurrency primitives to Pico, most likely implementing a message-passing system.
-
-My ultimate hope is that Pico become a simple, yet robust, functional, typed scripting language. There are several scripting languages which are functional; however, none of them enforce functional purity, immutable variables, or static typing, all of which Pico does (outside of IO). Combining the simplicity of a scripting language with the bug-reducing features above, I believe, will result in a very powerful language.
 
 ## Running pico
 
@@ -261,6 +257,12 @@ Prelude> :load Eval.hs Parser.hs AST.hs
 ```
 
 `eval'` takes a String of pico code and returns a value and a context, where the context is a tuple of a symbol table and a list of arguments. In short, the 3628800.0 is the value of note here.
+
+## Future Directions
+
+There is much work left to be done on Pico. The first priority is the correct evaluation of partial function application; next, I will add syntactic support for specifying function parameters out-of-line; next, I plan to add tuples and a list data type; after that, user-definable algebraic data types; finally, IO. IO in pico will not be handled purely, but there will be a modifier on functions which use IO so that they can only be called by other IO functions to encourage purity whenever possible. Further into the future, we may introduce concurrency primitives to Pico, most likely implementing a message-passing system.
+
+My ultimate hope is that Pico become a simple, yet robust, functional, statically typed scripting language. There are several scripting languages which are functional; however, none of them enforce functional purity, immutable variables, or static typing, all of which Pico does (outside of IO). Combining the simplicity of a scripting language with the bug-reducing features above, I believe, will result in a very powerful language.
 
 ## Pico Grammar
 

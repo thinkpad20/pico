@@ -8,3 +8,6 @@ haskell/Main
 haskell/*.hi
 haskell/*.o
 haskell/scratch
+docs
+experimental
+.DS_Store
