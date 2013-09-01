@@ -193,7 +193,7 @@ comp[i:num, j:num] = (if i < j then -1 else if i > j then 0 else 1)
 
 The [] syntax would indicate the start of a new lexical scope, omitting the need for {} on the right side.
 
-## Data Structures
+### Data Structures
 
 How we handle data structures in Pico is still largely up in the air. However, let's imagine that we have polymorphic types, and a Vector type.
 
