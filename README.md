@@ -247,6 +247,21 @@ Work will continue on Pico. The first priority is the correct evaluation of part
 
 My ultimate hope is that Pico become a simple, yet robust, functional, typed scripting language. There are several scripting languages which are functional; however, none of them enforce functional purity, immutable variables, or static typing, all of which Pico does (outside of IO). Combining the simplicity of a scripting language with the bug-reducing features above, I believe, will result in a very powerful language.
 
+## Running pico
+
+As of right now, the best way to evaluate Pico code is using the `eval'` function from `Eval.hs` while in GHCi:
+
+```
+> cd haskell
+> ghci
+Prelude> :load Eval.hs Parser.hs AST.hs
+*PicoEval> eval' "fact = {if n:num < 2 then 1 else n * fact(n-1)}, fact(10)"
+((3628800.0, empty symtable),([<table>fact=>({if (n:NumT < 2.0) then 1.0 else (n * fact((n - 1.0)))}, empty symtable)</table>],[]))
+*PicoEval>
+```
+
+`eval'` takes a String of pico code and returns a value and a context, where the context is a tuple of a symbol table and a list of arguments. In short, the 3628800.0 is the value of note here.
+
 ## Pico Grammar
 
 Pico is designed to be a very small language with minimal syntax. Currently the entire grammar is here (this will be expanded slightly to include algebraic types, pattern matching and possibly interfaces)
